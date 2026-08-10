@@ -1,0 +1,6 @@
+# Packages allowed to run install scripts.
+#   unrs-resolver — native module resolver used by eslint-config-next's
+#                   TypeScript import resolver. Without its postinstall the
+#                   prebuilt binding is not linked and `pnpm lint` fails.
+allowBuilds:
+  unrs-resolver: true

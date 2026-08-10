@@ -1,0 +1,471 @@
+'use client'
+
+import { useId, useRef, useState } from 'react'
+import { CheckMark } from '@/components/ui/icons'
+import { cn, formatTemplate } from '@/lib/cn'
+import {
+  HONEYPOT_FIELD,
+  submitQuoteRequest,
+  type QuotePayload,
+} from '@/lib/quote-submission'
+import type { QuoteContent } from '@/types/content'
+import { useQuoteRequest } from './quote-request-context'
+
+type FieldName = keyof Omit<QuotePayload, 'consent' | 'website'>
+
+const emptyValues: Record<FieldName, string> = {
+  name: '',
+  company: '',
+  country: '',
+  email: '',
+  phone: '',
+  product: '',
+  message: '',
+}
+
+const requiredFields: readonly FieldName[] = [
+  'name',
+  'company',
+  'country',
+  'email',
+  'product',
+  'message',
+]
+
+/** Same shape the design validated against. */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+const inputClass =
+  'h-12 rounded-none border bg-raymar-ivory px-3.5 outline-none transition-[border-color,background-color] duration-300 focus:border-raymar-gold focus:bg-raymar-white'
+
+function fieldBorder(invalid: boolean): string {
+  return invalid ? 'border-raymar-alert-rule' : 'border-raymar-green/16'
+}
+
+interface QuoteFormProps {
+  content: QuoteContent
+}
+
+/**
+ * Quotation request form.
+ *
+ * Validation mirrors the approved design: required fields must be non-empty,
+ * the email must match, and the KVKK consent box must be ticked. Errors are
+ * announced through a live region and the first invalid control receives focus.
+ *
+ * Submission goes through `submitQuoteRequest`, which is a documented mock —
+ * see `src/lib/quote-submission.ts`. Field values are never logged.
+ */
+export function QuoteForm({ content }: QuoteFormProps) {
+  const formId = useId()
+  const formRef = useRef<HTMLFormElement>(null)
+  const { request } = useQuoteRequest()
+
+  const [values, setValues] = useState<Record<FieldName, string>>(emptyValues)
+  const [consent, setConsent] = useState(false)
+  const [invalid, setInvalid] = useState<ReadonlySet<string>>(new Set())
+  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
+  const [submitted, setSubmitted] = useState<Record<FieldName, string>>(emptyValues)
+  const [appliedRequest, setAppliedRequest] = useState<number | null>(null)
+
+  const fieldId = (name: string) => `${formId}-${name}`
+
+  // A product card asked for a quote: preselect the group, prefill the message
+  // if the visitor has not written one, and return from the success state.
+  //
+  // Adjusted during render rather than in an effect — React's documented
+  // pattern for deriving state from a changed input. The token guard makes it
+  // idempotent, so re-rendering for any other reason does not overwrite what
+  // the visitor has typed.
+  if (request && request.token !== appliedRequest) {
+    setAppliedRequest(request.token)
+    setStatus((current) => (current === 'success' ? 'idle' : current))
+    setValues((current) => ({
+      ...current,
+      product: content.productOptions.includes(request.group)
+        ? request.group
+        : content.otherProductOption,
+      message: current.message.trim()
+        ? current.message
+        : formatTemplate(content.prefillTemplate, { product: request.name }),
+    }))
+  }
+
+  const setField = (name: FieldName, value: string) => {
+    setValues((current) => ({ ...current, [name]: value }))
+    setInvalid((current) => {
+      if (!current.has(name)) return current
+      const next = new Set(current)
+      next.delete(name)
+      return next
+    })
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const nextInvalid = new Set<string>()
+    for (const name of requiredFields) {
+      if (values[name].trim() === '') nextInvalid.add(name)
+    }
+    if (!nextInvalid.has('email') && !EMAIL_PATTERN.test(values.email.trim())) {
+      nextInvalid.add('email')
+    }
+    if (!consent) nextInvalid.add('consent')
+
+    setInvalid(nextInvalid)
+
+    if (nextInvalid.size > 0) {
+      const consentOnly = nextInvalid.size === 1 && nextInvalid.has('consent')
+      setError(consentOnly ? content.errorConsent : content.errorGeneric)
+
+      const first = [...requiredFields, 'consent'].find((name) => nextInvalid.has(name))
+      if (first) document.getElementById(fieldId(first))?.focus()
+      return
+    }
+
+    setError(null)
+    setStatus('submitting')
+
+    const honeypot =
+      (formRef.current?.elements.namedItem(HONEYPOT_FIELD) as HTMLInputElement | null)
+        ?.value ?? ''
+
+    const result = await submitQuoteRequest({
+      ...values,
+      consent,
+      website: honeypot,
+    })
+
+    if (!result.ok) {
+      setStatus('idle')
+      setError(content.errorSubmit)
+      return
+    }
+
+    setSubmitted(values)
+    setStatus('success')
+  }
+
+  const handleReset = () => {
+    setValues(emptyValues)
+    setConsent(false)
+    setInvalid(new Set())
+    setError(null)
+    setStatus('idle')
+  }
+
+  const summaryRows: readonly (readonly [string, string])[] = [
+    [content.fields.name.label, submitted.name],
+    [content.fields.company.label, submitted.company],
+    [content.fields.country.label, submitted.country],
+    [content.fields.email.label, submitted.email],
+    [content.fields.phone.label, submitted.phone || content.emptyValue],
+    [content.fields.product.label, submitted.product],
+    [content.fields.message.label, submitted.message],
+  ]
+
+  if (status === 'success') {
+    return (
+      <div
+        aria-live="polite"
+        className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-13 pb-11.5 md:px-11.5 md:pt-13 md:pb-11.5"
+      >
+        <span
+          aria-hidden="true"
+          className="flex h-13 w-13 items-center justify-center rounded-full bg-raymar-gold/16 text-raymar-green"
+        >
+          <CheckMark />
+        </span>
+        <h3 className="mt-6.5 text-4xl leading-[1.08] text-raymar-green">
+          {content.successHeading}
+        </h3>
+        <p className="mt-4 max-w-[420px] text-[15.5px] leading-[1.75] font-light text-raymar-ink/82">
+          {content.successBody}
+        </p>
+
+        <div className="mt-8.5 border-t border-raymar-green/12 pt-6.5">
+          <div className="text-xs font-normal tracking-[0.24em] text-raymar-ink/78 uppercase">
+            {content.summaryLabel}
+          </div>
+          <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-7 gap-y-3 text-[14.5px]">
+            {summaryRows.map(([label, value]) => (
+              <div key={label} className="contents">
+                <dt className="m-0 font-normal whitespace-nowrap text-raymar-ink/78">
+                  {label}
+                </dt>
+                <dd className="m-0 leading-[1.6] font-light break-words text-raymar-ink">
+                  {value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleReset}
+          className="mt-9 inline-flex cursor-pointer items-center gap-2.5 border-0 border-b border-raymar-green/24 bg-transparent p-0 pb-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:border-raymar-gold"
+        >
+          {content.resetCta}
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <form
+      ref={formRef}
+      noValidate
+      onSubmit={handleSubmit}
+      className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-7.5 pb-7 md:px-11.5 md:pt-11.5 md:pb-10.5"
+    >
+      <div className="grid grid-cols-1 gap-x-6 gap-y-6.5 md:grid-cols-2">
+        <TextField
+          id={fieldId('name')}
+          name="name"
+          label={content.fields.name.label}
+          placeholder={content.fields.name.placeholder}
+          autoComplete="name"
+          required
+          value={values.name}
+          invalid={invalid.has('name')}
+          onChange={(value) => setField('name', value)}
+        />
+        <TextField
+          id={fieldId('company')}
+          name="company"
+          label={content.fields.company.label}
+          placeholder={content.fields.company.placeholder}
+          autoComplete="organization"
+          required
+          value={values.company}
+          invalid={invalid.has('company')}
+          onChange={(value) => setField('company', value)}
+        />
+        <TextField
+          id={fieldId('country')}
+          name="country"
+          label={content.fields.country.label}
+          placeholder={content.fields.country.placeholder}
+          autoComplete="country-name"
+          required
+          value={values.country}
+          invalid={invalid.has('country')}
+          onChange={(value) => setField('country', value)}
+        />
+        <TextField
+          id={fieldId('email')}
+          name="email"
+          type="email"
+          label={content.fields.email.label}
+          placeholder={content.fields.email.placeholder}
+          autoComplete="email"
+          required
+          value={values.email}
+          invalid={invalid.has('email')}
+          onChange={(value) => setField('email', value)}
+        />
+        <TextField
+          id={fieldId('phone')}
+          name="phone"
+          type="tel"
+          label={content.fields.phone.label}
+          placeholder={content.fields.phone.placeholder}
+          autoComplete="tel"
+          value={values.phone}
+          invalid={false}
+          onChange={(value) => setField('phone', value)}
+        />
+
+        <label className="flex flex-col gap-2.5">
+          <FieldLabel required>{content.fields.product.label}</FieldLabel>
+          <select
+            id={fieldId('product')}
+            name="product"
+            required
+            value={values.product}
+            aria-invalid={invalid.has('product') || undefined}
+            onChange={(event) => setField('product', event.target.value)}
+            className={cn(
+              inputClass,
+              fieldBorder(invalid.has('product')),
+              'appearance-none px-3',
+            )}
+          >
+            <option value="">{content.productPlaceholder}</option>
+            {content.productOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            <option value={content.otherProductOption}>
+              {content.otherProductOption}
+            </option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-2.5 md:col-span-2">
+          <FieldLabel required>{content.fields.message.label}</FieldLabel>
+          <textarea
+            id={fieldId('message')}
+            name="message"
+            required
+            rows={4}
+            placeholder={content.fields.message.placeholder}
+            value={values.message}
+            aria-invalid={invalid.has('message') || undefined}
+            onChange={(event) => setField('message', event.target.value)}
+            className={cn(
+              'resize-y rounded-none border bg-raymar-ivory p-3.5 leading-[1.6] transition-[border-color,background-color] duration-300 outline-none focus:border-raymar-gold focus:bg-raymar-white',
+              fieldBorder(invalid.has('message')),
+            )}
+          />
+        </label>
+      </div>
+
+      {/* Honeypot: hidden from people and assistive technology, visible to bots. */}
+      <div
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-px w-px overflow-hidden"
+      >
+        <label htmlFor={fieldId(HONEYPOT_FIELD)}>Website</label>
+        <input
+          id={fieldId(HONEYPOT_FIELD)}
+          name={HONEYPOT_FIELD}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
+      </div>
+
+      <label className="mt-7 flex cursor-pointer items-start gap-3">
+        <input
+          id={fieldId('consent')}
+          name="consent"
+          type="checkbox"
+          required
+          checked={consent}
+          aria-invalid={invalid.has('consent') || undefined}
+          onChange={(event) => {
+            setConsent(event.target.checked)
+            setInvalid((current) => {
+              if (!current.has('consent')) return current
+              const next = new Set(current)
+              next.delete('consent')
+              return next
+            })
+          }}
+          className="mt-0.5 h-4.5 w-4.5 flex-none accent-raymar-green"
+        />
+        <span className="text-[13px] leading-[1.6] font-light text-raymar-ink/82">
+          {content.consentText}{' '}
+          <span className="text-raymar-ink/70">{content.consentPolicyNote}</span>
+        </span>
+      </label>
+
+      <p
+        role="alert"
+        aria-live="assertive"
+        className={cn(
+          'mt-5.5 border-l-2 border-raymar-alert-rule bg-raymar-alert-bed px-3.75 py-3.25 text-[13.5px] leading-[1.5] font-normal text-raymar-alert-ink',
+          error ? 'block' : 'hidden',
+        )}
+      >
+        {error}
+      </p>
+
+      <div className="mt-7.5 flex flex-wrap items-center gap-5.5">
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="inline-flex cursor-pointer items-center gap-3 rounded-none border-0 bg-raymar-green px-11 py-[21px] text-xs font-medium tracking-[0.2em] text-raymar-white uppercase transition-[background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-raymar-green-hover disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
+        >
+          {status === 'submitting' ? content.submitting : content.submit}
+          <span className="inline-flex text-raymar-gold">
+            <svg
+              width="32"
+              height="8"
+              viewBox="0 0 32 8"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M0 4h30M26 1l4 3-4 3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="square"
+              />
+            </svg>
+          </span>
+        </button>
+        <span className="text-[12.5px] font-normal text-raymar-ink/74">
+          {content.requiredNote}
+        </span>
+      </div>
+    </form>
+  )
+}
+
+function FieldLabel({
+  children,
+  required = false,
+}: {
+  children: string
+  required?: boolean
+}) {
+  return (
+    <span className="text-xs font-normal tracking-[0.24em] text-raymar-ink/84 uppercase">
+      {children}
+      {required ? ' *' : ''}
+    </span>
+  )
+}
+
+interface TextFieldProps {
+  id: string
+  name: string
+  label: string
+  value: string
+  invalid: boolean
+  onChange: (value: string) => void
+  type?: 'text' | 'email' | 'tel'
+  /** Explicitly nullable: the content model marks placeholders optional. */
+  placeholder?: string | undefined
+  autoComplete?: string | undefined
+  required?: boolean
+}
+
+function TextField({
+  id,
+  name,
+  label,
+  value,
+  invalid,
+  onChange,
+  type = 'text',
+  placeholder,
+  autoComplete,
+  required = false,
+}: TextFieldProps) {
+  return (
+    <label className="flex flex-col gap-2.5">
+      <FieldLabel required={required}>{label}</FieldLabel>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        required={required}
+        value={value}
+        aria-invalid={invalid || undefined}
+        onChange={(event) => onChange(event.target.value)}
+        className={cn(inputClass, fieldBorder(invalid))}
+      />
+    </label>
+  )
+}

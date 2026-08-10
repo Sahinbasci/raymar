@@ -1,0 +1,405 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   RAYMAR DESIGN TOKENS — single source of truth.
+
+   Every value below is transcribed from the approved Claude Design source at
+   design-source/project/Raymar Ana Sayfa.dc.html.
+   Do not hardcode brand colours anywhere else in the codebase.
+   ========================================================================= */
+@theme {
+  /* -- Breakpoints -------------------------------------------------------
+     The design prototype switched layout in JS at exactly these widths
+     (`breakpoint()`: <720 mobil, <1080 tablet, else masaustu). `xl` is the
+     extra step the walnut grid used (`applyWalnutBase`: <1240 => 2 columns). */
+  --breakpoint-sm: initial;
+  --breakpoint-md: 720px;
+  --breakpoint-lg: 1080px;
+  --breakpoint-xl: 1240px;
+  --breakpoint-2xl: initial;
+
+  /* -- Brand colour system ----------------------------------------------- */
+  --color-raymar-green: #004c38; /* corporate green — primary surface + text */
+  --color-raymar-green-deep: #0b2a20; /* deepest green — card beds, on-gold text */
+  --color-raymar-green-hover: #0b6047; /* green button hover */
+  --color-raymar-gold: #f0b038; /* corporate gold */
+  --color-raymar-gold-hover: #ffc65a; /* gold button hover */
+  --color-raymar-gold-dark: #8a5f0e; /* gold-family text on light surfaces (AA) */
+  --color-raymar-ivory: #f8f5ee; /* page background */
+  --color-raymar-cream: #efe6d5; /* alternating section background */
+  --color-raymar-white: #fcfcfc; /* broken white — cards, type on green */
+  --color-raymar-ink: #16352c; /* deep green body text */
+  --color-raymar-tan: #e6d7bd; /* natural product brown — image bed */
+
+  /* Overlay base, #002A1F. Every hero and card scrim is an alpha step of
+     this colour; the gradients spell the steps out literally because CSS
+     gradients cannot take an alpha of a custom property directly. */
+  --color-raymar-overlay: #002a1f;
+
+  /* Form validation palette (design: rgba(176,126,21,.2) bed, #6B4708 rule). */
+  --color-raymar-alert-bed: rgba(176, 126, 21, 0.2);
+  --color-raymar-alert-rule: #6b4708;
+  --color-raymar-alert-ink: #5e3f07;
+
+  /* -- Typography --------------------------------------------------------
+     `--font-sans` intentionally leads with the licensed DIN families so that a
+     future DIN licence drops in without touching components. Jost is the
+     fallback the approved design itself loads. See docs/DESIGN_SYSTEM.md. */
+  --font-sans: 'DIN Next LT Pro', 'DIN Pro', var(--font-jost), system-ui, sans-serif;
+  --font-display: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+
+  /* -- Motion tokens ------------------------------------------------------ */
+  --ease-raymar: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-cue: cubic-bezier(0.4, 0, 0.3, 1);
+
+  --animate-raymar-bob: rmrBob 2.8s var(--ease-cue) infinite;
+}
+
+@keyframes rmrBob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================= */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Sticky header height + breathing room, so in-page anchors are not
+       hidden underneath the fixed header. */
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-raymar-ivory);
+    color: var(--color-raymar-ink);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    letter-spacing: 0.005em;
+    font-variant-numeric: lining-nums;
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  img {
+    display: block;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--color-raymar-ink);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(22 53 44 / 0.54);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-raymar-gold);
+    outline-offset: 3px;
+  }
+
+  /* Headings inherit the display serif; weights are set per component so the
+     editorial hierarchy of the source design is preserved exactly. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    margin: 0;
+  }
+}
+
+/* ============================================================================
+   UTILITIES
+   ========================================================================= */
+
+/* The 1320px shell with the exact horizontal padding ladder from the design
+   prototype (20 / 32 / 40). */
+@utility shell {
+  margin-inline: auto;
+  max-width: 1320px;
+  padding-inline: 20px;
+
+  @media (width >= 720px) {
+    padding-inline: 32px;
+  }
+
+  @media (width >= 1080px) {
+    padding-inline: 40px;
+  }
+}
+
+/* The gold-rule eyebrow label used at the top of most sections. */
+@utility eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+/* ============================================================================
+   LAYOUT RULES THAT UTILITIES CANNOT EXPRESS CLEANLY
+
+   Everything here is either driven by a viewport-*height* query or by
+   `nth-child` position. Both are transcribed from the design prototype's
+   `applyResponsive()` / `applyWalnutBase()` routines. Ordinary responsive
+   layout stays in utility classes on the components themselves.
+   ========================================================================= */
+@layer components {
+  /* -- Hero -------------------------------------------------------------
+     On a window shorter than the floor, the hero collapses to exactly the
+     viewport so the bottom-anchored scroll cue can never fall below the fold.
+     That guard is a height media query rather than `min(…, 100svh)` inside the
+     clamp: if `svh` ever resolves to 0 — as it does in some embedded viewports
+     — a `min()` floor would collapse the whole hero to zero height. */
+  .hero-frame {
+    height: clamp(520px, 86svh, 1120px);
+  }
+
+  @media (width >= 720px) {
+    .hero-frame {
+      height: clamp(560px, 94svh, 1120px);
+    }
+  }
+
+  @media (width < 720px) and (height < 520px) {
+    .hero-frame {
+      height: 100svh;
+    }
+  }
+
+  @media (width >= 720px) and (height < 560px) {
+    .hero-frame {
+      height: 100svh;
+    }
+  }
+
+  .hero-cue {
+    bottom: 34px;
+    gap: 12px;
+  }
+
+  .hero-cue-label {
+    font-size: 11.5px;
+    letter-spacing: 0.18em;
+  }
+
+  .hero-cue-line {
+    height: 40px;
+  }
+
+  @media (width >= 720px) {
+    .hero-cue {
+      bottom: 56px;
+      gap: 16px;
+    }
+
+    .hero-cue-label {
+      font-size: 13px;
+      letter-spacing: 0.24em;
+    }
+
+    .hero-cue-line {
+      height: 64px;
+    }
+  }
+
+  /* Short laptop windows: pull the cue in so it clears the fold. */
+  @media (width >= 720px) and (height <= 699px) {
+    .hero-cue {
+      bottom: 38px;
+      gap: 12px;
+    }
+
+    .hero-cue-line {
+      height: 44px;
+    }
+  }
+
+  /* -- Experience strip -------------------------------------------------
+     Three credentials. Gold hairlines run between cells only, never around
+     the block. Three divides evenly into the wide layout, so the row goes
+     straight from one column to three without a two-up step that would strand
+     the third cell on a row of its own. */
+  .strip {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .strip > * {
+    padding: 40px 0;
+  }
+
+  .strip > * + * {
+    border-top: 1px solid rgb(240 176 56 / 0.5);
+  }
+
+  @media (width >= 720px) {
+    .strip {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Symmetric horizontal padding so all three centred cells align
+       identically. (The approved design zeroed the outer padding for a
+       left-aligned row; the centred treatment needs equal insets instead.) */
+    .strip > * {
+      padding: 58px 24px 54px;
+      border-top: 0;
+      border-left: 1px solid rgb(240 176 56 / 0.5);
+    }
+
+    .strip > *:first-child {
+      border-left: 0;
+    }
+  }
+
+  @media (width >= 1080px) {
+    .strip > * {
+      padding: 78px 34px 74px;
+    }
+  }
+
+  /* -- Walnut product grid ---------------------------------------------
+     The lead card spans two columns and carries a taller image well; the
+     final row is shortened so the block resolves flush. */
+  .walnut-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .walnut-media {
+    height: 230px;
+  }
+
+  @media (width >= 720px) {
+    .walnut-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .walnut-grid > *:first-child {
+      grid-column: span 2;
+    }
+
+    .walnut-media {
+      height: 256px;
+    }
+
+    .walnut-grid > *:first-child .walnut-media {
+      height: 300px;
+    }
+  }
+
+  @media (width >= 1240px) {
+    .walnut-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .walnut-media {
+      height: 284px;
+    }
+
+    .walnut-grid > *:nth-child(n + 4) .walnut-media {
+      height: 250px;
+    }
+  }
+
+  /* -- Range products ---------------------------------------------------
+     Six single-variety products, which is the number that makes the layout
+     work without any card needing a wider span: six divides evenly into both
+     the two-up (3 rows) and the three-up (2 rows) grid, so no card is ever
+     stranded alone on the last row.
+
+     The approved design's baseline break is carried over, but keyed to the
+     column count rather than to `2n`. In a three-up grid `2n` drops cards 2,
+     4 and 6, which lands differently in each row and reads as misalignment;
+     dropping the middle of every row instead gives the same broken baseline
+     as a deliberate, repeating rhythm. */
+  .range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: 18px;
+  }
+
+  .range-media {
+    height: 230px;
+  }
+
+  @media (width >= 720px) {
+    .range-grid {
+      gap: 22px;
+    }
+
+    .range-grid > *:nth-child(2n) {
+      margin-top: 38px;
+    }
+
+    .range-media {
+      height: 288px;
+    }
+  }
+
+  @media (width >= 1080px) {
+    .range-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .range-grid > *:nth-child(2n) {
+      margin-top: 0;
+    }
+
+    .range-grid > *:nth-child(3n + 2) {
+      margin-top: 38px;
+    }
+
+    .range-media {
+      height: 320px;
+    }
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   The approved design kills all keyframe animation and smooth scrolling.
+   Transitions are shortened rather than removed so that state changes
+   (header colour, drawer visibility) still resolve to the correct end state
+   instead of being cancelled mid-way.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

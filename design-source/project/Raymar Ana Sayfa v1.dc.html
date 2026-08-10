@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#F8F5EE;color:#16352C;font-family:"DIN Next LT Pro","DIN Pro","DIN",Archivo,Barlow,system-ui,sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+a{color:#004C38;text-decoration:none;transition:color .25s ease}
+a:hover{color:#F0B038}
+img{display:block}
+button{font-family:inherit}
+:focus-visible{outline:2px solid #F0B038;outline-offset:3px}
+input,select,textarea{font-family:inherit;font-size:15px;font-weight:300;color:#16352C}
+input::placeholder,textarea::placeholder{color:rgba(22,53,44,.54)}
+@keyframes rmrDot{0%{transform:translateY(0);opacity:0}22%{opacity:1}100%{transform:translateY(38px);opacity:0}}
+@keyframes rmrBob{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(5px);opacity:1}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none !important}}
+[data-rail]::-webkit-scrollbar{height:3px}
+[data-rail]::-webkit-scrollbar-thumb{background:rgba(0,76,56,.28)}
+</style>
+</helmet>
+<div data-rmr="root" style="position:relative;overflow-x:hidden;background:#F8F5EE">
+
+<header data-rmr="header" data-screen-label="Header" style="position:fixed;top:0;left:0;right:0;z-index:90;background:transparent;border-bottom:1px solid rgba(252,252,252,.14);transition:background .45s ease,border-color .45s ease,backdrop-filter .45s ease">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px;height:88px;display:flex;align-items:center;gap:40px;transition:height .35s ease" data-rmr="headerinner">
+    <a href="#ust" aria-label="Raymar Nuts — Ana Sayfa" style="position:relative;display:block;flex:none;width:172px;height:40px">
+      <img data-rmr="logo-light" src="assets/raymar-logo-white-gold.svg" alt="Raymar Nuts" width="172" height="40" style="position:absolute;left:0;top:0;width:172px;height:40px;object-fit:contain;object-position:left center;opacity:1;transition:opacity .4s ease">
+      <img data-rmr="logo-dark" src="assets/raymar-logo-green-gold.svg" alt="" aria-hidden="true" width="172" height="40" style="position:absolute;left:0;top:0;width:172px;height:40px;object-fit:contain;object-position:left center;opacity:0;transition:opacity .4s ease">
+    </a>
+    <nav data-rmr="nav" aria-label="Ana menü" style="margin-left:auto;display:flex;align-items:center;gap:34px">
+      <a data-rmr="navlink" href="#ust" style="color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase">Ana Sayfa</a>
+      <a data-rmr="navlink" href="#kurumsal" style="color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase">Kurumsal</a>
+      <a data-rmr="navlink" href="#urunler" style="color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase">Ürünler</a>
+      <a data-rmr="navlink" href="#ticaret" style="color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase">Uluslararası Ticaret</a>
+      <a data-rmr="navlink" href="#teklif" style="color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase">İletişim</a>
+    </nav>
+    <div data-rmr="lang" style="display:flex;align-items:center;gap:8px;padding-left:28px;border-left:1px solid rgba(252,252,252,.2)">
+      <button type="button" data-rmr="langtr" aria-pressed="true" style="background:none;border:0;padding:2px 2px;cursor:pointer;color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.1em">TR</button>
+      <span data-rmr="langsep" style="color:rgba(252,252,252,.55);font-size:12px">/</span>
+      <button type="button" aria-pressed="false" data-rmr="langen" style="background:none;border:0;padding:2px 2px;cursor:pointer;color:rgba(252,252,252,.8);font-size:12px;font-weight:500;letter-spacing:.1em">EN</button>
+    </div>
+    <a data-rmr="headercta" href="#teklif" style="flex:none;display:inline-flex;align-items:center;gap:10px;padding:13px 22px;background:#F0B038;color:#0B2A20;font-size:12px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;border-radius:2px;transition:background .3s ease,color .3s ease">Teklif Talep Et
+      <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#0B2A20" stroke-width="1.2" stroke-linecap="square"></path></svg>
+    </a>
+    <button type="button" data-rmr="burger" aria-label="Menüyü aç" aria-expanded="false" style="display:none;flex:none;width:48px;height:48px;background:none;border:1px solid rgba(252,252,252,.28);border-radius:2px;cursor:pointer;align-items:center;justify-content:center">
+      <span data-rmr="burgerbars" style="position:relative;display:block;width:20px;height:1px;background:#FCFCFC;box-shadow:0 -6px 0 #FCFCFC,0 6px 0 #FCFCFC"></span>
+    </button>
+  </div>
+</header>
+
+<div data-rmr="drawer" data-open="0" aria-hidden="true" style="position:fixed;inset:0;z-index:95;background:#F8F5EE;display:flex;flex-direction:column;padding:28px 28px 40px;opacity:0;visibility:hidden;transform:translateY(-12px);transition:opacity .4s ease,transform .4s ease,visibility .4s">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <img src="assets/raymar-logo-green-gold.svg" alt="Raymar Nuts" width="150" height="36" style="width:150px;height:36px;object-fit:contain;object-position:left center">
+    <button type="button" data-rmr="drawerclose" aria-label="Menüyü kapat" style="width:48px;height:48px;background:none;border:1px solid rgba(0,76,56,.22);border-radius:2px;cursor:pointer;color:#004C38;font-size:22px;font-weight:300;line-height:1">×</button>
+  </div>
+  <nav aria-label="Mobil menü" style="margin-top:44px;display:flex;flex-direction:column">
+    <a href="#ust" data-rmr="drawerlink" style="padding:20px 0;border-bottom:1px solid rgba(0,76,56,.12);color:#004C38;font-size:26px;font-weight:300">Ana Sayfa</a>
+    <a href="#kurumsal" data-rmr="drawerlink" style="padding:20px 0;border-bottom:1px solid rgba(0,76,56,.12);color:#004C38;font-size:26px;font-weight:300">Kurumsal</a>
+    <a href="#urunler" data-rmr="drawerlink" style="padding:20px 0;border-bottom:1px solid rgba(0,76,56,.12);color:#004C38;font-size:26px;font-weight:300">Ürünler</a>
+    <a href="#ticaret" data-rmr="drawerlink" style="padding:20px 0;border-bottom:1px solid rgba(0,76,56,.12);color:#004C38;font-size:26px;font-weight:300">Uluslararası Ticaret</a>
+    <a href="#teklif" data-rmr="drawerlink" style="padding:20px 0;border-bottom:1px solid rgba(0,76,56,.12);color:#004C38;font-size:26px;font-weight:300">İletişim</a>
+  </nav>
+  <a href="#teklif" data-rmr="drawerlink" style="margin-top:auto;display:flex;align-items:center;justify-content:center;gap:12px;min-height:56px;background:#004C38;color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;border-radius:2px">Teklif Talep Et</a>
+</div>
+
+<section id="ust" data-rmr="hero" data-screen-label="Hero" style="position:relative;height:clamp(560px,94svh,1120px);overflow:hidden;background:#004C38">
+  <img src="assets/hero-poster.jpg" alt="" aria-hidden="true" width="1600" height="900" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center">
+  <video data-rmr="herovideo" data-src="assets/raymar-hero.mp4" muted loop playsInline preload="none" poster="assets/hero-poster.jpg" aria-hidden="true" tabindex="-1" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center"></video>
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:210px;background:linear-gradient(to bottom,rgba(0,42,31,.6),rgba(0,42,31,.22) 55%,rgba(0,42,31,0))"></div>
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(to top,rgba(0,42,31,.52),rgba(0,42,31,.12) 55%,rgba(0,42,31,0))"></div>
+  <a data-rmr="herocue" href="#giris" style="position:absolute;left:50%;bottom:56px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:#FCFCFC;transition:color .35s ease,transform .45s cubic-bezier(.2,.7,.2,1)" style-hover="color:#F0B038;transform:translateX(-50%) translateY(5px)">
+    <span data-rmr="cuelabel" style="font-size:13px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;text-shadow:0 1px 18px rgba(0,42,31,.55)">Ürünleri Keşfet</span>
+    <span aria-hidden="true" data-rmr="cueline" style="display:block;width:1px;height:64px;background:linear-gradient(to bottom,rgba(252,252,252,.12),rgba(240,176,56,.9))"></span>
+    <svg aria-hidden="true" width="26" height="11" viewBox="0 0 26 11" style="animation:rmrBob 2.8s cubic-bezier(.4,0,.3,1) infinite"><path d="M1 1l12 8.4L25 1" fill="none" stroke="#F0B038" stroke-width="1.3" stroke-linecap="square"></path></svg>
+  </a>
+  </section>
+
+<section id="giris" data-screen-label="Giriş Sözü" style="position:relative;background:#004C38;overflow:hidden">
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(to right,rgba(240,176,56,0),rgba(240,176,56,.5) 30%,rgba(240,176,56,.5) 70%,rgba(240,176,56,0))"></div>
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="giris" style="display:flex;flex-direction:column;align-items:flex-start;padding:142px 0 148px">
+      <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 34px;color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+        <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+        30 Yıllık Uluslararası Kuruyemiş Ticareti
+      </p>
+      <h1 data-reveal data-delay="100" data-rmr="girish1" style="margin:0;max-width:900px;color:#FCFCFC;font-size:clamp(38px,5vw,74px);font-weight:300;line-height:1.05;letter-spacing:-.015em">Doğadan Seçilen Ürünler,<br>Dünyaya Güvenle.</h1>
+      <p data-reveal data-delay="200" data-rmr="girisp" style="margin:34px 0 0;max-width:560px;color:rgba(252,252,252,.84);font-size:17px;font-weight:300;line-height:1.75">Fındık başta olmak üzere ceviz ve seçkin ithal kuruyemiş gruplarında uzun yıllara dayanan uluslararası ticaret deneyimi.</p>
+      <div data-reveal data-delay="300" data-rmr="girisctas" style="margin-top:46px;display:flex;flex-wrap:wrap;gap:14px">
+        <a href="#urunler" style="display:inline-flex;align-items:center;gap:12px;padding:17px 30px;background:#F0B038;color:#0B2A20;font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;border-radius:2px;transition:background .3s ease,transform .3s ease" style-hover="background:#FFC65A;transform:translateY(-2px)">Ürünleri Keşfet
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#0B2A20" stroke-width="1.2" stroke-linecap="square"></path></svg>
+        </a>
+        <a href="#teklif" style="display:inline-flex;align-items:center;gap:12px;padding:17px 30px;background:transparent;border:1px solid rgba(248,245,238,.42);color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;border-radius:2px;transition:border-color .3s ease,background .3s ease" style-hover="border-color:#F8F5EE;background:rgba(248,245,238,.08)">Teklif Talep Et</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section data-screen-label="Deneyim Şeridi" style="background:#F8F5EE;border-bottom:1px solid rgba(0,76,56,.09)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="strip" style="display:grid;grid-template-columns:repeat(4,1fr)">
+      <div data-reveal data-delay="0" style="padding:56px 34px 52px 0">
+        <div style="color:#004C38;font-size:52px;font-weight:900;line-height:1;letter-spacing:-.02em">30 Yıl</div>
+        <div style="margin-top:16px;color:rgba(22,53,44,.8);font-size:14px;font-weight:400;line-height:1.5">Uluslararası Ticaret Deneyimi</div>
+      </div>
+      <div data-reveal data-delay="90" style="padding:56px 34px 52px;border-left:1px solid rgba(240,176,56,.5)">
+        <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase">Ana Uzmanlık</div>
+        <div style="margin-top:14px;color:#004C38;font-size:34px;font-weight:300;line-height:1.15">Fındık</div>
+      </div>
+      <div data-reveal data-delay="180" style="padding:56px 34px 52px;border-left:1px solid rgba(240,176,56,.5)">
+        <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase">Geniş Portföy</div>
+        <div style="margin-top:14px;color:#004C38;font-size:22px;font-weight:300;line-height:1.35">Ceviz ve Seçkin İthal Ürünler</div>
+      </div>
+      <div data-reveal data-delay="270" style="padding:56px 0 52px 34px;border-left:1px solid rgba(240,176,56,.5)">
+        <div style="color:#004C38;font-size:34px;font-weight:900;line-height:1;letter-spacing:.01em">B2B</div>
+        <div style="margin-top:16px;color:rgba(22,53,44,.8);font-size:14px;font-weight:400;line-height:1.5">Kurumsal Tedarik ve Ticaret</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="kurumsal" data-screen-label="Kurumsal Giriş" style="background:#EFE6D5;overflow:hidden">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="introgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:center;padding:132px 0 138px">
+      <div>
+        <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 34px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#8A5F0E" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          Kurumsal
+        </p>
+        <h2 data-reveal data-delay="80" style="margin:0;max-width:520px;color:#004C38;font-size:clamp(32px,3.9vw,60px);font-weight:300;line-height:1.1;letter-spacing:-.015em">Kuruyemiş ticaretinde<br>otuz yıllık deneyim.</h2>
+        <p data-reveal data-delay="160" style="margin:36px 0 0;max-width:498px;color:rgba(22,53,44,.84);font-size:17px;font-weight:300;line-height:1.78">Raymar Nuts, uluslararası kuruyemiş ticaretinde uzun yıllara dayanan tecrübesiyle; ana uzmanlık alanı olan fındığın yanında ceviz ve seçkin ithal ürün gruplarında kurumsal iş ortaklarına hizmet verir.</p>
+        <a data-reveal data-delay="240" href="#ticaret" style="margin-top:42px;display:inline-flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid rgba(0,76,56,.28);color:#004C38;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase">Kurumsal Bilgiler
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+        </a>
+      </div>
+      <div data-reveal data-delay="120" style="position:relative;display:flex;justify-content:flex-end">
+        <div aria-hidden="true" style="position:absolute;left:-6px;top:-30px;width:120px;height:120px;border-top:1px solid rgba(240,176,56,.75);border-left:1px solid rgba(240,176,56,.75);border-top-left-radius:26px"></div>
+        <div aria-hidden="true" style="position:absolute;right:-6px;bottom:-30px;width:120px;height:120px;border-bottom:1px solid rgba(240,176,56,.75);border-right:1px solid rgba(240,176,56,.75);border-bottom-right-radius:26px"></div>
+        <div style="position:relative;width:100%;max-width:480px;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:#E6D7BD">
+          <img data-parallax="0.06" src="assets/hazelnut-macro.jpg" alt="Fındık makro çekimi — temsili görsel" width="1500" height="1000" loading="lazy" style="width:100%;height:112%;margin-top:-6%;object-fit:cover">
+        </div>
+        <img src="assets/raymar-emblem-gold.svg" alt="" aria-hidden="true" width="44" height="48" style="position:absolute;left:14px;bottom:26px;width:44px;height:48px;opacity:.9">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Fındık — Amiral Ürün" style="position:relative;background:#004C38;overflow:hidden">
+  <img data-parallax="0.1" src="assets/hazelnut-shell.jpg" alt="" aria-hidden="true" width="1500" height="1000" loading="lazy" style="position:absolute;right:0;top:0;width:52%;height:100%;object-fit:cover;opacity:.5">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(90deg,#004C38 0%,#004C38 38%,rgba(0,76,56,.86) 52%,rgba(0,76,56,.42) 74%,rgba(0,76,56,.3) 100%)"></div>
+  <div style="position:relative;max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="flagship" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px;align-items:center;padding:150px 0 156px">
+      <div>
+        <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 34px;color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          Ana Uzmanlık Alanı
+        </p>
+        <h2 data-reveal data-delay="80" style="margin:0;max-width:560px;color:#FCFCFC;font-size:clamp(32px,4vw,62px);font-weight:300;line-height:1.08;letter-spacing:-.015em">Uzmanlığımızın merkezinde fındık var.</h2>
+        <p data-reveal data-delay="170" style="margin:34px 0 0;max-width:470px;color:rgba(252,252,252,.78);font-size:17px;font-weight:300;line-height:1.78">Fındık, Raymar’ın ürün portföyünün ve ticari deneyiminin merkezinde yer alır.</p>
+        <div data-reveal data-delay="250" style="margin-top:44px;display:flex;flex-wrap:wrap;align-items:center;gap:26px">
+          <a href="#urunler" style="display:inline-flex;align-items:center;gap:12px;padding:17px 30px;background:#F0B038;color:#0B2A20;font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;border-radius:2px;transition:background .3s ease,transform .3s ease" style-hover="background:#FFC65A;transform:translateY(-2px)">Fındık Ürünlerini İncele
+            <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#0B2A20" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          </a>
+        </div>
+        <p data-reveal data-delay="320" style="margin:52px 0 0;padding-left:16px;border-left:1px solid rgba(240,176,56,.55);max-width:420px;color:rgba(252,252,252,.78);font-size:12.5px;font-weight:400;line-height:1.65;letter-spacing:.02em">Ürün detayları firma tarafından sağlanacak içerikle güncellenecektir.</p>
+      </div>
+      <div data-reveal data-delay="140" style="position:relative;justify-self:end;width:100%;max-width:440px">
+        <div style="position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#0B2A20">
+          <img src="assets/hazelnut-macro.jpg" alt="Fındık — makro ürün görseli (temsili)" width="1500" height="1000" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:52% 48%">
+        </div>
+        <div aria-hidden="true" style="position:absolute;left:-28px;bottom:-28px;display:flex;flex-direction:column;gap:9px;padding:16px 13px;background:#004C38">
+          <span style="display:block;width:7px;height:7px;border-radius:50%;background:#F0B038"></span>
+          <span style="display:block;width:11px;height:11px;border-radius:50%;background:#F0B038"></span>
+          <span style="display:block;width:7px;height:7px;border-radius:50%;background:rgba(240,176,56,.55)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="urunler" data-screen-label="Ürün Portföyü" style="background:#F8F5EE">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;padding:130px 0 52px">
+      <div>
+        <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 30px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#8A5F0E" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          Ürün Portföyü
+        </p>
+        <h2 data-reveal data-delay="80" style="margin:0;max-width:640px;color:#004C38;font-size:clamp(30px,3.6vw,54px);font-weight:300;line-height:1.12;letter-spacing:-.015em">Üç ana ürün grubu, tek bir ticaret disiplini.</h2>
+      </div>
+      <p data-reveal data-delay="160" style="margin:0;max-width:330px;color:rgba(22,53,44,.76);font-size:15px;font-weight:300;line-height:1.7">Fındık, ceviz ürünleri ve seçkin ithal ürünler; kurumsal tedarik talepleri doğrultusunda sunulur.</p>
+    </div>
+    <div data-rmr="portfolio" style="display:grid;grid-template-columns:1.12fr 1fr;gap:18px;padding-bottom:132px">
+      <a data-reveal data-rmr="pf-main" href="#urunler" style="position:relative;display:block;min-height:660px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+        <img data-hover-img src="assets/hazelnut-macro.jpg" alt="Fındık ürün grubu (temsili görsel)" width="1500" height="1000" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.82) 0%,rgba(0,42,31,.28) 44%,rgba(0,42,31,.04) 72%)"></span>
+        <span style="position:absolute;left:34px;top:32px;display:inline-flex;align-items:center;gap:9px;padding:8px 13px;background:rgba(11,42,32,.5);color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">A · Amiral Ürün</span>
+        <span style="position:absolute;left:34px;right:34px;bottom:34px;display:block">
+          <span data-hover-title style="display:block;color:#FCFCFC;font-size:44px;font-weight:300;line-height:1.1;letter-spacing:0;transition:letter-spacing .5s ease">Fındık</span>
+          <span style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+            <span style="color:rgba(252,252,252,.84);font-size:13.5px;font-weight:400;letter-spacing:.02em">Ana uzmanlık alanı</span>
+            <span data-hover-arrow style="display:inline-flex;transition:transform .5s cubic-bezier(.2,.7,.2,1)">
+              <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </span>
+          </span>
+        </span>
+      </a>
+      <div data-rmr="pf-side" style="display:grid;grid-template-rows:auto auto;gap:18px">
+        <a data-reveal data-delay="90" href="#ceviz" style="position:relative;display:block;min-height:322px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+          <img data-hover-img src="assets/walnut-bulk.jpg" alt="Ceviz ürünleri grubu (temsili görsel)" width="1200" height="800" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+          <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.8) 0%,rgba(0,42,31,.2) 52%,rgba(0,42,31,0) 80%)"></span>
+          <span style="position:absolute;left:28px;top:26px;display:inline-flex;align-items:center;gap:9px;padding:7px 12px;background:rgba(11,42,32,.5);color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">B</span>
+          <span style="position:absolute;left:28px;right:28px;bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px">
+            <span style="display:block">
+              <span data-hover-title style="display:block;color:#FCFCFC;font-size:30px;font-weight:300;line-height:1.15;transition:letter-spacing .5s ease">Ceviz Ürünleri</span>
+              <span style="margin-top:8px;display:block;color:rgba(252,252,252,.82);font-size:13px;font-weight:400">Yedi ürün grubu</span>
+            </span>
+            <span data-hover-arrow style="display:inline-flex;flex:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)">
+              <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </span>
+          </span>
+        </a>
+        <div data-rmr="pf-small" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <a data-reveal data-delay="140" href="#ithal" style="position:relative;display:block;min-height:152px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+            <img data-hover-img src="assets/pumpkin-green.jpg" alt="Kabak çekirdeği içi (temsili görsel)" width="900" height="600" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.82),rgba(0,42,31,.1))"></span>
+            <span style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span data-hover-title style="color:#FCFCFC;font-size:16px;font-weight:400;line-height:1.3;transition:letter-spacing .5s ease">Kabak Çekirdeği İçi</span>
+              <span data-hover-arrow style="display:inline-flex;flex:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)"><svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg></span>
+            </span>
+          </a>
+          <a data-reveal data-delay="180" href="#ithal" style="position:relative;display:block;min-height:152px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+            <img data-hover-img src="assets/pecan.jpg" alt="Pikan cevizi (temsili görsel)" width="900" height="1350" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.82),rgba(0,42,31,.1))"></span>
+            <span style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span data-hover-title style="color:#FCFCFC;font-size:16px;font-weight:400;line-height:1.3;transition:letter-spacing .5s ease">Pikan Cevizi</span>
+              <span data-hover-arrow style="display:inline-flex;flex:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)"><svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg></span>
+            </span>
+          </a>
+          <a data-reveal data-delay="220" href="#ithal" style="position:relative;display:block;min-height:152px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+            <img data-hover-img src="assets/macadamia-white.jpg" alt="Makademya (temsili görsel)" width="900" height="600" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.82),rgba(0,42,31,.1))"></span>
+            <span style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span data-hover-title style="color:#FCFCFC;font-size:16px;font-weight:400;line-height:1.3;transition:letter-spacing .5s ease">Makademya</span>
+              <span data-hover-arrow style="display:inline-flex;flex:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)"><svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg></span>
+            </span>
+          </a>
+          <a data-reveal data-delay="260" href="#ithal" style="position:relative;display:block;min-height:152px;overflow:hidden;border-radius:2px;background:#0B2A20" data-hover="card">
+            <img data-hover-img src="assets/sunflower-seed.jpg" alt="Ayçekirdeği (temsili görsel)" width="900" height="600" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+            <span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,42,31,.82),rgba(0,42,31,.1))"></span>
+            <span style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span data-hover-title style="color:#FCFCFC;font-size:16px;font-weight:400;line-height:1.3;transition:letter-spacing .5s ease">Ayçekirdeği</span>
+              <span data-hover-arrow style="display:inline-flex;flex:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)"><svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg></span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ceviz" data-screen-label="Ceviz Ürün Ailesi" style="background:#EFE6D5">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;padding:126px 0 50px">
+      <div>
+        <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 30px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#8A5F0E" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          Ceviz Ürünleri
+        </p>
+        <h2 data-reveal data-delay="80" style="margin:0;max-width:600px;color:#004C38;font-size:clamp(30px,3.6vw,54px);font-weight:300;line-height:1.12;letter-spacing:-.015em">Ceviz içi ürün grupları.</h2>
+      </div>
+      <p data-reveal data-delay="160" style="margin:0;max-width:360px;color:rgba(22,53,44,.76);font-size:15px;font-weight:300;line-height:1.7">Ceviz içi ürünler, kurumsal tedarik talepleri doğrultusunda aşağıdaki ürün gruplarında sunulur.</p>
+    </div>
+    <div data-rmr="walnut" data-rail style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:34px">
+      <article data-reveal data-rmr="wn" data-hover="card" style="grid-column:span 2;position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:284px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-halves-macro.jpg" alt="Bal Rengi Ceviz İçi (temsili görsel)" width="900" height="675" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:26px 26px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:26px;font-weight:300;line-height:1.2;transition:letter-spacing .5s ease">Bal Rengi Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:20px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Bal Rengi Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Bal Rengi Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;letter-spacing:.04em;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="70" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:284px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-burlap.jpg" alt="Kızıl Ceviz İçi (temsili görsel)" width="900" height="1200" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:40% 55%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:26px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Kızıl Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Kızıl Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Kızıl Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="110" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:284px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-halves-white.jpg" alt="Pirinç Ceviz İçi (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:26px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Pirinç Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Pirinç Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Pirinç Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="150" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:250px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-texture.jpg" alt="Kırık Ceviz İçi (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:60% 50%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:24px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Kırık Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Kırık Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Kırık Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="190" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:250px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-bulk.jpg" alt="Süper Lüks – Yarım Beyaz Ceviz İçi (temsili görsel)" width="1200" height="800" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:30% 40%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:24px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Süper Lüks – Yarım Beyaz Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Süper Lüks – Yarım Beyaz Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Süper Lüks – Yarım Beyaz Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="230" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:250px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-basket.jpg" alt="Lüks Ceviz İçi – Naturel (temsili görsel)" width="900" height="1350" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:24px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Lüks Ceviz İçi – Naturel</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Lüks Ceviz İçi – Naturel" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Lüks Ceviz İçi – Naturel" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+      <article data-reveal data-delay="270" data-rmr="wn" data-hover="card" style="position:relative;display:flex;flex-direction:column;background:#FCFCFC;border:1px solid rgba(0,76,56,.1);border-radius:2px;overflow:hidden">
+        <div style="position:relative;height:250px;overflow:hidden;background:#E6D7BD">
+          <img data-hover-img src="assets/walnut-shell.jpg" alt="Çeyrek Ceviz İçi (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:55% 60%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:24px 24px 24px">
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>Ceviz İçi</span>
+          <h3 data-hover-title style="margin:0;color:#004C38;font-size:22px;font-weight:300;line-height:1.22;transition:letter-spacing .5s ease">Çeyrek Ceviz İçi</h3>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:2px">
+            <a href="#teklif" data-detail="Ceviz Ürünleri" data-name="Çeyrek Ceviz İçi" style="display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase">Detayları Gör
+              <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </a>
+            <button type="button" data-quote="Ceviz Ürünleri" data-name="Çeyrek Ceviz İçi" style="background:none;border:0;padding:0;cursor:pointer;color:rgba(22,53,44,.78);font-size:12.5px;font-weight:400;border-bottom:1px solid rgba(22,53,44,.36);transition:color .25s ease,border-color .25s ease" style-hover="color:#004C38;border-color:#F0B038">Teklif Talep Et</button>
+          </div>
+        </div>
+      </article>
+    </div>
+    <p style="margin:0;padding:0 0 118px;color:rgba(22,53,44,.74);font-size:12.5px;font-weight:400;letter-spacing:.02em">Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır.</p>
+  </div>
+</section>
+
+<section id="ithal" data-screen-label="Seçkin İthal Ürünler" style="background:#F8F5EE;border-top:1px solid rgba(0,76,56,.08)">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:30px;padding:126px 0 56px">
+      <h2 data-reveal style="margin:0;color:#004C38;font-size:clamp(30px,3.6vw,54px);font-weight:300;line-height:1.12;letter-spacing:-.015em">Seçkin İthal Ürünler</h2>
+      <p data-reveal data-delay="120" style="margin:0;max-width:340px;color:rgba(22,53,44,.76);font-size:15px;font-weight:300;line-height:1.7">İthal ürün gruplarında kurumsal tedarik ve ticaret.</p>
+    </div>
+    <div data-rmr="imported" data-rail style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding-bottom:126px;align-items:start">
+      <article data-reveal data-rmr="imp" data-hover="card" style="display:flex;flex-direction:column;gap:20px">
+        <div style="position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#EFE6D5">
+          <img data-hover-img src="assets/pumpkin-green.jpg" alt="Kabak Çekirdeği İçi (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 45%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div>
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>İthal Ürün</span>
+          <h3 data-hover-title style="margin:14px 0 0;color:#004C38;font-size:24px;font-weight:300;line-height:1.2;transition:letter-spacing .5s ease">Kabak Çekirdeği İçi</h3>
+          <button type="button" data-quote="Kabak Çekirdeği İçi" data-name="Kabak Çekirdeği İçi" style="margin-top:18px;background:none;border:0;padding:0 0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(0,76,56,.24);transition:border-color .25s ease" style-hover="border-color:#F0B038">Teklif Talep Et
+            <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          </button>
+        </div>
+      </article>
+      <article data-reveal data-delay="90" data-rmr="imp" style="display:flex;flex-direction:column;gap:20px;margin-top:38px" data-hover="card">
+        <div style="position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#EFE6D5">
+          <img data-hover-img src="assets/pecan.jpg" alt="Pikan Cevizi (temsili görsel)" width="900" height="1350" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 26%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div>
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>İthal Ürün</span>
+          <h3 data-hover-title style="margin:14px 0 0;color:#004C38;font-size:24px;font-weight:300;line-height:1.2;transition:letter-spacing .5s ease">Pikan Cevizi</h3>
+          <button type="button" data-quote="Pikan Cevizi" data-name="Pikan Cevizi" style="margin-top:18px;background:none;border:0;padding:0 0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(0,76,56,.24);transition:border-color .25s ease" style-hover="border-color:#F0B038">Teklif Talep Et
+            <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          </button>
+        </div>
+      </article>
+      <article data-reveal data-delay="180" data-rmr="imp" data-hover="card" style="display:flex;flex-direction:column;gap:20px">
+        <div style="position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#EFE6D5">
+          <img data-hover-img src="assets/macadamia-white.jpg" alt="Makademya (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:46% 50%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div>
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>İthal Ürün</span>
+          <h3 data-hover-title style="margin:14px 0 0;color:#004C38;font-size:24px;font-weight:300;line-height:1.2;transition:letter-spacing .5s ease">Makademya</h3>
+          <button type="button" data-quote="Makademya" data-name="Makademya" style="margin-top:18px;background:none;border:0;padding:0 0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(0,76,56,.24);transition:border-color .25s ease" style-hover="border-color:#F0B038">Teklif Talep Et
+            <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          </button>
+        </div>
+      </article>
+      <article data-reveal data-delay="270" data-rmr="imp" style="display:flex;flex-direction:column;gap:20px;margin-top:38px" data-hover="card">
+        <div style="position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#EFE6D5">
+          <img data-hover-img src="assets/sunflower-seed.jpg" alt="Ayçekirdeği (temsili görsel)" width="900" height="600" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 50%;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)">
+        </div>
+        <div>
+          <span style="display:flex;align-items:center;gap:9px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F0B038"></span>İthal Ürün</span>
+          <h3 data-hover-title style="margin:14px 0 0;color:#004C38;font-size:24px;font-weight:300;line-height:1.2;transition:letter-spacing .5s ease">Ayçekirdeği</h3>
+          <button type="button" data-quote="Ayçekirdeği" data-name="Ayçekirdeği" style="margin-top:18px;background:none;border:0;padding:0 0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(0,76,56,.24);transition:border-color .25s ease" style-hover="border-color:#F0B038">Teklif Talep Et
+            <svg width="13" height="8" viewBox="0 0 13 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="ticaret" data-screen-label="30 Yıl Hikâyesi" style="position:relative;background:#004C38;overflow:hidden">
+  <div aria-hidden="true" data-rmr="dots" style="position:absolute;inset:0;opacity:.16;background-image:radial-gradient(circle,#F0B038 1.6px,transparent 1.7px);background-size:46px 46px;background-position:0 0"></div>
+  <div aria-hidden="true" style="position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(to bottom,rgba(240,176,56,0),rgba(240,176,56,.18),rgba(240,176,56,0))"></div>
+  <div style="position:relative;max-width:1320px;margin:0 auto;padding:0 40px">
+    <div style="padding:148px 0 0;max-width:840px">
+      <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 34px;color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+        <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+        Uluslararası Ticaret
+      </p>
+      <h2 data-reveal data-delay="80" style="margin:0;color:#FCFCFC;font-size:clamp(30px,3.8vw,58px);font-weight:300;line-height:1.1;letter-spacing:-.015em">30 yıldır uluslararası kuruyemiş ticaretinin içindeyiz.</h2>
+    </div>
+    <div data-rmr="story" style="margin-top:88px;padding-bottom:150px">
+      <div aria-hidden="true" style="height:1px;background:linear-gradient(to right,rgba(240,176,56,.15),rgba(240,176,56,.6) 12%,rgba(240,176,56,.6) 88%,rgba(240,176,56,.15))"></div>
+      <div data-rmr="storygrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:26px">
+        <div data-reveal style="padding-top:0">
+          <span aria-hidden="true" style="display:block;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:#F0B038"></span>
+          <p style="margin:34px 0 0;color:#FCFCFC;font-size:20px;font-weight:300;line-height:1.35">Uzun soluklu ticari deneyim</p>
+        </div>
+        <div data-reveal data-delay="90">
+          <span aria-hidden="true" style="display:block;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:rgba(240,176,56,.6)"></span>
+          <p style="margin:34px 0 0;color:#FCFCFC;font-size:20px;font-weight:300;line-height:1.35">Ürün bilgisi</p>
+        </div>
+        <div data-reveal data-delay="180">
+          <span aria-hidden="true" style="display:block;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:#F0B038"></span>
+          <p style="margin:34px 0 0;color:#FCFCFC;font-size:20px;font-weight:300;line-height:1.35">Uluslararası ticaret yaklaşımı</p>
+        </div>
+        <div data-reveal data-delay="270">
+          <span aria-hidden="true" style="display:block;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:rgba(240,176,56,.6)"></span>
+          <p style="margin:34px 0 0;color:#FCFCFC;font-size:20px;font-weight:300;line-height:1.35">Kurumsal iş ortaklıkları</p>
+        </div>
+        <div data-reveal data-delay="360">
+          <span aria-hidden="true" style="display:block;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:#F0B038"></span>
+          <p style="margin:34px 0 0;color:#FCFCFC;font-size:20px;font-weight:300;line-height:1.35">Süreklilik</p>
+        </div>
+      </div>
+      <div data-reveal data-delay="120" style="margin-top:90px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:44px">
+        <div style="display:flex;align-items:flex-end;gap:18px">
+          <span style="color:#F0B038;font-size:104px;font-weight:900;line-height:.82;letter-spacing:-.03em">30</span>
+          <span style="padding-bottom:10px;color:rgba(252,252,252,.84);font-size:14px;font-weight:400;line-height:1.5;max-width:150px">yıllık ticaret deneyimi</span>
+        </div>
+        <p style="margin:0;max-width:520px;padding-bottom:8px;color:rgba(252,252,252,.8);font-size:15px;font-weight:300;line-height:1.75">Kurumsal geçmişe ilişkin doğrulanmış bilgiler firma tarafından sağlandığında bu bölüm güncellenecektir.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="teklif" data-screen-label="Teklif ve İletişim" style="background:#EFE6D5">
+  <div style="max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="quote" style="display:grid;grid-template-columns:.85fr 1.15fr;gap:96px;padding:134px 0 140px;align-items:start">
+      <div>
+        <p data-reveal style="display:flex;align-items:center;gap:14px;margin:0 0 32px;color:#8A5F0E;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase">
+          <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true" style="flex:none"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#8A5F0E" stroke-width="1.2" stroke-linecap="square"></path></svg>
+          Teklif Talebi
+        </p>
+        <h2 data-reveal data-delay="80" style="margin:0;color:#004C38;font-size:clamp(28px,3.2vw,46px);font-weight:300;line-height:1.15;letter-spacing:-.01em">Ürün ve tedarik talepleriniz için iletişime geçin.</h2>
+        <p data-reveal data-delay="160" style="margin:30px 0 0;max-width:400px;color:rgba(22,53,44,.82);font-size:16px;font-weight:300;line-height:1.78">İlgilendiğiniz ürün grubunu ve ticari talebinizi paylaşın; Raymar ekibi sizinle iletişime geçsin.</p>
+        <div data-reveal data-delay="240" style="margin-top:52px;padding-top:34px;border-top:1px solid rgba(0,76,56,.16);display:flex;flex-direction:column;gap:22px">
+          <div>
+            <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Adres</div>
+            <div style="margin-top:9px;color:#16352C;font-size:14.5px;font-weight:300;line-height:1.65">Marex Dış Tic. Ltd. Şti.<br>Oruçreis Mah. Vadi Cad. No:108 K:8 D:491<br>İstanbul Ticaret Sarayı 34235 Giyimkent<br>Esenler / İstanbul</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+            <div>
+              <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Telefon</div>
+              <div style="margin-top:9px;color:rgba(22,53,44,.76);font-size:14.5px;font-weight:300">[Telefon bilgisi eklenecek]</div>
+            </div>
+            <div>
+              <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">E-posta</div>
+              <div style="margin-top:9px;color:rgba(22,53,44,.76);font-size:14.5px;font-weight:300">[E-posta bilgisi eklenecek]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-reveal data-delay="120" data-rmr="formwrap" style="position:relative">
+        <div aria-hidden="true" style="position:absolute;right:-10px;top:-26px;width:104px;height:104px;border-top:1px solid rgba(240,176,56,.8);border-right:1px solid rgba(240,176,56,.8);border-top-right-radius:24px"></div>
+        <form data-rmr="form" novalidate style="position:relative;background:#FCFCFC;border:1px solid rgba(0,76,56,.12);border-radius:2px;padding:46px 46px 42px">
+          <div data-rmr="fields" style="display:grid;grid-template-columns:1fr 1fr;gap:26px 24px">
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Ad Soyad *</span>
+              <input data-field name="ad" type="text" required autocomplete="name" placeholder="Adınız ve soyadınız" style="height:48px;padding:0 14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Firma *</span>
+              <input data-field name="firma" type="text" required autocomplete="organization" placeholder="Firma adı" style="height:48px;padding:0 14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Ülke *</span>
+              <input data-field name="ulke" type="text" required autocomplete="country-name" placeholder="Ülke" style="height:48px;padding:0 14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">E-posta *</span>
+              <input data-field name="eposta" type="email" required autocomplete="email" placeholder="ornek@firma.com" style="height:48px;padding:0 14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Telefon</span>
+              <input data-field name="telefon" type="tel" autocomplete="tel" placeholder="+90" style="height:48px;padding:0 14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">İlgilenilen Ürün *</span>
+              <select data-field data-rmr="product" name="urun" required style="height:48px;padding:0 12px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;appearance:none;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC">
+                <option value="">Seçiniz</option>
+                <option value="Fındık">Fındık</option>
+                <option value="Ceviz Ürünleri">Ceviz Ürünleri</option>
+                <option value="Kabak Çekirdeği İçi">Kabak Çekirdeği İçi</option>
+                <option value="Pikan Cevizi">Pikan Cevizi</option>
+                <option value="Makademya">Makademya</option>
+                <option value="Ayçekirdeği">Ayçekirdeği</option>
+                <option value="Diğer">Diğer</option>
+              </select>
+            </label>
+            <label data-rmr="msgfield" style="grid-column:span 2;display:flex;flex-direction:column;gap:10px">
+              <span style="color:rgba(22,53,44,.84);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Talep Mesajı *</span>
+              <textarea data-field data-rmr="message" name="mesaj" required rows="4" placeholder="Ürün grubu, miktar ve teslim beklentinizi kısaca paylaşın." style="padding:14px;background:#F8F5EE;border:1px solid rgba(0,76,56,.16);border-radius:2px;outline:none;resize:vertical;line-height:1.6;transition:border-color .25s ease,background .25s ease" style-focus="border-color:#F0B038;background:#FCFCFC"></textarea>
+            </label>
+          </div>
+          <label style="margin-top:28px;display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+            <input data-field data-rmr="kvkk" name="kvkk" type="checkbox" required style="margin:2px 0 0;width:18px;height:18px;flex:none;accent-color:#004C38">
+            <span style="color:rgba(22,53,44,.82);font-size:13px;font-weight:300;line-height:1.6">KVKK ve gizlilik politikası kapsamında verilerimin işlenmesine onay veriyorum. <span style="color:rgba(22,53,44,.7)">[Politika metni eklenecek]</span></span>
+          </label>
+          <p data-rmr="formerror" role="alert" style="display:none;margin:22px 0 0;padding:13px 15px;background:rgba(176,126,21,.2);border-left:2px solid #6B4708;color:#5E3F07;font-size:13.5px;font-weight:400;line-height:1.5"></p>
+          <div style="margin-top:30px;display:flex;flex-wrap:wrap;align-items:center;gap:22px">
+            <button type="submit" style="display:inline-flex;align-items:center;gap:12px;padding:17px 32px;background:#004C38;border:0;border-radius:2px;cursor:pointer;color:#FCFCFC;font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;transition:background .3s ease,transform .3s ease" style-hover="background:#0B6047;transform:translateY(-2px)">Talebi Gönder
+              <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden="true"><path d="M1 1l3 3-3 3M7.5 1l3 3-3 3M14 1l3 3-3 3" fill="none" stroke="#F0B038" stroke-width="1.2" stroke-linecap="square"></path></svg>
+            </button>
+            <span style="color:rgba(22,53,44,.74);font-size:12.5px;font-weight:400">* Zorunlu alanlar</span>
+          </div>
+        </form>
+        <div data-rmr="success" aria-live="polite" style="display:none;position:relative;background:#FCFCFC;border:1px solid rgba(0,76,56,.12);border-radius:2px;padding:52px 46px 46px">
+          <span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:rgba(240,176,56,.16)">
+            <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 8.5l6.5 6L21 1" fill="none" stroke="#004C38" stroke-width="1.6"></path></svg>
+          </span>
+          <h3 style="margin:26px 0 0;color:#004C38;font-size:30px;font-weight:300;line-height:1.2">Talebiniz alındı.</h3>
+          <p style="margin:16px 0 0;max-width:420px;color:rgba(22,53,44,.82);font-size:15.5px;font-weight:300;line-height:1.75">Raymar ekibi paylaştığınız bilgiler üzerinden sizinle iletişime geçecek.</p>
+          <div style="margin-top:34px;padding-top:26px;border-top:1px solid rgba(0,76,56,.12)">
+            <div style="color:rgba(22,53,44,.78);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Gönderilecek bilgiler</div>
+            <dl data-rmr="summary" style="margin:20px 0 0;display:grid;grid-template-columns:auto 1fr;gap:12px 28px;font-size:14.5px"></dl>
+          </div>
+          <button type="button" data-rmr="reset" style="margin-top:36px;display:inline-flex;align-items:center;gap:10px;padding:0 0 10px;background:none;border:0;border-bottom:1px solid rgba(0,76,56,.24);cursor:pointer;color:#004C38;font-size:12.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;transition:border-color .25s ease" style-hover="border-color:#F0B038">Yeni talep oluştur</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer data-screen-label="Footer" style="position:relative;background:#004C38;overflow:hidden">
+  <div aria-hidden="true" style="position:absolute;right:-40px;top:-30px;width:220px;height:240px;opacity:.07;background:url('assets/raymar-emblem-gold.svg') no-repeat center/contain"></div>
+  <div style="position:relative;max-width:1320px;margin:0 auto;padding:0 40px">
+    <div data-rmr="footergrid" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:56px;padding:100px 0 68px">
+      <div>
+        <img src="assets/raymar-logo-white-gold.svg" alt="Raymar Nuts" width="186" height="44" style="width:186px;height:44px;object-fit:contain;object-position:left center">
+        <p style="margin:30px 0 0;max-width:330px;color:rgba(252,252,252,.84);font-size:14.5px;font-weight:300;line-height:1.75">Uluslararası kuruyemiş ticaretinde otuz yıllık deneyim. Ana uzmanlık alanı fındık; ceviz ve seçkin ithal ürün gruplarında kurumsal tedarik.</p>
+        <p style="margin:32px 0 0;color:#F0B038;font-size:16px;font-weight:400;letter-spacing:.14em;text-transform:uppercase">Tane Tane Lezzetler</p>
+      </div>
+      <div>
+        <div style="color:rgba(252,252,252,.74);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Kurumsal</div>
+        <div style="margin-top:22px;display:flex;flex-direction:column;gap:14px">
+          <a href="#ust" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Ana Sayfa</a>
+          <a href="#kurumsal" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Kurumsal</a>
+          <a href="#ticaret" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Uluslararası Ticaret</a>
+          <a href="#teklif" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">İletişim</a>
+        </div>
+      </div>
+      <div>
+        <div style="color:rgba(252,252,252,.74);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">Ürünler</div>
+        <div style="margin-top:22px;display:flex;flex-direction:column;gap:14px">
+          <a href="#urunler" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Fındık</a>
+          <a href="#ceviz" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Ceviz Ürünleri</a>
+          <a href="#ithal" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Kabak Çekirdeği İçi</a>
+          <a href="#ithal" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Pikan Cevizi</a>
+          <a href="#ithal" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Makademya</a>
+          <a href="#ithal" style="color:rgba(252,252,252,.9);font-size:14.5px;font-weight:300" style-hover="color:#F0B038">Ayçekirdeği</a>
+        </div>
+      </div>
+      <div>
+        <div style="color:rgba(252,252,252,.74);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase">İletişim</div>
+        <div style="margin-top:22px;color:rgba(252,252,252,.78);font-size:14px;font-weight:300;line-height:1.7">Marex Dış Tic. Ltd. Şti.<br>Oruçreis Mah. Vadi Cad. No:108 K:8 D:491<br>İstanbul Ticaret Sarayı 34235 Giyimkent<br>Esenler / İstanbul</div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;color:rgba(252,252,252,.76);font-size:14px;font-weight:300">
+          <span>[Telefon bilgisi eklenecek]</span>
+          <span>[E-posta bilgisi eklenecek]</span>
+        </div>
+        <div style="margin-top:22px;display:flex;align-items:center;gap:9px">
+          <span style="color:#F0B038;font-size:12px;font-weight:500;letter-spacing:.1em">TR</span>
+          <span style="color:rgba(252,252,252,.66);font-size:12px">/</span>
+          <span style="color:rgba(252,252,252,.8);font-size:12px;font-weight:500;letter-spacing:.1em">EN</span>
+        </div>
+      </div>
+    </div>
+    <div data-rmr="footerbottom" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:26px 0 40px;border-top:1px solid rgba(240,176,56,.24)">
+      <span style="color:rgba(252,252,252,.76);font-size:12.5px;font-weight:300">© 2026 Raymar Nuts. Tüm hakları saklıdır.</span>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:26px">
+        <a href="#teklif" style="color:rgba(252,252,252,.82);font-size:12.5px;font-weight:300" style-hover="color:#F0B038">Gizlilik Politikası</a>
+        <a href="#teklif" style="color:rgba(252,252,252,.82);font-size:12.5px;font-weight:300" style-hover="color:#F0B038">KVKK Aydınlatma Metni</a>
+        <a href="#teklif" style="color:rgba(252,252,252,.82);font-size:12.5px;font-weight:300" style-hover="color:#F0B038">Yasal Bilgiler</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;girisDuzeni&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sol&quot;,&quot;orta&quot;],&quot;default&quot;:&quot;sol&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Giriş Sözü&quot;},&quot;portfoyDuzeni&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;editoryal&quot;,&quot;kademeli&quot;,&quot;genis-serit&quot;],&quot;default&quot;:&quot;editoryal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Ürün Portföyü&quot;},&quot;cevizDuzeni&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grid&quot;,&quot;ray&quot;,&quot;indeks&quot;],&quot;default&quot;:&quot;grid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Ceviz Ürünleri&quot;},&quot;headerDavranisi&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;seffaf-ivory&quot;,&quot;her-zaman-ivory&quot;,&quot;cizgi&quot;],&quot;default&quot;:&quot;seffaf-ivory&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;formDuzeni&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;iki-kolon&quot;,&quot;katmanli&quot;],&quot;default&quot;:&quot;iki-kolon&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Teklif Formu&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this.root = document.querySelector('[data-rmr="root"]');
+    if (!this.root) return;
+    this.rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.q = (n) => this.root.querySelector('[data-rmr="' + n + '"]');
+    this.qa = (s) => Array.prototype.slice.call(this.root.querySelectorAll(s));
+    this.bp = this.breakpoint();
+    this.applyResponsive();
+    this.applyVariants();
+    this.initHeader();
+    this.initDrawer();
+    this.initHovers();
+    this.initVideo();
+    this.initForm();
+    this.initDelegates();
+    if (!this.rm) { this.initReveals(); this.initParallax(); }
+    this.onResize = () => {
+      const bp = this.breakpoint();
+      if (bp !== this.bp) { this.bp = bp; this.applyResponsive(); this.applyVariants(); }
+      this.syncHeader();
+    };
+    window.addEventListener('resize', this.onResize);
+  }
+
+  componentDidUpdate() { if (this.root) { this._hsig = null; this.applyResponsive(); this.applyVariants(); this.syncHeader(); } }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('scroll', this.onScroll);
+    if (this._playPoll) clearInterval(this._playPoll);
+    if (this.io) this.io.disconnect();
+  }
+
+  breakpoint() {
+    const w = window.innerWidth;
+    return w < 720 ? 'mobil' : (w < 1080 ? 'tablet' : 'masaustu');
+  }
+
+  set(el, styles) { if (el) Object.keys(styles).forEach((k) => { el.style[k] = styles[k]; }); }
+
+  /* ---------- responsive ---------- */
+  applyResponsive() {
+    const bp = this.bp, mob = bp === 'mobil', tab = bp === 'tablet';
+    const narrow = mob || tab;
+    const pad = mob ? '0 20px' : (tab ? '0 32px' : '0 40px');
+    this.qa('[style*="max-width:1320px"]').forEach((el) => { el.style.padding = pad; });
+    this.set(this.q('headerinner'), { padding: pad, gap: mob ? '16px' : '28px' });
+    this.set(this.q('nav'), { display: narrow ? 'none' : 'flex', gap: tab ? '22px' : '34px' });
+    this.set(this.q('lang'), { display: narrow ? 'none' : 'flex' });
+    this.set(this.q('headercta'), { display: narrow ? 'none' : 'inline-flex' });
+    this.set(this.q('burger'), { display: narrow ? 'flex' : 'none' });
+
+    /* the floor must never exceed the viewport, or the bottom-anchored cue falls below the fold */
+    const vh = window.innerHeight;
+    const floor = Math.min(mob ? 520 : 560, vh);
+    this.set(this.q('hero'), { height: 'clamp(' + floor + 'px,' + (mob ? 86 : 94) + 'svh,1120px)', minHeight: '0px' });
+    const tight = vh < 700;
+    this.set(this.q('herocue'), { bottom: mob ? '34px' : (tight ? '38px' : '56px'), gap: mob ? '12px' : (tight ? '12px' : '16px') });
+    this.set(this.q('cuelabel'), { fontSize: mob ? '11.5px' : '13px', letterSpacing: mob ? '.18em' : '.24em' });
+    this.set(this.q('cueline'), { height: mob ? '40px' : (tight ? '44px' : '64px') });
+    this.set(this.q('giris'), { padding: mob ? '80px 0 84px' : (tab ? '104px 0 110px' : '142px 0 148px') });
+
+    this.set(this.q('strip'), { gridTemplateColumns: mob ? '1fr' : (tab ? '1fr 1fr' : 'repeat(4,1fr)') });
+    this.qa('[data-rmr="strip"] > div').forEach((el, i) => {
+      if (mob) { el.style.padding = '32px 0'; el.style.borderLeft = '0'; el.style.borderTop = i === 0 ? '0' : '1px solid rgba(240,176,56,.5)'; }
+      else if (tab) { el.style.padding = '40px 26px'; el.style.borderLeft = (i % 2 === 0) ? '0' : '1px solid rgba(240,176,56,.5)'; el.style.borderTop = i < 2 ? '0' : '1px solid rgba(240,176,56,.28)'; }
+    });
+
+    const secPadY = mob ? '76px' : (tab ? '100px' : '');
+    this.set(this.q('introgrid'), { gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: mob ? '54px' : (tab ? '64px' : '96px'), padding: secPadY ? secPadY + ' 0' : '132px 0 138px' });
+    this.set(this.q('flagship'), { gridTemplateColumns: narrow ? '1fr' : 'minmax(0,1fr) minmax(0,1fr)', gap: mob ? '48px' : '80px', padding: secPadY ? secPadY + ' 0' : '150px 0 156px' });
+    this.set(this.q('quote'), { gridTemplateColumns: narrow ? '1fr' : '.85fr 1.15fr', gap: mob ? '52px' : (tab ? '60px' : '96px'), padding: secPadY ? secPadY + ' 0' : '134px 0 140px' });
+    this.set(this.q('fields'), { gridTemplateColumns: mob ? '1fr' : '1fr 1fr' });
+    this.set(this.q('msgfield'), { gridColumn: mob ? 'span 1' : 'span 2' });
+    this.qa('[data-rmr="form"], [data-rmr="success"]').forEach((el) => { el.style.padding = mob ? '30px 22px 28px' : '46px 46px 42px'; });
+    this.set(this.q('storygrid'), { gridTemplateColumns: mob ? '1fr' : (tab ? 'repeat(2,1fr)' : 'repeat(5,1fr)'), gap: mob ? '30px' : '26px' });
+    this.set(this.q('footergrid'), { gridTemplateColumns: mob ? '1fr' : (tab ? '1fr 1fr' : '1.4fr 1fr 1fr 1fr'), gap: mob ? '40px' : '56px', padding: mob ? '64px 0 48px' : '100px 0 68px' });
+
+    this.applyPortfolioBase();
+    this.applyWalnutBase();
+    this.applyImportedBase();
+  }
+
+  applyPortfolioBase() {
+    const mob = this.bp === 'mobil', tab = this.bp === 'tablet';
+    this.set(this.q('portfolio'), { gridTemplateColumns: mob ? '1fr' : '1.12fr 1fr', gap: '18px', paddingBottom: mob ? '76px' : '132px' });
+    this.set(this.q('pf-main'), { minHeight: mob ? '420px' : (tab ? '540px' : '660px'), gridColumn: 'auto' });
+    this.set(this.q('pf-side'), { paddingTop: '0', display: 'grid', gridTemplateColumns: '1fr', gridTemplateRows: 'auto auto' });
+    this.set(this.q('pf-small'), { gridTemplateColumns: '1fr 1fr' });
+  }
+
+  applyWalnutBase() {
+    const mob = this.bp === 'mobil';
+    const cols = mob ? 1 : (window.innerWidth < 1240 ? 2 : 4);
+    const w = this.q('walnut');
+    this.set(w, { display: 'grid', gridTemplateColumns: 'repeat(' + cols + ',1fr)', gap: '18px', overflowX: 'visible', scrollSnapType: 'none', paddingBottom: '34px' });
+    this.qa('[data-rmr="wn"]').forEach((el, i) => {
+      el.style.gridColumn = (i === 0 && cols > 1) ? 'span 2' : 'auto';
+      el.style.width = 'auto';
+      el.style.flex = 'none';
+      el.style.scrollSnapAlign = 'none';
+      el.style.flexDirection = 'column';
+      el.style.alignItems = 'stretch';
+      el.style.background = '#FCFCFC';
+      el.style.border = '1px solid rgba(0,76,56,.1)';
+      const im = el.querySelector('[data-hover-img]');
+      const box = im ? im.parentElement : null;
+      if (box) {
+        box.style.width = 'auto';
+        box.style.flex = 'none';
+        box.style.height = mob ? '230px' : (cols === 2 ? (i === 0 ? '300px' : '256px') : (i === 0 ? '284px' : (i < 3 ? '284px' : '250px')));
+      }
+      const body = el.children[1];
+      if (body) { body.style.flexDirection = 'column'; body.style.alignItems = 'stretch'; body.style.justifyContent = 'flex-start'; body.style.flex = 'none'; body.style.padding = '26px 24px 24px'; body.style.gap = '14px'; }
+    });
+  }
+
+  applyImportedBase() {
+    const mob = this.bp === 'mobil', tab = this.bp === 'tablet';
+    this.set(this.q('imported'), { display: 'grid', gridTemplateColumns: mob ? '1fr 1fr' : (tab ? 'repeat(2,1fr)' : 'repeat(4,1fr)'), gap: mob ? '18px' : '22px', paddingBottom: mob ? '76px' : '126px' });
+    this.qa('[data-rmr="imp"]').forEach((el, i) => { el.style.marginTop = (!mob && i % 2 === 1) ? '38px' : '0'; });
+  }
+
+  /* ---------- variants ---------- */
+  applyVariants() {
+    const mob = this.bp === 'mobil', tab = this.bp === 'tablet', narrow = mob || tab;
+
+    /* statement block alignment */
+    const gv = this.props.girisDuzeni || 'sol';
+    const g = this.q('giris');
+    if (g) {
+      const mid = gv === 'orta';
+      this.set(g, { alignItems: mid ? 'center' : 'flex-start', textAlign: mid ? 'center' : 'left' });
+      this.set(this.q('girish1'), { maxWidth: mid ? '980px' : '900px' });
+      this.set(this.q('girisp'), { maxWidth: mid ? '620px' : '560px' });
+      this.set(this.q('girisctas'), { justifyContent: mid ? 'center' : 'flex-start' });
+      this.qa('[data-rmr="giris"] > p:first-child').forEach((el) => { el.style.justifyContent = mid ? 'center' : 'flex-start'; });
+    }
+
+    /* portfolio layout */
+    const pv = this.props.portfoyDuzeni || 'editoryal';
+    this.applyPortfolioBase();
+    if (pv === 'kademeli' && !mob) {
+      this.set(this.q('portfolio'), { gridTemplateColumns: '1fr 1fr', gap: '22px' });
+      this.set(this.q('pf-main'), { minHeight: tab ? '560px' : '700px' });
+      this.set(this.q('pf-side'), { paddingTop: '72px' });
+      this.set(this.q('pf-small'), { gridTemplateColumns: '1fr' });
+    } else if (pv === 'genis-serit' && !mob) {
+      this.set(this.q('portfolio'), { gridTemplateColumns: '1fr', gap: '18px' });
+      this.set(this.q('pf-main'), { minHeight: tab ? '420px' : '480px' });
+      this.set(this.q('pf-small'), { gridTemplateColumns: tab ? 'repeat(2,1fr)' : 'repeat(4,1fr)' });
+    }
+
+    /* walnut layout */
+    const wv = this.props.cevizDuzeni || 'grid';
+    this.applyWalnutBase();
+    if (wv === 'ray') {
+      this.set(this.q('walnut'), { display: 'flex', gridTemplateColumns: 'none', overflowX: 'auto', scrollSnapType: 'x proximity', paddingBottom: '44px' });
+      this.qa('[data-rmr="wn"]').forEach((el, i) => {
+        el.style.gridColumn = 'auto';
+        el.style.flex = '0 0 auto';
+        el.style.width = mob ? '80vw' : '318px';
+        el.style.scrollSnapAlign = 'start';
+        const im = el.querySelector('[data-hover-img]');
+        if (im) im.parentElement.style.height = '264px';
+      });
+    } else if (wv === 'indeks' && !mob) {
+      this.set(this.q('walnut'), { display: 'grid', gridTemplateColumns: '1fr', gap: '0' });
+      this.qa('[data-rmr="wn"]').forEach((el, i) => {
+        el.style.gridColumn = 'auto';
+        el.style.flexDirection = 'row';
+        el.style.alignItems = 'center';
+        el.style.background = 'transparent';
+        el.style.border = '0';
+        el.style.borderTop = '1px solid rgba(0,76,56,.14)';
+        const im = el.querySelector('[data-hover-img]');
+        if (im) { im.parentElement.style.height = '104px'; im.parentElement.style.width = '148px'; im.parentElement.style.flex = '0 0 148px'; }
+        const body = el.children[1];
+        if (body) { body.style.flexDirection = 'row'; body.style.alignItems = 'center'; body.style.justifyContent = 'space-between'; body.style.flex = '1'; body.style.padding = '18px 4px 18px 28px'; body.style.gap = '28px'; }
+      });
+    }
+
+    /* quote form layout */
+    const fv = this.props.formDuzeni || 'iki-kolon';
+    const fw = this.q('formwrap');
+    if (fv === 'katmanli' && !mob) {
+      this.set(this.q('quote'), { gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', alignItems: 'center' });
+      this.set(fw, { marginTop: '0', transform: 'translateY(28px)' });
+      this.set(this.q('fields'), { gridTemplateColumns: '1fr' });
+      this.set(this.q('msgfield'), { gridColumn: 'span 1' });
+    } else {
+      this.set(fw, { transform: 'none' });
+      this.set(this.q('quote'), { alignItems: 'start' });
+      this.set(this.q('fields'), { gridTemplateColumns: mob ? '1fr' : '1fr 1fr' });
+      this.set(this.q('msgfield'), { gridColumn: mob ? 'span 1' : 'span 2' });
+    }
+  }
+
+  /* ---------- header ---------- */
+  initHeader() {
+    this.onScroll = () => {
+      this.syncHeader();
+      if (this._raf) return;
+      this._raf = requestAnimationFrame(() => { this._raf = null; this.runParallax(); });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.syncHeader();
+  }
+
+  syncHeader() {
+    const h = this.q('header'); if (!h) return;
+    const mode = this.props.headerDavranisi || 'seffaf-ivory';
+    const solid = mode === 'her-zaman-ivory' ? true : window.scrollY > 48;
+    const sig = mode + '|' + solid + '|' + this.bp;
+    if (sig === this._hsig) return;
+    this._hsig = sig;
+    const mob = this.bp === 'mobil';
+    const inner = this.q('headerinner');
+    const light = this.q('logo-light'), dark = this.q('logo-dark');
+    let onDark;
+    if (mode === 'cizgi') {
+      this.set(h, { background: solid ? 'rgba(0,76,56,.82)' : 'transparent', backdropFilter: solid ? 'blur(14px)' : 'none', borderBottomColor: 'rgba(240,176,56,' + (solid ? '.4' : '.22') + ')' });
+      onDark = true;
+    } else {
+      this.set(h, { background: solid ? '#F8F5EE' : 'transparent', backdropFilter: 'none', borderBottomColor: solid ? 'rgba(0,76,56,.12)' : 'rgba(252,252,252,.14)' });
+      onDark = !solid;
+    }
+    if (inner) inner.style.height = (mob ? (solid ? 64 : 72) : (solid ? 76 : 88)) + 'px';
+    if (light) light.style.opacity = onDark ? '1' : '0';
+    if (dark) dark.style.opacity = onDark ? '0' : '1';
+    this.qa('[data-rmr="navlink"]').forEach((a) => { a.style.color = onDark ? '#FCFCFC' : '#004C38'; });
+    const lang = this.q('lang'), sep = this.q('langsep'), en = this.q('langen'), burger = this.q('burger'), bars = this.q('burgerbars');
+    if (lang) lang.style.borderLeftColor = onDark ? 'rgba(252,252,252,.2)' : 'rgba(0,76,56,.18)';
+    const tr = this.q('langtr');
+    if (tr) tr.style.color = onDark ? '#F0B038' : '#8A5F0E';
+    if (sep) sep.style.color = onDark ? 'rgba(252,252,252,.55)' : 'rgba(22,53,44,.76)';
+    if (en) en.style.color = onDark ? 'rgba(252,252,252,.8)' : 'rgba(22,53,44,.78)';
+    if (burger) burger.style.borderColor = onDark ? 'rgba(252,252,252,.28)' : 'rgba(0,76,56,.24)';
+    if (bars) { const c = onDark ? '#FCFCFC' : '#004C38'; bars.style.background = c; bars.style.boxShadow = '0 -6px 0 ' + c + ',0 6px 0 ' + c; }
+    const cta = this.q('headercta');
+    if (cta) {
+      const dk = mode === 'cizgi' || onDark;
+      cta.style.background = dk ? '#F0B038' : '#004C38';
+      cta.style.color = dk ? '#0B2A20' : '#FCFCFC';
+      const p = cta.querySelector('path'); if (p) p.setAttribute('stroke', dk ? '#0B2A20' : '#F0B038');
+    }
+  }
+
+  /* ---------- hero video ---------- */
+  initVideo() {
+    const v = this.q('herovideo');
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+    v.loop = true;
+    v.addEventListener('ended', () => { v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(() => {}); });
+    if (this.rm) { try { v.pause(); } catch (e) {} return; }
+    const url = v.getAttribute('data-src') || v.getAttribute('src');
+    const start = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    /* Fetch the file ourselves and hand it over as an object URL: some runtimes
+       reject the element's own ranged media request (NETWORK_NO_SOURCE), and
+       loading it directly first would log a resource error on every page load. */
+    fetch(url).then((r) => (r.ok ? r.blob() : Promise.reject(r.status))).then((b) => {
+      v.src = URL.createObjectURL(b.type ? b : new Blob([b], { type: 'video/mp4' }));
+      v.loop = true;
+      v.muted = true;
+      v.addEventListener('loadeddata', start, { once: true });
+      v.addEventListener('canplay', start, { once: true });
+      try { v.load(); } catch (e) {}
+      start();
+    }).catch(() => {});
+    /* autoplay is suspended while the document is hidden, and can be blocked
+       until the first gesture — retry on both */
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
+    window.addEventListener('pointerdown', start, { once: true });
+    window.addEventListener('keydown', start, { once: true });
+    this._playPoll = setInterval(() => {
+      if (v.readyState >= 2 && v.paused && !document.hidden) start();
+    }, 1500);
+  }
+
+  /* ---------- drawer ---------- */
+  initDrawer() {
+    const d = this.q('drawer'), b = this.q('burger'), c = this.q('drawerclose');
+    if (!d) return;
+    const open = (v) => {
+      d.dataset.open = v ? '1' : '0';
+      d.style.opacity = v ? '1' : '0';
+      d.style.visibility = v ? 'visible' : 'hidden';
+      d.style.transform = v ? 'none' : 'translateY(-12px)';
+      d.setAttribute('aria-hidden', v ? 'false' : 'true');
+      if (b) b.setAttribute('aria-expanded', v ? 'true' : 'false');
+      document.body.style.overflow = v ? 'hidden' : '';
+    };
+    if (b) b.addEventListener('click', () => open(d.dataset.open !== '1'));
+    if (c) c.addEventListener('click', () => open(false));
+    this.qa('[data-rmr="drawerlink"]').forEach((a) => a.addEventListener('click', () => open(false)));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && d.dataset.open === '1') open(false); });
+  }
+
+  /* ---------- hover ---------- */
+  initHovers() {
+    this.qa('[data-hover="card"]').forEach((card) => {
+      const img = card.querySelector('[data-hover-img]');
+      const title = card.querySelector('[data-hover-title]');
+      const arrow = card.querySelector('[data-hover-arrow]');
+      const en = () => { if (img) img.style.transform = 'scale(1.04)'; if (title) title.style.letterSpacing = '.012em'; if (arrow) arrow.style.transform = 'translateX(7px)'; };
+      const lv = () => { if (img) img.style.transform = 'none'; if (title) title.style.letterSpacing = ''; if (arrow) arrow.style.transform = 'none'; };
+      card.addEventListener('mouseenter', en);
+      card.addEventListener('mouseleave', lv);
+      card.addEventListener('focusin', en);
+      card.addEventListener('focusout', lv);
+    });
+  }
+
+  /* ---------- reveals ---------- */
+  initReveals() {
+    const vh = window.innerHeight;
+    const items = this.qa('[data-reveal]').filter((el) => el.getBoundingClientRect().top > vh * 0.9);
+    if (!items.length) return;
+    items.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(22px)';
+      el.style.transition = 'opacity .95s cubic-bezier(.2,.7,.2,1), transform .95s cubic-bezier(.2,.7,.2,1)';
+      el.style.willChange = 'opacity, transform';
+    });
+    const show = (el) => {
+      const d = parseInt(el.getAttribute('data-delay') || '0', 10);
+      setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; el.style.willChange = 'auto'; }, d);
+    };
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { show(e.target); this.io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    items.forEach((el) => this.io.observe(el));
+    this._revealFallback = setTimeout(() => items.forEach(show), 5000);
+  }
+
+  /* ---------- parallax ---------- */
+  initParallax() {
+    this.px = this.qa('[data-parallax]');
+    this.runParallax();
+  }
+
+  runParallax() {
+    if (!this.px || !this.px.length || this.bp === 'mobil') return;
+    const vh = window.innerHeight;
+    this.px.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 200) return;
+      const k = parseFloat(el.getAttribute('data-parallax')) || 0.08;
+      const off = (r.top + r.height / 2 - vh / 2) * -k;
+      el.style.transform = 'translate3d(0,' + off.toFixed(1) + 'px,0)';
+    });
+  }
+
+  /* ---------- product → quote ---------- */
+  initDelegates() {
+    this.root.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-quote],[data-detail]');
+      if (!t) return;
+      const group = t.getAttribute('data-quote') || t.getAttribute('data-detail');
+      const name = t.getAttribute('data-name') || group;
+      const sel = this.q('product'), msg = this.q('message');
+      if (sel) { const has = Array.prototype.some.call(sel.options, (o) => o.value === group); sel.value = has ? group : 'Diğer'; }
+      if (msg && !msg.value.trim()) msg.value = name + ' ürün grubu için teklif talebimi iletmek istiyorum.';
+      const succ = this.q('success'), form = this.q('form');
+      if (succ && succ.style.display !== 'none') { succ.style.display = 'none'; if (form) form.style.display = 'block'; }
+      if (t.tagName === 'BUTTON') { e.preventDefault(); const tgt = document.getElementById('teklif'); if (tgt) window.scrollTo({ top: tgt.getBoundingClientRect().top + window.scrollY - 80, behavior: this.rm ? 'auto' : 'smooth' }); }
+    });
+  }
+
+  /* ---------- form ---------- */
+  initForm() {
+    const form = this.q('form'); if (!form) return;
+    const err = this.q('formerror');
+    const mark = (el, bad) => { el.style.borderColor = bad ? '#8A5F0E' : 'rgba(0,76,56,.16)'; };
+    form.addEventListener('input', (e) => { if (e.target.hasAttribute('data-field')) mark(e.target, false); });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fields = this.qa('[data-rmr="form"] [data-field]');
+      let bad = null;
+      fields.forEach((f) => {
+        let ok = true;
+        if (f.type === 'checkbox') ok = f.checked;
+        else if (f.required) ok = f.value.trim().length > 0;
+        if (ok && f.type === 'email') ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.value.trim());
+        if (!ok) { if (f.type !== 'checkbox') mark(f, true); if (!bad) bad = f; } else if (f.type !== 'checkbox') mark(f, false);
+      });
+      if (bad) {
+        if (err) { err.style.display = 'block'; err.textContent = bad.type === 'checkbox' ? 'Devam etmek için KVKK onayını işaretleyin.' : 'Lütfen zorunlu alanları eksiksiz ve doğru doldurun.'; }
+        bad.focus();
+        return;
+      }
+      if (err) err.style.display = 'none';
+      const val = (n) => { const el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
+      const rows = [['Ad Soyad', val('ad')], ['Firma', val('firma')], ['Ülke', val('ulke')], ['E-posta', val('eposta')], ['Telefon', val('telefon') || '—'], ['İlgilenilen Ürün', val('urun')], ['Talep Mesajı', val('mesaj')]];
+      const dl = this.q('summary');
+      if (dl) {
+        dl.textContent = '';
+        rows.forEach(([k, v]) => {
+          const dt = document.createElement('dt');
+          dt.textContent = k;
+          dt.style.cssText = 'margin:0;color:rgba(22,53,44,.78);font-weight:400;white-space:nowrap';
+          const dd = document.createElement('dd');
+          dd.textContent = v;
+          dd.style.cssText = 'margin:0;color:#16352C;font-weight:300;line-height:1.6';
+          dl.appendChild(dt); dl.appendChild(dd);
+        });
+      }
+      const succ = this.q('success');
+      form.style.display = 'none';
+      if (succ) { succ.style.display = 'block'; succ.scrollIntoView ? null : null; }
+    });
+    const rst = this.q('reset');
+    if (rst) rst.addEventListener('click', () => {
+      const succ = this.q('success');
+      if (succ) succ.style.display = 'none';
+      form.reset();
+      form.style.display = 'block';
+      this.qa('[data-rmr="form"] [data-field]').forEach((f) => { if (f.type !== 'checkbox') f.style.borderColor = 'rgba(0,76,56,.16)'; });
+    });
+  }
+
+  renderVals() { return {}; }
+}
+
+</script>
+</body>
+</html>
