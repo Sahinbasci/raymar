@@ -345,16 +345,18 @@
      the two-up (3 rows) and the three-up (2 rows) grid, so no card is ever
      stranded alone on the last row.
 
-     The approved design's baseline break is carried over, but keyed to the
-     column count rather than to `2n`. In a three-up grid `2n` drops cards 2,
-     4 and 6, which lands differently in each row and reads as misalignment;
-     dropping the middle of every row instead gives the same broken baseline
-     as a deliberate, repeating rhythm. */
+     The approved design's alternating 38px drop is NOT carried over.
+
+     It was written for four identical cards in a single row, where offsetting
+     every second one breaks an over-regular baseline. At three columns over two
+     rows it stops reading as rhythm: the eye has a strong horizontal reference
+     from the row above, and a lone offset card in the middle of each row just
+     looks misaligned. The row is held flush instead, and the interest comes
+     from the hairline and the type rather than from displacement. */
   .range-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    align-items: start;
-    gap: 18px;
+    gap: 18px 18px;
   }
 
   .range-media {
@@ -363,11 +365,7 @@
 
   @media (width >= 720px) {
     .range-grid {
-      gap: 22px;
-    }
-
-    .range-grid > *:nth-child(2n) {
-      margin-top: 38px;
+      gap: 40px 22px;
     }
 
     .range-media {
@@ -378,14 +376,7 @@
   @media (width >= 1080px) {
     .range-grid {
       grid-template-columns: repeat(3, 1fr);
-    }
-
-    .range-grid > *:nth-child(2n) {
-      margin-top: 0;
-    }
-
-    .range-grid > *:nth-child(3n + 2) {
-      margin-top: 38px;
+      gap: 52px 28px;
     }
 
     .range-media {

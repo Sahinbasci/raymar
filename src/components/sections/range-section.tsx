@@ -48,7 +48,7 @@ export function RangeSection({ content }: { content: RangeContent }) {
             const copy = content.products[product.id]
             return (
               <Reveal key={product.id} delay={product.revealDelay}>
-                <article className="group flex flex-col gap-5">
+                <article className="group flex flex-col gap-5.5">
                   <div className="range-media relative overflow-hidden bg-raymar-tan">
                     {product.image ? (
                       <MediaFrame
@@ -61,7 +61,11 @@ export function RangeSection({ content }: { content: RangeContent }) {
                       <PendingMedia label={content.imagePending} />
                     )}
                   </div>
-                  <div>
+                  {/* A gold hairline runs the full width of every card and
+                      every card starts at the same baseline, so the row reads
+                      as one system. This is what carries the structure now
+                      that the alternating offset is gone. */}
+                  <div className="border-t border-raymar-gold/45 pt-5">
                     <CategoryLabel>{content.categoryLabel}</CategoryLabel>
                     <h3 className="mt-3.5 font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-normal text-raymar-green transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]">
                       {copy.name}

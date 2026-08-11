@@ -49,6 +49,46 @@ export function SiteFooter({ content }: { content: FooterContent }) {
         style={{ backgroundImage: `url('${brandAssets.emblemGold}')` }}
       />
 
+      {/*
+        Closing band, as a backdrop rather than a strip.
+
+        It used to sit below the content as its own block along the very bottom
+        edge, which read as a strip pasted on the end. Now it rises out of the
+        bottom of the footer and reaches up to roughly the slogan, with the
+        copyright row sitting over it.
+
+        The top edge is a curve, not a rule.
+
+        A radial mask hides an ellipse through the middle, so the product climbs
+        at the left and right edges and dips deeply in the centre. The radii
+        matter: in CSS these are radii, not diameters, so a horizontal radius
+        above ~96% would reach past both edges and flatten the whole thing back
+        into a straight line — which is exactly what a first attempt at 115% did.
+        At 62% the edges fall outside the ellipse and lift immediately, while the
+        centre stays clear until past halfway.
+
+        That clear centre is also what keeps the slogan and the copyright
+        readable, so the curve is doing two jobs at once.
+
+        `-webkit-mask-image` is repeated for Safari, which still needs the prefix.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[clamp(240px,46%,560px)] overflow-hidden"
+      >
+        {/* Two masks intersected. The radial one carves the parabola; the
+            linear one fades the very top so the curve does not collide with the
+            container edge and leave a hard diagonal corner at each side, which
+            is what a single radial mask produced. */}
+        <div className="absolute inset-0 [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)] [mask-composite:intersect] [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)]">
+          <MediaFrame image={footerBand} alt="" sizes="100vw" />
+          {/* Holds the photograph back to a backdrop. Heaviest across the middle
+              band where the copyright row sits, easing only at the very bottom
+              where nothing is set over it. */}
+          <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_76_56/0.62)_0%,rgb(0_76_56/0.74)_46%,rgb(0_76_56/0.7)_78%,rgb(0_76_56/0.5)_100%)]" />
+        </div>
+      </div>
+
       <div className="relative shell">
         <div className="grid grid-cols-1 gap-10 pt-16 pb-12 md:grid-cols-2 md:gap-14 md:pt-25 md:pb-17 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
@@ -115,25 +155,6 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             ))}
           </div>
         </div>
-      </div>
-
-      {/*
-        Closing band. The image is washed up into the green by a four-stop
-        gradient, so the product emerges from the surface instead of sitting on
-        it as a pasted strip. Sized in `vw` at the small end so a 360px phone
-        does not get a band as tall as its own content block.
-
-        Both the height and the gradient are deliberately generous: at the
-        earlier 196px cap with a 0.34 floor the walnuts only surfaced in the
-        last few dozen pixels and the band read as a smudge along the very
-        bottom edge rather than as the page resolving into product.
-      */}
-      <div
-        aria-hidden="true"
-        className="relative h-[clamp(132px,19vw,320px)] w-full overflow-hidden"
-      >
-        <MediaFrame image={footerBand} alt="" sizes="100vw" />
-        <span className="absolute inset-0 bg-[linear-gradient(to_bottom,var(--color-raymar-green)_0%,rgb(0_76_56/0.8)_26%,rgb(0_76_56/0.44)_58%,rgb(0_76_56/0.18)_100%)]" />
       </div>
     </footer>
   )

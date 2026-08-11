@@ -55,22 +55,40 @@ export function TradeStorySection({ content }: { content: TradeStoryContent }) {
         </div>
 
         <div className="mt-14 pb-19 md:mt-18 md:pb-25 lg:mt-24 lg:pb-33">
-          <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6.5 md:gap-y-13 lg:grid-cols-5">
-            {content.pillars.map((pillar, index) => (
-              <Reveal key={pillar} delay={index * 90}>
-                <div className="border-t border-raymar-gold/50 pt-6">
-                  <span
-                    aria-hidden="true"
-                    className="block font-[family-name:var(--font-display)] text-[30px] leading-none font-light text-raymar-gold"
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <p className="mt-5 font-[family-name:var(--font-display)] text-[25px] leading-[1.2] font-normal text-raymar-white">
-                    {pillar}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+          {/*
+            Each step is a marked point on one continuous rule rather than five
+            separate cells. The rule runs edge to edge behind the row; every
+            step opens it with a filled dot sitting ON the line, and the numeral
+            hangs beneath. That reads as a sequence — which is what five
+            ordered principles are — where the earlier bare number over a
+            detached border read as five unrelated labels.
+          */}
+          <div className="relative">
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 hidden h-px bg-[linear-gradient(to_right,rgb(240_176_56/0.15),rgb(240_176_56/0.55)_18%,rgb(240_176_56/0.55)_82%,rgb(240_176_56/0.15))] lg:block"
+            />
+            <div className="grid grid-cols-1 gap-y-11 md:grid-cols-2 md:gap-x-7 md:gap-y-14 lg:grid-cols-5 lg:gap-x-6">
+              {content.pillars.map((pillar, index) => (
+                <Reveal key={pillar} delay={index * 90}>
+                  <div className="group relative border-t border-raymar-gold/40 pt-7 lg:border-t-0 lg:pt-9">
+                    <span
+                      aria-hidden="true"
+                      className="absolute -top-[3.5px] left-0 hidden h-[7px] w-[7px] rounded-full bg-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:scale-150 lg:block"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="block font-[family-name:var(--font-display)] text-[34px] leading-none font-light tracking-[0.02em] text-raymar-gold/85"
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <p className="mt-4.5 max-w-[210px] font-[family-name:var(--font-display)] text-[24px] leading-[1.22] font-normal text-raymar-white">
+                      {pillar}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
 
           <Reveal delay={120}>
