@@ -3,5 +3,4 @@
 #                   TypeScript import resolver. Without its postinstall the
 #                   prebuilt binding is not linked and `pnpm lint` fails.
 allowBuilds:
-  ffmpeg-static: set this to true or false
   unrs-resolver: true
