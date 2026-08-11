@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { m, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { brandAssets } from '@/data/products'
 import { cn } from '@/lib/cn'
 
@@ -34,7 +34,29 @@ interface FloatingMotifProps {
  * The caller is responsible for placing this inside a clipping parent; the
  * responsive overflow test will fail the build's QA if a motif escapes.
  */
-export function FloatingMotif({
+/**
+ * The motif is `hidden lg:block` in every caller, but a mounted component still
+ * runs its `useScroll` subscription — a per-frame scroll/resize callback against
+ * a `display:none` element — on the phones where it is never shown. Gating the
+ * whole subtree on the `lg` media query keeps the hooks from mounting at all
+ * below 1024px, so nothing subscribes to scroll on mobile.
+ */
+export function FloatingMotif(props: FloatingMotifProps) {
+  const [enabled, setEnabled] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setEnabled(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  if (!enabled) return null
+  return <FloatingMotifInner {...props} />
+}
+
+function FloatingMotifInner({
   className,
   width,
   drift = 28,

@@ -55,7 +55,7 @@ export function MobileDrawer({ open, onClose, nav, header }: MobileDrawerProps) 
       aria-label={header.mobileNavAriaLabel}
       className="m-0 h-full max-h-full w-full max-w-full -translate-y-3 flex-col border-0 bg-raymar-ivory p-0 text-raymar-ink opacity-0 transition-[opacity,translate,display,overlay] transition-discrete duration-[400ms] ease-out backdrop:bg-transparent open:flex [&[open]]:translate-y-0 [&[open]]:opacity-100 starting:[&[open]]:-translate-y-3 starting:[&[open]]:opacity-0"
     >
-      <div className="flex h-full flex-col px-7 pt-7 pb-10">
+      <div className="flex h-full flex-col overflow-y-auto overscroll-contain px-7 pt-7 pb-10">
         <div className="flex items-center justify-between">
           <BrandLogo variant="green-gold" height={36} alt={header.logoAlt} />
           <button

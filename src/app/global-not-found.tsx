@@ -39,7 +39,7 @@ export default function GlobalNotFound() {
       className={`${jost.variable} ${cormorant.variable} ${cormorantItalic.variable}`}
     >
       <body>
-        <main className="flex min-h-screen flex-col items-start justify-center bg-raymar-green">
+        <main className="flex min-h-dvh flex-col items-start justify-center bg-raymar-green">
           <div className="shell">
             <BrandLogo variant="white-gold" height={52} alt={header.logoAlt} />
             <p className="mt-12 text-xs font-normal tracking-[0.3em] text-raymar-gold uppercase">

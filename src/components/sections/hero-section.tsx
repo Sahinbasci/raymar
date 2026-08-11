@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { getImageProps } from 'next/image'
 import Link from 'next/link'
 import { HeroVideo } from '@/components/media/hero-video'
 import { ChevronDown } from '@/components/ui/icons'
@@ -19,34 +19,50 @@ import type { HeroContent } from '@/types/content'
  * readable.
  */
 export function HeroSection({ content }: { content: HeroContent }) {
+  // Art-direct the LCP poster with a real <picture>: only the source that
+  // matches the viewport is ever downloaded. Two separate <Image fill priority>
+  // elements each preloaded AND downloaded their srcset even when `display:none`,
+  // so a phone fetched the ~51 KB landscape poster it never shows on top of the
+  // ~15 KB portrait one it does. `getImageProps` gives us Next's optimized
+  // srcset/AVIF pipeline inside markup we control.
+  const posterCommon = {
+    alt: content.posterAlt,
+    fill: true as const,
+    priority: true,
+    sizes: '100vw',
+  }
+  const { props: desktopPoster } = getImageProps({
+    ...posterCommon,
+    src: heroMedia.poster,
+  })
+  const { props: mobilePoster } = getImageProps({
+    ...posterCommon,
+    src: heroMedia.posterMobile,
+  })
+
   return (
     <section
       id="ust"
       className="hero-frame relative overflow-hidden bg-raymar-green"
       aria-label="Raymar Nuts"
     >
-      {/* Two art-directed posters: the approved 16:9 on tablet/desktop, a
-          portrait cut (the mobile clip's first frame) below 720px. Each is
-          hidden at the other breakpoint; the video fades in over whichever
-          shows. 720px is the design's `mobil` breakpoint, matched by HeroVideo. */}
-      <Image
-        src={heroMedia.poster}
-        alt={content.posterAlt}
-        aria-hidden={content.posterAlt === '' ? true : undefined}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-center max-[719px]:hidden"
-      />
-      <Image
-        src={heroMedia.posterMobile}
-        alt={content.posterAlt}
-        aria-hidden={content.posterAlt === '' ? true : undefined}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-center min-[720px]:hidden"
-      />
+      {/* Approved 16:9 poster at ≥720px (the design's `mobil` breakpoint, matched
+          by HeroVideo), the portrait cut (the mobile clip's first frame) below.
+          The <img> default is the mobile poster, so phones never even request the
+          landscape source. The video fades in over whichever poster shows. */}
+      <picture>
+        <source
+          media="(min-width: 720px)"
+          srcSet={desktopPoster.srcSet}
+          sizes={desktopPoster.sizes}
+        />
+        <img
+          {...mobilePoster}
+          alt={content.posterAlt}
+          aria-hidden={content.posterAlt === '' ? true : undefined}
+          className="object-cover object-center"
+        />
+      </picture>
 
       <HeroVideo />
 

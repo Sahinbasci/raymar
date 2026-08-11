@@ -81,6 +81,9 @@
        hidden underneath the fixed header. */
     scroll-padding-top: 96px;
     -webkit-text-size-adjust: 100%;
+    /* Kill the grey/black flash WebKit paints on every tap; the custom
+       :focus-visible ring already carries all focus affordance. */
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -107,7 +110,9 @@
   select,
   textarea {
     font-family: inherit;
-    font-size: 15px;
+    /* 16px is the exact threshold below which iOS Safari zooms the viewport on
+       focus and never zooms back out; 15px triggered it on the quote form. */
+    font-size: 16px;
     font-weight: 300;
     color: var(--color-raymar-ink);
   }

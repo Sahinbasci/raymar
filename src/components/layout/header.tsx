@@ -59,7 +59,7 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
         data-solid={solid}
         className="group/header fixed inset-x-0 top-0 z-[90] border-b border-raymar-white/14 bg-transparent transition-[background-color,border-color] duration-[450ms] ease-out data-[solid=true]:border-raymar-green/12 data-[solid=true]:bg-raymar-ivory"
       >
-        <div className="shell flex h-18 items-center gap-4 transition-[height] duration-[350ms] ease-out group-data-[solid=true]/header:h-16 md:h-22 md:gap-7 md:group-data-[solid=true]/header:h-19">
+        <div className="shell flex h-18 items-center gap-4 group-data-[solid=true]/header:h-16 md:h-22 md:gap-7 md:group-data-[solid=true]/header:h-19">
           <Link
             href={`/${locale}#ust`}
             aria-label={header.homeAriaLabel}
@@ -77,7 +77,6 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
                 variant="green-gold"
                 height={40}
                 alt=""
-                priority
                 className="absolute top-0 left-0 opacity-0 transition-opacity duration-[400ms] group-data-[solid=true]/header:opacity-100"
               />
             </span>
