@@ -60,6 +60,7 @@ cp .env.example .env.local   # then set NEXT_PUBLIC_SITE_URL
 - [`docs/HERO_VIDEO_PROMPT.md`](docs/HERO_VIDEO_PROMPT.md) — mobil hero videosu AI üretim prompt'u
 - [`docs/QA_REPORT.md`](docs/QA_REPORT.md) — what was tested, what was fixed, what is still open
 - [`docs/SEO_GEO_PLAN.md`](docs/SEO_GEO_PLAN.md) — arama ve yapay zekâ görünürlüğü stratejisi (TR)
+- [`docs/CONTENT_BRIEF.md`](docs/CONTENT_BRIEF.md) — yazılacak her metin satırı, numaralı (TR)
 
 ## Important
 
