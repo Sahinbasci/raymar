@@ -106,6 +106,8 @@ credits are recorded here for provenance only.
 | `walnut-broken.jpg`       | RGY23                | Pixabay 5852421  | Pixabay Content  |
 | `walnut-halves-pale.jpg`  | Ajale                | Pixabay 1049558  | Pixabay Content  |
 | `walnut-natural.jpg`      | Arina Krasnikova     | Pexels 6316688   | Pexels License   |
+| `walnut-quarter.jpg`      | Engin Akyurt         | Pexels 38571528  | Pexels License   |
+| `walnut-band.jpg`         | Zulfugar Karimov     | Pexels 34415661  | Pexels License   |
 
 All were downscaled to a 1400px long edge at quality 62 (never upscaled: the two
 Pixabay files stay at their native 1280px) and are served through `next/image`,

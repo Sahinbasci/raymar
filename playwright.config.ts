@@ -5,7 +5,8 @@ import { defineConfig, devices } from '@playwright/test'
  * navigation, responsive integrity, form validation, motion preferences and the
  * hero fallback. Tests run against the production build, not `next dev`.
  */
-const PORT = 3210
+/** Overridable so a run can dodge a port already taken on the machine. */
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3210)
 const baseURL = `http://127.0.0.1:${PORT}`
 
 export default defineConfig({

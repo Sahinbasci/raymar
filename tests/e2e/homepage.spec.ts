@@ -7,7 +7,7 @@ const SECTION_IDS = [
   'kurumsal',
   'urunler',
   'ceviz',
-  'ithal',
+  'urunlerimiz',
   'ticaret',
   'teklif',
 ] as const

@@ -28,13 +28,40 @@ export const jost = Jost({
   fallback: ['system-ui', 'sans-serif'],
 })
 
-// Only 300 and 400 are used, in roman and (for the footer tagline) italic.
-// Nothing in the site sets a heavier weight, so no synthetic bold is possible.
+/*
+ * Only 300 and 400 are used, in roman and — for the footer slogan alone —
+ * italic. Nothing in the site sets a heavier weight, so no synthetic bold is
+ * possible.
+ *
+ * `preload: false`. Every preloaded font competes with the hero poster, which
+ * is the LCP element: measured on a throttled phone profile the six preloaded
+ * faces totalled 189 KB and finished between 1.0 and 1.4 s, pushing LCP out by
+ * roughly a second. The display face is not needed to paint the first viewport
+ * — the hero carries no serif text — so it loads on demand and `display: swap`
+ * covers the gap with Georgia.
+ */
 export const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
   weight: ['300', '400'],
-  style: ['normal', 'italic'],
+  style: ['normal'],
   display: 'swap',
+  preload: false,
   variable: '--font-cormorant',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
+})
+
+/*
+ * The italic is a separate face because it is used by exactly one line, the
+ * footer slogan, far below the fold. Bundled into the roman declaration it
+ * added ~72 KB to every visit — including a `latin-ext` italic that no glyph on
+ * the site can ever match.
+ */
+export const cormorantItalic = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300'],
+  style: ['italic'],
+  display: 'swap',
+  preload: false,
+  variable: '--font-cormorant-italic',
   fallback: ['Georgia', 'Times New Roman', 'serif'],
 })

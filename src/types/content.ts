@@ -176,6 +176,13 @@ export interface QuoteContent {
   readonly prefillTemplate: string
 }
 
+export interface NotFoundContent {
+  readonly code: string
+  readonly heading: string
+  readonly cta: string
+  readonly metaTitle: string
+}
+
 export interface FooterColumn {
   readonly heading: string
   readonly links: readonly LinkItem[]
@@ -207,6 +214,7 @@ export interface Dictionary {
   readonly range: RangeContent
   readonly tradeStory: TradeStoryContent
   readonly quote: QuoteContent
+  readonly notFound: NotFoundContent
   readonly footer: FooterContent
   readonly meta: {
     readonly siteName: string

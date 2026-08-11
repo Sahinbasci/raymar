@@ -117,7 +117,11 @@ test.describe('language switch', () => {
     page,
   }) => {
     await page.goto('/tr')
-    const en = page.getByRole('button', { name: 'EN' })
+    // `exact` matters: Playwright matches accessible names as a
+    // case-insensitive substring by default, and every product card now
+    // carries an aria-label — "Bal Rengi Ceviz İçi için teklif talep et"
+    // contains "en", so a loose match resolves to two elements.
+    const en = page.getByRole('button', { name: 'EN', exact: true })
     await expect(en).toHaveAttribute('aria-disabled', 'true')
   })
 })

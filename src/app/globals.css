@@ -47,6 +47,10 @@
      fallback the approved design itself loads. See docs/DESIGN_SYSTEM.md. */
   --font-sans: 'DIN Next LT Pro', 'DIN Pro', var(--font-jost), system-ui, sans-serif;
   --font-display: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  /* Separate face: the italic is preloaded nowhere and used by the footer
+     slogan alone. Without its own token the browser would synthesise an
+     oblique from the roman. */
+  --font-display-italic: var(--font-cormorant-italic), Georgia, 'Times New Roman', serif;
 
   /* -- Motion tokens ------------------------------------------------------ */
   --ease-raymar: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -113,9 +117,17 @@
     color: rgb(22 53 44 / 0.54);
   }
 
+  /* Two-tone focus ring.
+     Gold alone measured 1.76:1 on ivory, 1.55:1 on cream and 1.87:1 on white —
+     invisible across the light two-thirds of the page, and well under the 3:1
+     that WCAG 1.4.11 asks of a focus indicator. A dark ring alone would then
+     disappear on the deep-green sections instead. Painting both means one of
+     the two always contrasts: the deep-green halo carries the light surfaces
+     (9.8:1 on white) and the gold band carries the green ones (5.25:1). */
   :focus-visible {
     outline: 2px solid var(--color-raymar-gold);
-    outline-offset: 3px;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--color-raymar-green-deep);
   }
 
   /* Headings inherit the display serif; weights are set per component so the

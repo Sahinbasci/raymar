@@ -54,7 +54,12 @@ export function CorporateIntro({ content }: { content: CorporateIntroContent }) 
               <MediaFrame
                 image={editorialImages.corporatePortrait}
                 alt={content.imageAlt}
-                sizes="(min-width: 1080px) 480px, (min-width: 720px) 45vw, 100vw"
+                /* The grid is single-column until `lg`, so the portrait is
+                   capped at its own max-width of 480px from the moment the
+                   shell is wide enough to reach it — not from 1080px. The old
+                   45vw step declared 345px for a slot measuring 480px at
+                   768px, and the optimizer duly served an upscaled file. */
+                sizes="(min-width: 600px) 480px, 100vw"
               />
             </ParallaxMedia>
             <BrandEmblem width={44} className="absolute bottom-6.5 left-3.5 opacity-90" />

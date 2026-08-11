@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { CheckMark } from '@/components/ui/icons'
 import { cn, formatTemplate } from '@/lib/cn'
 import {
@@ -35,8 +35,14 @@ const requiredFields: readonly FieldName[] = [
 /** Same shape the design validated against. */
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
+/*
+ * No `outline-none` here. It used to sit in this string, and because Tailwind
+ * emits the utilities layer after the base layer it beat the global
+ * `:focus-visible` rule in globals.css — every control in the form had its
+ * focus ring silently removed, leaving a border-colour change as the only cue.
+ */
 const inputClass =
-  'h-12 rounded-none border bg-raymar-ivory px-3.5 outline-none transition-[border-color,background-color] duration-300 focus:border-raymar-gold focus:bg-raymar-white'
+  'h-12 rounded-none border bg-raymar-ivory px-3.5 transition-[border-color,background-color] duration-300 focus:border-raymar-gold focus:bg-raymar-white'
 
 function fieldBorder(invalid: boolean): string {
   return invalid ? 'border-raymar-alert-rule' : 'border-raymar-green/16'
@@ -68,8 +74,25 @@ export function QuoteForm({ content }: QuoteFormProps) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [submitted, setSubmitted] = useState<Record<FieldName, string>>(emptyValues)
   const [appliedRequest, setAppliedRequest] = useState<number | null>(null)
+  /** The last message this component generated, so a later CTA can replace it. */
+  const [lastPrefill, setLastPrefill] = useState('')
+  /**
+   * Text for the persistent live region. A region only announces changes it is
+   * present for, so it is mounted across every state and written into after the
+   * fact — the success panel used to arrive with its own region already
+   * populated, which announces nothing.
+   */
+  const [announcement, setAnnouncement] = useState('')
+  const successHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const fieldId = (name: string) => `${formId}-${name}`
+
+  // Submitting replaces the whole form with the success panel, so focus would
+  // otherwise fall back to <body> and the visitor would be left at the top of
+  // the document with no idea what happened.
+  useEffect(() => {
+    if (status === 'success') successHeadingRef.current?.focus()
+  }, [status])
 
   // A product card asked for a quote: preselect the group, prefill the message
   // if the visitor has not written one, and return from the success state.
@@ -79,16 +102,24 @@ export function QuoteForm({ content }: QuoteFormProps) {
   // idempotent, so re-rendering for any other reason does not overwrite what
   // the visitor has typed.
   if (request && request.token !== appliedRequest) {
+    const prefill = formatTemplate(content.prefillTemplate, { product: request.name })
     setAppliedRequest(request.token)
+    setLastPrefill(prefill)
     setStatus((current) => (current === 'success' ? 'idle' : current))
     setValues((current) => ({
       ...current,
       product: content.productOptions.includes(request.group)
         ? request.group
         : content.otherProductOption,
-      message: current.message.trim()
-        ? current.message
-        : formatTemplate(content.prefillTemplate, { product: request.name }),
+      // Replace the message when it is empty OR when it is still the sentence
+      // this component wrote last time. Comparing against `lastPrefill` is what
+      // lets a second product CTA correct the message: previously only the
+      // select changed, so the enquiry named one product and described another.
+      // Anything the visitor typed themselves is never overwritten.
+      message:
+        !current.message.trim() || current.message === lastPrefill
+          ? prefill
+          : current.message,
     }))
   }
 
@@ -144,8 +175,17 @@ export function QuoteForm({ content }: QuoteFormProps) {
       return
     }
 
+    // Keep a snapshot for the summary, then clear the live form. Leaving the
+    // values in state meant a later product CTA re-opened the form holding the
+    // previous enquirer's name, e-mail and phone with the KVKK box still
+    // ticked — on a shared or kiosk browser that exposes one visitor's details
+    // to the next, and invites a resubmission under someone else's name.
     setSubmitted(values)
+    setValues(emptyValues)
+    setConsent(false)
+    setLastPrefill('')
     setStatus('success')
+    setAnnouncement(`${content.successHeading} ${content.successBody}`)
   }
 
   const handleReset = () => {
@@ -154,6 +194,11 @@ export function QuoteForm({ content }: QuoteFormProps) {
     setInvalid(new Set())
     setError(null)
     setStatus('idle')
+    setAnnouncement('')
+    // Without this a product requested during the in-flight submit keeps its
+    // token marked as applied and can never be re-applied.
+    setAppliedRequest(null)
+    setLastPrefill('')
   }
 
   const summaryRows: readonly (readonly [string, string])[] = [
@@ -166,19 +211,36 @@ export function QuoteForm({ content }: QuoteFormProps) {
     [content.fields.message.label, submitted.message],
   ]
 
+  /*
+   * Mounted in both states and always the first child, so React reconciles it
+   * as the same DOM node across the swap. That persistence is the whole point:
+   * a live region announces changes made while it is on the page, and the old
+   * markup inserted a fresh region with the confirmation already inside it,
+   * which assistive technology has nothing to compare against and so says
+   * nothing at all.
+   */
+  const liveRegion = (
+    <p role="status" aria-live="polite" className="sr-only">
+      {announcement}
+    </p>
+  )
+
   if (status === 'success') {
     return (
-      <div
-        aria-live="polite"
-        className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-13 pb-11.5 md:px-11.5 md:pt-13 md:pb-11.5"
-      >
+      <>
+        {liveRegion}
+        <div className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-13 pb-11.5 md:px-11.5 md:pt-13 md:pb-11.5">
         <span
           aria-hidden="true"
           className="flex h-13 w-13 items-center justify-center rounded-full bg-raymar-gold/16 text-raymar-green"
         >
           <CheckMark />
         </span>
-        <h3 className="mt-6.5 text-4xl leading-[1.08] text-raymar-green">
+        <h3
+          ref={successHeadingRef}
+          tabIndex={-1}
+          className="mt-6.5 text-4xl leading-[1.08] text-raymar-green focus-visible:outline-offset-4"
+        >
           {content.successHeading}
         </h3>
         <p className="mt-4 max-w-[420px] text-[15.5px] leading-[1.75] font-light text-raymar-ink/82">
@@ -210,17 +272,20 @@ export function QuoteForm({ content }: QuoteFormProps) {
         >
           {content.resetCta}
         </button>
-      </div>
+        </div>
+      </>
     )
   }
 
   return (
-    <form
-      ref={formRef}
-      noValidate
-      onSubmit={handleSubmit}
-      className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-7.5 pb-7 md:px-11.5 md:pt-11.5 md:pb-10.5"
-    >
+    <>
+      {liveRegion}
+      <form
+        ref={formRef}
+        noValidate
+        onSubmit={handleSubmit}
+        className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-7.5 pb-7 md:px-11.5 md:pt-11.5 md:pb-10.5"
+      >
       <div className="grid grid-cols-1 gap-x-6 gap-y-6.5 md:grid-cols-2">
         <TextField
           id={fieldId('name')}
@@ -318,7 +383,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
             aria-invalid={invalid.has('message') || undefined}
             onChange={(event) => setField('message', event.target.value)}
             className={cn(
-              'resize-y rounded-none border bg-raymar-ivory p-3.5 leading-[1.6] transition-[border-color,background-color] duration-300 outline-none focus:border-raymar-gold focus:bg-raymar-white',
+              'resize-y rounded-none border bg-raymar-ivory p-3.5 leading-[1.6] transition-[border-color,background-color] duration-300 focus:border-raymar-gold focus:bg-raymar-white',
               fieldBorder(invalid.has('message')),
             )}
           />
@@ -406,7 +471,8 @@ export function QuoteForm({ content }: QuoteFormProps) {
           {content.requiredNote}
         </span>
       </div>
-    </form>
+      </form>
+    </>
   )
 }
 

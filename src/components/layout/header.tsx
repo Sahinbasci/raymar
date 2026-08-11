@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BrandLogo } from '@/components/media/brand-logo'
 import { ChevronTrail } from '@/components/ui/icons'
 import { useScrollThreshold } from '@/hooks/use-scroll-threshold'
@@ -32,6 +32,26 @@ interface SiteHeaderProps {
 export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
   const solid = useScrollThreshold(48)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  /*
+   * Close the drawer once the desktop navigation takes over.
+   *
+   * The burger that opens it is hidden from `lg` up, so a drawer left open
+   * across that boundary is a modal `<dialog>` covering — and inerting — the
+   * whole desktop layout with no visible control to dismiss it. The real
+   * trigger is not a resized window but a tablet rotated from portrait (1024px,
+   * burger visible) to landscape (1366px, burger gone).
+   */
+  useEffect(() => {
+    if (!menuOpen) return
+    const desktop = window.matchMedia('(min-width: 1080px)')
+    const close = () => {
+      if (desktop.matches) setMenuOpen(false)
+    }
+    close()
+    desktop.addEventListener('change', close)
+    return () => desktop.removeEventListener('change', close)
+  }, [menuOpen])
 
   return (
     <>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { MotionProvider } from '@/components/motion/motion-provider'
 import { getDictionary } from '@/content'
-import { cormorant, jost } from '@/lib/fonts'
+import { cormorant, cormorantItalic, jost } from '@/lib/fonts'
 import { completeLocales, isLocale, localeTags, type Locale } from '@/lib/i18n'
 import { ogImage, siteUrl } from '@/lib/site'
 import '../globals.css'
@@ -76,7 +76,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={localeTags[locale as Locale]}
-      className={`${jost.variable} ${cormorant.variable}`}
+      className={`${jost.variable} ${cormorant.variable} ${cormorantItalic.variable}`}
     >
       <head>
         {/*

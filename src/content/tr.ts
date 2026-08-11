@@ -274,6 +274,13 @@ export const tr: Dictionary = {
     prefillTemplate: '{product} ürün grubu için teklif talebimi iletmek istiyorum.',
   },
 
+  notFound: {
+    code: '404',
+    heading: 'Aradığınız sayfa bulunamadı.',
+    cta: 'Ana Sayfaya Dön',
+    metaTitle: 'Sayfa bulunamadı',
+  },
+
   footer: {
     logoAlt: 'Raymar Nuts',
     blurb:

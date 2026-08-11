@@ -93,7 +93,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
 
         <div className="flex items-center gap-6 md:gap-10">
           <span aria-hidden="true" className="h-px flex-1 bg-raymar-gold/28" />
-          <p className="m-0 text-center font-[family-name:var(--font-display)] text-[26px] leading-[1.25] font-light tracking-[0.005em] text-raymar-gold italic md:text-[34px]">
+          <p className="m-0 text-center font-[family-name:var(--font-display-italic)] text-[26px] leading-[1.25] font-light tracking-[0.005em] text-raymar-gold italic md:text-[34px]">
             {content.tagline}
           </p>
           <span aria-hidden="true" className="h-px flex-1 bg-raymar-gold/28" />

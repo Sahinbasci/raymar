@@ -33,6 +33,11 @@ interface PortfolioCardProps {
  * One tile of the portfolio mosaic. The three sizes share the same anatomy —
  * cover image, gradient scrim, optional index badge, serif title and a sliding
  * arrow — at the scales the design specifies.
+ *
+ * The title is an `h3`, not the styled `span` it started as. The section's own
+ * heading is an `h2`, and rendering six product names as spans meant a screen
+ * reader jumping by heading skipped the entire product mosaic — the outline
+ * went straight from the section heading to the walnut grid below it.
  */
 function PortfolioCard({ card, copy, size, sizes, className }: PortfolioCardProps) {
   return (
@@ -70,9 +75,9 @@ function PortfolioCard({ card, copy, size, sizes, className }: PortfolioCardProp
                 narrow at 390px AND at 768px (where the mosaic splits into two
                 columns), so a viewport rule cannot serve both. The design's
                 21px is restored as soon as the tile is wide enough for it. */}
-            <span className="font-[family-name:var(--font-display)] text-[16px] leading-[1.14] font-normal text-raymar-white transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em] @min-[200px]:text-[18px] @min-[250px]:text-[21px]">
+            <h3 className="m-0 font-[family-name:var(--font-display)] text-[16px] leading-[1.14] font-normal text-raymar-white transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em] @min-[200px]:text-[18px] @min-[250px]:text-[21px]">
               {copy.title}
-            </span>
+            </h3>
             <span className="inline-flex flex-none text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:translate-x-[7px]">
               <ArrowShort />
             </span>
@@ -86,16 +91,16 @@ function PortfolioCard({ card, copy, size, sizes, className }: PortfolioCardProp
                 : 'right-7 bottom-7 left-7',
             )}
           >
-            <span
+            <h3
               className={cn(
-                'block font-[family-name:var(--font-display)] font-light text-raymar-white transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]',
+                'm-0 block font-[family-name:var(--font-display)] font-light text-raymar-white transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]',
                 size === 'lead'
                   ? 'text-[clamp(38px,5vw,54px)] leading-[1.02] tracking-[-0.01em]'
                   : 'text-[clamp(28px,3.4vw,36px)] leading-[1.06]',
               )}
             >
               {copy.title}
-            </span>
+            </h3>
             <span className="mt-3 flex items-center justify-between gap-5">
               <span className="text-[13.5px] font-normal tracking-[0.02em] text-raymar-white/84">
                 {copy.subtitle}
@@ -141,7 +146,7 @@ export function PortfolioSection({ content }: { content: PortfolioContent }) {
             card={portfolioLead}
             copy={content.cards[portfolioLead.id]}
             size="lead"
-            sizes="(min-width: 1080px) 53vw, 100vw"
+            sizes="(min-width: 720px) 48vw, 100vw"
           />
 
           <div className="grid grid-rows-[auto_auto] gap-4.5">
@@ -149,7 +154,7 @@ export function PortfolioSection({ content }: { content: PortfolioContent }) {
               card={portfolioSecondary}
               copy={content.cards[portfolioSecondary.id]}
               size="secondary"
-              sizes="(min-width: 1080px) 45vw, 100vw"
+              sizes="(min-width: 720px) 42vw, 100vw"
             />
             <div className="grid grid-cols-2 gap-4.5">
               {portfolioTiles.map((tile) => (
@@ -158,7 +163,7 @@ export function PortfolioSection({ content }: { content: PortfolioContent }) {
                   card={tile}
                   copy={content.cards[tile.id]}
                   size="tile"
-                  sizes="(min-width: 1080px) 22vw, 50vw"
+                  sizes="(min-width: 720px) 21vw, 50vw"
                 />
               ))}
             </div>
