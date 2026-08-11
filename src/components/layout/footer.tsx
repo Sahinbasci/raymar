@@ -74,7 +74,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
       */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[clamp(240px,46%,560px)] overflow-hidden"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[clamp(280px,56%,680px)] overflow-hidden"
       >
         {/* Two masks intersected. The radial one carves the parabola; the
             linear one fades the very top so the curve does not collide with the

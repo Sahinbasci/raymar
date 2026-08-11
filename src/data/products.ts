@@ -330,8 +330,8 @@ export const editorialImages = {
  */
 export const footerBand = {
   src: '/images/walnut-band.jpg',
-  width: 2400,
-  height: 1600,
+  width: 3200,
+  height: 2133,
   objectPosition: '50% 50%',
 } satisfies ProductImage
 
