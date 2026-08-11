@@ -17,10 +17,18 @@ export function proxy(request: NextRequest) {
 
   if (pathname === '/') {
     const url = request.nextUrl.clone()
+    /*
+     * Deliberately 307, not 308.
+     *
+     * `/` sends everyone to Turkish today only because Turkish is the one
+     * published locale. The moment English ships this has to become an
+     * Accept-Language negotiation, and a permanent redirect would already be
+     * cached in every returning visitor's browser — an export buyer whose
+     * browser learned `/` → `/tr` months earlier would never reach `/en`.
+     * The destination is provisional, so the redirect says so.
+     */
     url.pathname = `/${defaultLocale}`
-    // 308, not the default 307: this mapping is permanent, and a temporary
-    // redirect leaves `/` competing with `/tr` in the index.
-    return NextResponse.redirect(url, 308)
+    return NextResponse.redirect(url)
   }
 
   /*

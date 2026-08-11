@@ -17,10 +17,18 @@ export const defaultLocale: Locale = 'tr'
 /** Locales whose content is approved and therefore publicly routable. */
 export const completeLocales: readonly Locale[] = ['tr']
 
-/** BCP-47 tags used for `<html lang>` and metadata alternates. */
+/**
+ * BCP-47 tags used for `<html lang>` and metadata alternates.
+ *
+ * Language-only, deliberately. Region-qualified tags narrow the audience: an
+ * `en-GB` alternate tells Google the English page is meant for the United
+ * Kingdom, which suppresses it for exactly the buyers this site exists to reach
+ * — importers in Germany, Italy, the Gulf and the United States. Turkish nut
+ * exports go to 122 countries; none of the pages here are region-specific.
+ */
 export const localeTags: Record<Locale, string> = {
-  tr: 'tr-TR',
-  en: 'en-GB',
+  tr: 'tr',
+  en: 'en',
 }
 
 export const localeLabels: Record<Locale, string> = {

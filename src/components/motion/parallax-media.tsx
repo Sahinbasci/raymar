@@ -37,17 +37,28 @@ export function ParallaxMedia({ children, overscan, className }: ParallaxMediaPr
     offset: ['start end', 'end start'],
   })
 
-  const y = useTransform(scrollYProgress, [0, 1], [-overscan, overscan])
+  /*
+   * Reduced motion flattens the output range rather than dropping `y` from the
+   * style object.
+   *
+   * Removing the key looked equivalent and was not: the server renders with
+   * `useReducedMotion()` still `null`, so the prerendered HTML carries a real
+   * `transform: translateY(-32px)`. A reduced-motion client then rendered
+   * without the key, React kept the server attribute because a client render
+   * that omits a style does not clear it, and Motion — no longer owning the
+   * property — never wrote over it. The portrait stayed permanently offset for
+   * exactly the users who asked for less movement, and stuck the same way with
+   * JavaScript disabled entirely. Keeping the key means Motion owns the
+   * transform in every state and drives it to zero.
+   */
+  const travel = reduced ? 0 : overscan
+  const y = useTransform(scrollYProgress, [0, 1], [-travel, travel])
 
   return (
     <div ref={ref} className={className}>
       <m.div
         className="absolute inset-x-0"
-        style={{
-          top: -overscan,
-          bottom: -overscan,
-          ...(reduced ? {} : { y }),
-        }}
+        style={{ top: -overscan, bottom: -overscan, y }}
       >
         {children}
       </m.div>

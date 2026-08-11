@@ -48,7 +48,10 @@ export function FloatingMotif({
     target: ref,
     offset: ['start end', 'end start'],
   })
-  const y = useTransform(scrollYProgress, [0, 1], [drift, -drift])
+  // Flattened, not removed — see the note in `parallax-media.tsx`. Dropping the
+  // key left the server's `translateY` on the node for reduced-motion users.
+  const travel = reduced ? 0 : drift
+  const y = useTransform(scrollYProgress, [0, 1], [travel, -travel])
 
   const height = Math.round((width / brandAssets.emblemRatio) * 100) / 100
 
@@ -59,7 +62,7 @@ export function FloatingMotif({
       className={cn('pointer-events-none absolute select-none', className)}
       style={{ width, height, opacity }}
     >
-      <m.div style={reduced ? {} : { y }}>
+      <m.div style={{ y }}>
         <Image
           src={brandAssets.emblemGold}
           alt=""
