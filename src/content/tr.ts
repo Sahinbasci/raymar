@@ -263,6 +263,8 @@ export const tr: Dictionary = {
     requiredNote: '* Zorunlu alanlar',
     errorGeneric: 'Lütfen zorunlu alanları eksiksiz ve doğru doldurun.',
     errorConsent: 'Devam etmek için KVKK onayını işaretleyin.',
+    errorFieldRequired: 'Bu alan zorunludur.',
+    errorFieldEmail: 'Geçerli bir e-posta adresi girin.',
     errorSubmit: 'Talebiniz şu anda iletilemedi. Lütfen tekrar deneyin.',
     submitting: 'Gönderiliyor…',
     successHeading: 'Talebiniz alındı.',

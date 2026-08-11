@@ -160,6 +160,10 @@ export interface QuoteContent {
   readonly requiredNote: string
   readonly errorGeneric: string
   readonly errorConsent: string
+  /** Attached to an empty required field via `aria-describedby`. */
+  readonly errorFieldRequired: string
+  /** Attached to a malformed e-mail field via `aria-describedby`. */
+  readonly errorFieldEmail: string
   readonly errorSubmit: string
   readonly submitting: string
   readonly successHeading: string

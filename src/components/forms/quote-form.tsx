@@ -123,6 +123,20 @@ export function QuoteForm({ content }: QuoteFormProps) {
     }))
   }
 
+  /*
+   * The reason a given control is invalid.
+   *
+   * The banner alone said only "fill the required fields in correctly", which
+   * tells a screen-reader user nothing once focus lands on a control — and a
+   * malformed e-mail and an empty one are not the same problem.
+   */
+  const fieldError = (name: FieldName | 'consent'): string | undefined => {
+    if (!invalid.has(name)) return undefined
+    if (name === 'consent') return content.errorConsent
+    if (name === 'email' && values.email.trim() !== '') return content.errorFieldEmail
+    return content.errorFieldRequired
+  }
+
   const setField = (name: FieldName, value: string) => {
     setValues((current) => ({ ...current, [name]: value }))
     setInvalid((current) => {
@@ -151,8 +165,21 @@ export function QuoteForm({ content }: QuoteFormProps) {
       const consentOnly = nextInvalid.size === 1 && nextInvalid.has('consent')
       setError(consentOnly ? content.errorConsent : content.errorGeneric)
 
+      /*
+       * Announce, then move focus — not both in the same tick.
+       *
+       * Writing the banner and focusing a control together means the focus
+       * change interrupts the assertive announcement in most screen readers, so
+       * the user hears the field label instead of the reason. Deferring by a
+       * frame lets the alert land first. The per-field message reached through
+       * `aria-describedby` then repeats the reason on the control itself.
+       */
       const first = [...requiredFields, 'consent'].find((name) => nextInvalid.has(name))
-      if (first) document.getElementById(fieldId(first))?.focus()
+      if (first) {
+        requestAnimationFrame(() => {
+          document.getElementById(fieldId(first))?.focus()
+        })
+      }
       return
     }
 
@@ -296,6 +323,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           required
           value={values.name}
           invalid={invalid.has('name')}
+          error={fieldError('name')}
           onChange={(value) => setField('name', value)}
         />
         <TextField
@@ -307,6 +335,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           required
           value={values.company}
           invalid={invalid.has('company')}
+          error={fieldError('company')}
           onChange={(value) => setField('company', value)}
         />
         <TextField
@@ -318,6 +347,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           required
           value={values.country}
           invalid={invalid.has('country')}
+          error={fieldError('country')}
           onChange={(value) => setField('country', value)}
         />
         <TextField
@@ -330,6 +360,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           required
           value={values.email}
           invalid={invalid.has('email')}
+          error={fieldError('email')}
           onChange={(value) => setField('email', value)}
         />
         <TextField
@@ -341,6 +372,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           autoComplete="tel"
           value={values.phone}
           invalid={false}
+          error={fieldError('phone')}
           onChange={(value) => setField('phone', value)}
         />
 
@@ -352,6 +384,9 @@ export function QuoteForm({ content }: QuoteFormProps) {
             required
             value={values.product}
             aria-invalid={invalid.has('product') || undefined}
+            aria-describedby={
+              fieldError('product') ? `${fieldId('product')}-error` : undefined
+            }
             onChange={(event) => setField('product', event.target.value)}
             className={cn(
               inputClass,
@@ -369,6 +404,11 @@ export function QuoteForm({ content }: QuoteFormProps) {
               {content.otherProductOption}
             </option>
           </select>
+          {fieldError('product') ? (
+            <span id={`${fieldId('product')}-error`} className={fieldErrorClass}>
+              {fieldError('product')}
+            </span>
+          ) : null}
         </label>
 
         <label className="flex flex-col gap-2.5 md:col-span-2">
@@ -381,12 +421,20 @@ export function QuoteForm({ content }: QuoteFormProps) {
             placeholder={content.fields.message.placeholder}
             value={values.message}
             aria-invalid={invalid.has('message') || undefined}
+            aria-describedby={
+              fieldError('message') ? `${fieldId('message')}-error` : undefined
+            }
             onChange={(event) => setField('message', event.target.value)}
             className={cn(
               'resize-y rounded-none border bg-raymar-ivory p-3.5 leading-[1.6] transition-[border-color,background-color] duration-300 focus:border-raymar-gold focus:bg-raymar-white',
               fieldBorder(invalid.has('message')),
             )}
           />
+          {fieldError('message') ? (
+            <span id={`${fieldId('message')}-error`} className={fieldErrorClass}>
+              {fieldError('message')}
+            </span>
+          ) : null}
         </label>
       </div>
 
@@ -414,6 +462,9 @@ export function QuoteForm({ content }: QuoteFormProps) {
           required
           checked={consent}
           aria-invalid={invalid.has('consent') || undefined}
+          aria-describedby={
+            fieldError('consent') ? `${fieldId('consent')}-error` : undefined
+          }
           onChange={(event) => {
             setConsent(event.target.checked)
             setInvalid((current) => {
@@ -428,6 +479,14 @@ export function QuoteForm({ content }: QuoteFormProps) {
         <span className="text-[13px] leading-[1.6] font-light text-raymar-ink/82">
           {content.consentText}{' '}
           <span className="text-raymar-ink/70">{content.consentPolicyNote}</span>
+          {fieldError('consent') ? (
+            <span
+              id={`${fieldId('consent')}-error`}
+              className={cn('mt-1.5 block', fieldErrorClass)}
+            >
+              {fieldError('consent')}
+            </span>
+          ) : null}
         </span>
       </label>
 
@@ -491,12 +550,18 @@ function FieldLabel({
   )
 }
 
+/** Shared styling for the message a control points at with `aria-describedby`. */
+const fieldErrorClass =
+  'text-[12.5px] leading-[1.45] font-normal text-raymar-alert-ink'
+
 interface TextFieldProps {
   id: string
   name: string
   label: string
   value: string
   invalid: boolean
+  /** Rendered under the control and wired up with `aria-describedby`. */
+  error?: string | undefined
   onChange: (value: string) => void
   type?: 'text' | 'email' | 'tel'
   /** Explicitly nullable: the content model marks placeholders optional. */
@@ -511,6 +576,7 @@ function TextField({
   label,
   value,
   invalid,
+  error,
   onChange,
   type = 'text',
   placeholder,
@@ -529,9 +595,15 @@ function TextField({
         required={required}
         value={value}
         aria-invalid={invalid || undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
         onChange={(event) => onChange(event.target.value)}
         className={cn(inputClass, fieldBorder(invalid))}
       />
+      {error ? (
+        <span id={`${id}-error`} className={fieldErrorClass}>
+          {error}
+        </span>
+      ) : null}
     </label>
   )
 }
