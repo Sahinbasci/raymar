@@ -16,6 +16,24 @@ const scriptSrc = isDev
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
   : "script-src 'self' 'unsafe-inline'"
 
+/*
+ * Two directives that only make sense over HTTPS on a real domain, and that
+ * actively break a plain-HTTP dev server.
+ *
+ * `upgrade-insecure-requests` rewrites every http:// request to https://.
+ * Against `next dev` on localhost there is no TLS listener, so Safari upgraded
+ * the navigation and the connection was simply dropped — the page would not
+ * open at all. Chromium happened to tolerate it; Safari did not.
+ *
+ * `Strict-Transport-Security` is specified to be ignored when received over
+ * plain HTTP, but sending it there is meaningless at best, and a browser that
+ * does honour it pins localhost to HTTPS for two years — a genuinely painful
+ * thing to undo on a developer's machine.
+ *
+ * Both ship in production, where they are correct and wanted.
+ */
+const httpsDirectives = isDev ? [] : ['upgrade-insecure-requests']
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -78,13 +96,17 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "object-src 'none'",
-              'upgrade-insecure-requests',
+              ...httpsDirectives,
             ].join('; '),
           },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
+          ...(isDev
+            ? []
+            : [
+                {
+                  key: 'Strict-Transport-Security',
+                  value: 'max-age=63072000; includeSubDomains; preload',
+                },
+              ]),
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
