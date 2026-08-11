@@ -3,6 +3,17 @@ import type { NextConfig } from 'next'
 const isDev = process.env.NODE_ENV === 'development'
 
 /*
+ * Escape hatch for testing a *production* build over plain HTTP on the LAN —
+ * e.g. opening the built site from a phone at http://<mac-ip>:3100. It only
+ * suppresses the two HTTPS-forcing headers below (which would otherwise upgrade
+ * every request to https:// and drop the connection); it changes nothing about
+ * the deployed site, which never sets this. Next resolves `headers()` at BUILD
+ * time into the routes manifest, so this must be set for `next build`
+ * (`ALLOW_INSECURE_LAN=1 next build`), not just `next start`.
+ */
+const allowInsecureLan = process.env.ALLOW_INSECURE_LAN === '1'
+
+/*
  * `script-src` is the one directive that differs by environment.
  *
  * React's development build uses `eval()` to reconstruct call stacks across
@@ -32,7 +43,7 @@ const scriptSrc = isDev
  *
  * Both ship in production, where they are correct and wanted.
  */
-const httpsDirectives = isDev ? [] : ['upgrade-insecure-requests']
+const httpsDirectives = isDev || allowInsecureLan ? [] : ['upgrade-insecure-requests']
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -108,7 +119,7 @@ const nextConfig: NextConfig = {
               ...httpsDirectives,
             ].join('; '),
           },
-          ...(isDev
+          ...(isDev || allowInsecureLan
             ? []
             : [
                 {
