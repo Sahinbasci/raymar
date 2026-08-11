@@ -1,5 +1,21 @@
 import type { NextConfig } from 'next'
 
+const isDev = process.env.NODE_ENV === 'development'
+
+/*
+ * `script-src` is the one directive that differs by environment.
+ *
+ * React's development build uses `eval()` to reconstruct call stacks across
+ * environments — it says so itself in the console when blocked — and it
+ * documents that it never does so in production. Without `unsafe-eval` in dev
+ * the app still renders, but every error loses its stack and the overlay stops
+ * being useful. Adding it in production would weaken the policy for no benefit,
+ * so the exception is scoped to dev only and never ships.
+ */
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'"
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -42,6 +58,9 @@ const nextConfig: NextConfig = {
          * inline styles, and for script-src because the App Router bootstraps
          * with inline scripts; a nonce-based policy needs middleware-rendered
          * responses, which conflicts with the fully static export here.
+         *
+         * `script-src` additionally carries `unsafe-eval` in development only —
+         * see the note on `scriptSrc` above.
          */
         source: '/(.*)',
         headers: [
@@ -49,7 +68,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              scriptSrc,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "media-src 'self'",
