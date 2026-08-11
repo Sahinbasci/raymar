@@ -321,18 +321,29 @@ export const editorialImages = {
 /**
  * Full-bleed band that closes the footer.
  *
- * Wants a wide, dense, evenly-lit field of product: the band crops to roughly
- * 7:1, so anything with a single subject or a strong focal point falls apart
- * at that ratio. It also spans the whole viewport, so the source has to be
- * genuinely wide — the first pass used a 900px file stretched past 1900px and
- * the upscale was visible. This frame is 2400px and appears nowhere else on
- * the page.
+ * A dense bulk field was the wrong instinct here. Cropped to roughly 4:1 and
+ * run the full width of the page, a mass of loose walnut kernels read as busy
+ * noise rather than as product — there was no subject for the eye to land on.
+ * This frame is the opposite: shallow depth of field, one pistachio sharp in
+ * the foreground with its kernel showing, everything behind it falling into
+ * warm bokeh. It also happens to sit exactly on the brand palette, gold through
+ * cream with the green of the kernel.
+ *
+ * `objectPosition` has to account for the mask, not just the crop. The parabola
+ * hides the upper half of the band through the centre, so the only part visible
+ * where the eye actually lands is the BOTTOM of the crop window. Centring the
+ * sharp nut in the window therefore hides it; the value is pulled up until that
+ * nut sits low in the window and so lands inside the visible strip.
+ *
+ * The source has to be genuinely wide because the band spans the viewport: an
+ * early version used a 900px file stretched past 1900px and the upscale was
+ * plain to see.
  */
 export const footerBand = {
-  src: '/images/walnut-band.jpg',
+  src: '/images/pistachio-band-bulk.jpg',
   width: 3200,
-  height: 2133,
-  objectPosition: '50% 50%',
+  height: 2400,
+  objectPosition: '50% 52%',
 } satisfies ProductImage
 
 export const heroMedia = {
