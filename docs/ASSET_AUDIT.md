@@ -107,6 +107,8 @@ credits are recorded here for provenance only.
 | `walnut-halves-pale.jpg`  | Ajale                | Pixabay 1049558  | Pixabay Content  |
 | `walnut-natural.jpg`      | Arina Krasnikova     | Pexels 6316688   | Pexels License   |
 | `walnut-quarter.jpg`      | Engin Akyurt         | Pexels 38571528  | Pexels License   |
+| `walnut-red.jpg`          | Tom Hermans          | Unsplash IbL3Zd62Q7Q | Unsplash License |
+| `walnut-rice.jpg`         | Bodhi Peace          | Wikimedia Commons | **CC BY-SA 4.0** ⚠ |
 | `pistachio-band-bulk.jpg` | Engin Akyurt         | Pexels 27644256  | Pexels License   |
 
 All were downscaled to a 1400px long edge at quality 62 (never upscaled: the two
@@ -117,13 +119,30 @@ which emits 9–60 KB AVIF at the widths the layout actually requests.
 candidates are hosted on `plus.unsplash.com` — that is Unsplash+, a paid
 subscription licence, not the free Unsplash License, and none were used.
 
-**Still unphotographed.** Three walnut grades — Kızıl, Pirinç and Çeyrek — have
-no honest stock equivalent: free libraries contain no reddish-kernel, rice-grade
-or quarter-grade photograph, and every candidate was an ordinary golden kernel
-that would assert a grade the picture does not show. Those three cards render
-the `PendingMedia` placeholder instead. Grade differentiation is the commercial
-point of that section, so the remaining fix is a single shoot covering all seven
-grades on one surface.
+**⚠ `walnut-rice.jpg` carries an attribution obligation.** It is the ONLY image
+on the site not under a no-attribution licence. CC BY-SA 4.0 requires:
+  1. **Attribution** — "Bodhi Peace, CC BY-SA 4.0, via Wikimedia Commons",
+     visible in a reasonable place (a credits line or the walnut-section
+     footnote).
+  2. **Share-alike** — the centre-crop is a derivative and must itself be
+     offered under CC BY-SA 4.0. This does NOT relicense the site or its code;
+     it binds only that one image file.
+Source: https://commons.wikimedia.org/wiki/File:Chopped_walnuts_on_board.jpg
+It was chosen only because it is the single genuinely rice-grade free photo in
+existence; its quality is below the rest of the set (harsh flash, warm cast) and
+it is a candidate for replacement by an own-shoot or a paid licence.
+
+**Kızıl is a colour grade, not the red-pellicle cultivar.** `walnut-red.jpg`
+is a warm reddish-amber kernel bed, chosen to read distinctly redder than the
+pale grades. A genuinely red-pellicle ('Robert Livermore' / 'Yolo Red') kernel
+photo does not exist under any free licence — four independent stock sweeps
+(Pexels, Unsplash, Pixabay, Wikimedia + open web) came back empty; the only
+red-kernel images are on paid libraries or a low-res, legally-gray US patent
+figure. Representing the grade by its colour is the honest option.
+
+**Best remaining fix.** A single shoot covering all seven walnut grades on one
+surface would replace both compromises above (the CC BY-SA rice image and the
+colour-grade kızıl stand-in) with the company's own product in one pass.
 
 ## 4. Placeholder content — REQUIRES CLIENT INPUT
 

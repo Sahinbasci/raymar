@@ -128,8 +128,12 @@ export const tr: Dictionary = {
     categoryLabel: 'Ceviz İçi',
     detailsCta: 'Detayları Gör',
     quoteCta: 'Teklif Talep Et',
+    // The second sentence is the CC BY-SA 4.0 attribution that `walnut-rice.jpg`
+    // (the Pirinç card) legally requires. It is the only attributed image on the
+    // site; remove this credit only when that photograph is replaced by an
+    // own-shoot or a no-attribution licence. See docs/ASSET_AUDIT.md.
     footnote:
-      'Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır.',
+      'Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır. Pirinç görseli: Bodhi Peace, Wikimedia Commons, CC BY-SA 4.0.',
     imagePending: 'Ürün görseli hazırlanıyor',
     // One group today, using the label the approved design already applies to
     // every walnut card. Further groups must be named by Raymar.

@@ -103,16 +103,30 @@ export const walnutProducts: readonly WalnutProduct[] = [
     revealDelay: 0,
   },
   {
+    // "Kızıl" is the colour grade, not the rare red-pellicle cultivar: it names
+    // the redder, darker-amber kernels against the pale "beyaz" end of the
+    // range. This warm reddish-amber bed reads distinctly darker than
+    // `walnut-honey` (Bal Rengi) and the pale halves, which is exactly the
+    // distinction the grade claims. A genuinely red-pellicle kernel photo does
+    // not exist under any free licence — four independent stock searches came
+    // back empty — so representing the grade by its colour is the honest option.
     id: 'kizil',
     group: 'ceviz-ici',
-    image: null,
+    image: { src: '/images/walnut-red.jpg', width: 2400, height: 1600 },
     featured: false,
     revealDelay: 70,
   },
   {
+    // "Pirinç" is the size grade — the smallest, rice-fine broken pieces. No
+    // clean, free product-bed photo of rice-grade walnut exists (every free
+    // result is a kitchen scene or a poor snapshot; the clean ones are all
+    // paid). This is the one genuinely small-piece free image, centre-cropped
+    // to the pile. It is licensed CC BY-SA 4.0 (Bodhi Peace) — attribution and
+    // share-alike required; see docs/ASSET_AUDIT.md — the only image on the
+    // site that carries an attribution obligation.
     id: 'pirinc',
     group: 'ceviz-ici',
-    image: null,
+    image: { src: '/images/walnut-rice.jpg', width: 2600, height: 2600 },
     featured: false,
     revealDelay: 110,
   },
