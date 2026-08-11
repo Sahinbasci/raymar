@@ -64,7 +64,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
         matter: in CSS these are radii, not diameters, so a horizontal radius
         above ~96% would reach past both edges and flatten the whole thing back
         into a straight line — which is exactly what a first attempt at 115% did.
-        At 62% the edges fall outside the ellipse and lift immediately, while the
+        The edges fall outside the ellipse and lift immediately, while the
         centre stays clear until past halfway.
 
         That clear centre is also what keeps the slogan and the copyright
@@ -80,13 +80,17 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             linear one fades the very top so the curve does not collide with the
             container edge and leave a hard diagonal corner at each side, which
             is what a single radial mask produced. */}
-        <div className="absolute inset-0 [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)] [mask-composite:intersect] [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)]">
+        <div className="absolute inset-0 [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)] [mask-composite:intersect] [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)]">
           <MediaFrame image={footerBand} alt="" sizes="100vw" />
-          {/* The veil is now shaped around the copyright row rather than laid
-              evenly over the whole band: heaviest exactly where that line sits,
-              then released almost entirely below it so the walnuts come forward
-              at the bottom edge instead of staying behind a flat wash. */}
-          <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_76_56/0.6)_0%,rgb(0_76_56/0.72)_42%,rgb(0_76_56/0.66)_66%,rgb(0_76_56/0.24)_86%,rgb(0_76_56/0.08)_100%)]" />
+          {/* The veil is shaped around the copyright row rather than laid evenly
+              over the band: light everywhere so the crop shows through, with a
+              narrow peak at 58-70% — exactly the strip that row occupies.
+
+              Measured against rendered pixels rather than guessed. On the
+              brightest pistachio highlights the small print sat at 3.48:1,
+              under the 4.5:1 that 12.5px text needs; the peak plus full-opacity
+              white takes it to 5.34:1 without dimming the rest of the band. */}
+          <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_76_56/0.42)_0%,rgb(0_76_56/0.5)_38%,rgb(0_76_56/0.68)_58%,rgb(0_76_56/0.7)_70%,rgb(0_76_56/0.3)_82%,rgb(0_76_56/0.08)_92%,rgb(0_76_56/0.02)_100%)]" />
         </div>
       </div>
 
@@ -144,7 +148,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             copyright row is the last thing set over the band, and everything
             below it is left to the photograph. */}
         <div className="mt-13 flex flex-wrap items-center justify-between gap-5 border-t border-raymar-gold/24 pt-6.5 pb-28 md:pb-36">
-          <span className="text-[12.5px] font-light text-raymar-white/76">
+          <span className="text-[12.5px] font-light text-raymar-white">
             {content.copyright}
           </span>
           <div className="flex flex-wrap items-center gap-6.5">
@@ -152,7 +156,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-[12.5px] font-light text-raymar-white/82 transition-colors duration-300 hover:text-raymar-gold"
+                className="text-[12.5px] font-light text-raymar-white transition-colors duration-300 hover:text-raymar-gold"
               >
                 {link.label}
               </Link>
