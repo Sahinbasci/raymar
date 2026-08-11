@@ -370,10 +370,18 @@ export const heroMedia = {
    * path here to switch it on. See docs/HERO_VIDEO_SPEC.md for the exact
    * production spec.
    */
-  videoMobile: null as string | null,
+  videoMobile: '/video/raymar-hero-mobile.mp4' as string | null,
   poster: '/images/hero-poster.jpg',
   posterWidth: 1600,
   posterHeight: 900,
+  /**
+   * Portrait poster for phones, cut from the mobile clip's FIRST frame so the
+   * poster→video hand-off is seamless. It also carries the reduced-motion and
+   * Data-Saver fallback on mobile, where the 16:9 poster would crop badly.
+   */
+  posterMobile: '/images/hero-poster-mobile.jpg',
+  posterMobileWidth: 720,
+  posterMobileHeight: 1280,
   /** Source runtime in seconds; the design loops the clip continuously. */
   durationSeconds: 8,
 } as const

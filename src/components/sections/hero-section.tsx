@@ -25,6 +25,10 @@ export function HeroSection({ content }: { content: HeroContent }) {
       className="hero-frame relative overflow-hidden bg-raymar-green"
       aria-label="Raymar Nuts"
     >
+      {/* Two art-directed posters: the approved 16:9 on tablet/desktop, a
+          portrait cut (the mobile clip's first frame) below 720px. Each is
+          hidden at the other breakpoint; the video fades in over whichever
+          shows. 720px is the design's `mobil` breakpoint, matched by HeroVideo. */}
       <Image
         src={heroMedia.poster}
         alt={content.posterAlt}
@@ -32,7 +36,16 @@ export function HeroSection({ content }: { content: HeroContent }) {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center"
+        className="object-cover object-center max-[719px]:hidden"
+      />
+      <Image
+        src={heroMedia.posterMobile}
+        alt={content.posterAlt}
+        aria-hidden={content.posterAlt === '' ? true : undefined}
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center min-[720px]:hidden"
       />
 
       <HeroVideo />

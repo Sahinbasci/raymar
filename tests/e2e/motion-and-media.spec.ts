@@ -52,7 +52,7 @@ test.describe('reduced motion', () => {
       .locator('video')
       .evaluate((el: HTMLVideoElement) => el.paused)
     expect(paused).toBe(true)
-    await expect(page.locator('#ust img').first()).toBeVisible()
+    await expect(page.locator('#ust img:visible').first()).toBeVisible()
   })
 })
 
@@ -78,11 +78,15 @@ test.describe('hero media', () => {
   test('poster fallback carries the hero when the video cannot load', async ({
     page,
   }) => {
-    await page.route('**/video/raymar-hero.mp4', (route) => route.abort())
+    // Block every hero clip — desktop and the portrait mobile cut — so the test
+    // exercises the fallback on whichever viewport it runs in.
+    await page.route('**/video/raymar-hero*.mp4', (route) => route.abort())
     await page.goto('/tr')
 
-    // The composition and all hero information survive without playback.
-    const poster = page.locator('#ust img').first()
+    // The composition and all hero information survive without playback. Two
+    // art-directed posters exist (16:9 desktop, portrait mobile); exactly one is
+    // shown per viewport, so assert against the visible one.
+    const poster = page.locator('#ust img:visible').first()
     await expect(poster).toBeVisible()
     await expect(
       page.locator('#ust').getByRole('link', { name: /Ürünleri Keşfet/ }),
@@ -97,7 +101,7 @@ test.describe('hero media', () => {
 
   test('poster is served as the LCP-critical image and is not lazy', async ({ page }) => {
     await page.goto('/tr')
-    const poster = page.locator('#ust img').first()
+    const poster = page.locator('#ust img:visible').first()
     await expect(poster).not.toHaveAttribute('loading', 'lazy')
   })
 
