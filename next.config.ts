@@ -54,13 +54,15 @@ const nextConfig: NextConfig = {
     // Matches the viewport ladder documented in docs/RESPONSIVE_NOTES.md so the
     // generated srcset lands on the widths the layout actually uses.
     /*
-     * 2560 is the top rung because the full-bleed surfaces — the hero poster
-     * and the footer band — declare `sizes="100vw"`, and a 1440px window on a
-     * 2x display needs 2880 device pixels. Capped at 1920 the optimizer had to
-     * stretch its widest variant by half again, which was visible in the band.
-     * Only images that actually request a viewport-wide slot reach this rung.
+     * 2880 is the top rung, and it is exact rather than approximate: the
+     * full-bleed surfaces — the hero poster and the footer band — declare
+     * `sizes="100vw"`, and a 1440px window on a 2x display needs precisely
+     * 2880 device pixels. Capped at 1920 the optimizer stretched its widest
+     * variant by half again, which was plainly visible in the band; at 2560 it
+     * still upscaled slightly. Only images that request a viewport-wide slot
+     * ever reach this rung, so the cost is confined to those two.
      */
-    deviceSizes: [360, 430, 640, 768, 1024, 1280, 1440, 1728, 1920, 2560],
+    deviceSizes: [360, 430, 640, 768, 1024, 1280, 1440, 1728, 1920, 2880],
     imageSizes: [96, 148, 256, 320, 384, 480, 640],
     // The source files are content-stable: a photograph is only ever replaced
     // by shipping a different filename. Next's 4-hour default would have the

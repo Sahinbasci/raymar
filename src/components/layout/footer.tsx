@@ -82,10 +82,11 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             is what a single radial mask produced. */}
         <div className="absolute inset-0 [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)] [mask-composite:intersect] [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_54%,#000_100%),linear-gradient(to_bottom,transparent_0%,#000_26%)]">
           <MediaFrame image={footerBand} alt="" sizes="100vw" />
-          {/* Holds the photograph back to a backdrop. Heaviest across the middle
-              band where the copyright row sits, easing only at the very bottom
-              where nothing is set over it. */}
-          <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_76_56/0.62)_0%,rgb(0_76_56/0.74)_46%,rgb(0_76_56/0.7)_78%,rgb(0_76_56/0.5)_100%)]" />
+          {/* The veil is now shaped around the copyright row rather than laid
+              evenly over the whole band: heaviest exactly where that line sits,
+              then released almost entirely below it so the walnuts come forward
+              at the bottom edge instead of staying behind a flat wash. */}
+          <span className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_76_56/0.6)_0%,rgb(0_76_56/0.72)_42%,rgb(0_76_56/0.66)_66%,rgb(0_76_56/0.24)_86%,rgb(0_76_56/0.08)_100%)]" />
         </div>
       </div>
 
@@ -139,7 +140,10 @@ export function SiteFooter({ content }: { content: FooterContent }) {
           <span aria-hidden="true" className="h-px flex-1 bg-raymar-gold/28" />
         </div>
 
-        <div className="mt-13 flex flex-wrap items-center justify-between gap-5 border-t border-raymar-gold/24 pt-6.5 pb-13 md:pb-16">
+        {/* The deep bottom padding is the clear strip the walnuts occupy: the
+            copyright row is the last thing set over the band, and everything
+            below it is left to the photograph. */}
+        <div className="mt-13 flex flex-wrap items-center justify-between gap-5 border-t border-raymar-gold/24 pt-6.5 pb-28 md:pb-36">
           <span className="text-[12.5px] font-light text-raymar-white/76">
             {content.copyright}
           </span>
