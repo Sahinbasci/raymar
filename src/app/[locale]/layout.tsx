@@ -9,6 +9,7 @@ import {
   defaultLocale,
   isLocale,
   localeTags,
+  ogLocales,
   type Locale,
 } from '@/lib/i18n'
 import { organizationGraph } from '@/lib/schema'
@@ -80,7 +81,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       siteName: meta.siteName,
       title: meta.title,
       description: meta.description,
-      locale: localeTags[locale],
+      locale: ogLocales[locale],
       url: `/${locale}`,
       images: [
         {

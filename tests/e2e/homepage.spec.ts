@@ -49,7 +49,9 @@ test.describe('homepage', () => {
   test('/ redirects to the default locale', async ({ page }) => {
     await page.goto('/')
     await expect(page).toHaveURL(/\/tr$/)
-    await expect(page.locator('html')).toHaveAttribute('lang', 'tr-TR')
+    // Language-only by design: hreflang alternates must not geo-restrict the
+    // page, and `localeTags` feeds both `<html lang>` and those alternates.
+    await expect(page.locator('html')).toHaveAttribute('lang', 'tr')
   })
 
   test('renders every section in the approved order', async ({ page }) => {

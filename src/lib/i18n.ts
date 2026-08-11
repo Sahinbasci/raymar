@@ -31,6 +31,18 @@ export const localeTags: Record<Locale, string> = {
   en: 'en',
 }
 
+/**
+ * Open Graph locales, which are NOT the same shape as hreflang.
+ *
+ * `og:locale` is specified as `language_TERRITORY` and consumers reject a bare
+ * language code, so this cannot reuse `localeTags` — those are deliberately
+ * language-only so hreflang does not geo-restrict the pages.
+ */
+export const ogLocales: Record<Locale, string> = {
+  tr: 'tr_TR',
+  en: 'en_US',
+}
+
 export const localeLabels: Record<Locale, string> = {
   tr: 'TR',
   en: 'EN',
