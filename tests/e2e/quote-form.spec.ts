@@ -61,7 +61,7 @@ test.describe('quotation form', () => {
     await page.getByLabel('Firma *').fill('Test A.Ş.')
     await page.getByLabel('Ülke *').fill('Türkiye')
     await page.getByLabel('E-posta *').fill('test@firma.com')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Ceviz Ürünleri')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Ceviz İçi')
     await page.getByLabel('Talep Mesajı *').fill('20 ton ceviz içi talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
 
@@ -72,7 +72,7 @@ test.describe('quotation form', () => {
       page.locator('#teklif').getByText('20 ton ceviz içi talebi.'),
     ).toBeVisible()
     await expect(
-      page.locator('#teklif dd').filter({ hasText: /^Ceviz Ürünleri$/ }),
+      page.locator('#teklif dd').filter({ hasText: /^Ceviz İçi$/ }),
     ).toBeVisible()
 
     await page.getByRole('button', { name: 'Yeni talep oluştur' }).click()

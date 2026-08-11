@@ -90,6 +90,12 @@ export interface PortfolioContent {
 export interface ProductCopy {
   readonly name: string
   readonly imageAlt: string
+  /**
+   * One or two sentences under the product name. Optional because the client
+   * supplies these product by product; a card without one renders the name and
+   * the quote link only, exactly as before.
+   */
+  readonly description?: string
 }
 
 export interface WalnutContent {

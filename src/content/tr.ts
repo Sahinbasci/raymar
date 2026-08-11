@@ -34,9 +34,11 @@ export const tr: Dictionary = {
   },
 
   statement: {
-    eyebrow: '25 Yıllık Uluslararası Kuruyemiş Ticareti',
-    headingLines: ['Doğadan Seçilen Ürünler,', 'Dünyaya Güvenle.'],
-    body: 'Fındık başta olmak üzere ceviz ve seçkin kuruyemiş gruplarında uzun yıllara dayanan uluslararası ticaret deneyimi.',
+    // Set in title case; `.eyebrow` uppercases it in CSS, and the document is
+    // lang="tr-TR" so the i/İ mapping is the Turkish one.
+    eyebrow: 'B2B Kuruyemiş Ticareti',
+    headingLines: ['Kuruyemiş Tedarikinde', '25 Yıllık Ticaret Deneyimi'],
+    body: 'Ceviz içi başta olmak üzere fındık, Antep fıstığı, çekirdek ürünleri ve makademyada kurumsal alıcılara yönelik B2B ticaret yürütüyoruz.',
     primaryCta: 'Ürünleri Keşfet',
     secondaryCta: 'Teklif Talep Et',
   },
@@ -69,29 +71,29 @@ export const tr: Dictionary = {
 
   corporateIntro: {
     eyebrow: 'Kurumsal',
-    headingLines: ['Kuruyemiş ticaretinde', 'yirmi beş yıllık deneyim.'],
-    body: 'Raymar Nuts, uluslararası kuruyemiş ticaretinde uzun yıllara dayanan tecrübesiyle fındık, ceviz ve seçkin kuruyemiş gruplarında kurumsal iş ortaklarına hizmet verir.',
+    headingLines: ['Kuruyemiş Ticaretinde', '25 Yıllık Deneyim'],
+    body: 'Raymar Nuts, Marex Dış Tic. Ltd. Şti. çatısı altında; ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyanın B2B ticaretini yürütür.',
     link: 'Kurumsal Bilgiler',
     imageAlt: 'Fındık makro çekimi — temsili görsel',
   },
 
   portfolio: {
     eyebrow: 'Ürün Portföyü',
-    heading: 'Ürün gruplarımız, tek bir ticaret disiplini.',
+    heading: 'Kurumsal alımlar için geniş kuruyemiş portföyü',
     intro:
-      'Fındık, ceviz ürünleri ve seçkin kuruyemiş grupları; kurumsal tedarik talepleri doğrultusunda sunulur.',
+      'Ceviz içinden fındığa, Antep fıstığından çekirdek ürünleri ve makademyaya uzanan B2B ürün gamı.',
     cards: {
       findik: {
         badge: '01 · Amiral Ürün',
         title: 'Fındık',
-        subtitle: 'Kabuklu ve iç',
+        subtitle: 'Kabuklu ve İç',
         imageAlt: 'Fındık ürün grubu (temsili görsel)',
       },
       ceviz: {
         badge: '02',
-        title: 'Ceviz Ürünleri',
-        subtitle: 'Yedi ürün çeşidi',
-        imageAlt: 'Ceviz ürünleri grubu (temsili görsel)',
+        title: 'Ceviz İçi',
+        subtitle: '7 Ayrı Kalite',
+        imageAlt: 'Ceviz içi ürün grubu (temsili görsel)',
       },
       'kabak-cekirdegi': {
         badge: '',
@@ -117,10 +119,12 @@ export const tr: Dictionary = {
   },
 
   walnut: {
-    eyebrow: 'Ceviz Ürünleri',
-    heading: 'Ceviz içi ürün grupları.',
+    // Also the value the walnut cards send as the requested product group, so
+    // it has to stay byte-identical to its entry in `quote.productOptions`.
+    eyebrow: 'Ceviz İçi',
+    heading: 'Ceviz İçinde Yedi Ayrı Kalite',
     intro:
-      'Ceviz içi ürünler, kurumsal tedarik talepleri doğrultusunda aşağıdaki ürün gruplarında sunulur.',
+      'Bal Rengi, Kızıl, Pirinç, Kırık, Süper Lüks Yarım Beyaz, Lüks Naturel ve Çeyrek olmak üzere yedi farklı ceviz içi kalitesi sunulur.',
     categoryLabel: 'Ceviz İçi',
     detailsCta: 'Detayları Gör',
     quoteCta: 'Teklif Talep Et',
@@ -168,7 +172,7 @@ export const tr: Dictionary = {
     eyebrow: 'Ürün Grupları',
     heading: 'Ürünlerimiz',
     intro:
-      'Ceviz dışındaki ürün gruplarımız; kurumsal tedarik talepleri doğrultusunda sunulur.',
+      'Ceviz içinin yanı sıra fındık, Antep fıstığı, kabak çekirdeği içi, ayçekirdeği içi, çerezlik ayçekirdeği ve makademya ürün gamımızda yer alır.',
     categoryLabel: 'Ürün Grubu',
     quoteCta: 'Teklif Talep Et',
     imagePending: 'Ürün görseli hazırlanıyor',
@@ -176,6 +180,8 @@ export const tr: Dictionary = {
       findik: {
         name: 'Fındık',
         imageAlt: 'Kabuklu fındık',
+        description:
+          'Kabuklu ve iç fındık seçenekleri, kurumsal alım ve B2B ticaret talepleri kapsamında sunulur.',
       },
       'antep-fistigi': {
         name: 'Antep Fıstığı',
@@ -248,7 +254,7 @@ export const tr: Dictionary = {
     // miss drops the visitor silently into "Diğer".
     productOptions: [
       'Fındık',
-      'Ceviz Ürünleri',
+      'Ceviz İçi',
       'Antep Fıstığı',
       'Kabak Çekirdeği İçi',
       'Ayçekirdeği İçi',
@@ -286,7 +292,7 @@ export const tr: Dictionary = {
   footer: {
     logoAlt: 'Raymar Nuts',
     blurb:
-      'Uluslararası kuruyemiş ticaretinde yirmi beş yıllık deneyime sahibiz. Fındık, ceviz ve seçkin kuruyemiş gruplarında kurumsal tedarik sağlıyoruz.',
+      'Raymar Nuts, Marex Dış Tic. Ltd. Şti. çatısı altında ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyada B2B kuruyemiş ticareti yürütür.',
     // Identity manual, p.145: the slogan is always set in quotation marks,
     // italic, gold. See docs/ASSET_AUDIT.md.
     tagline: '“Tane Tane Lezzetler”',
@@ -303,7 +309,7 @@ export const tr: Dictionary = {
       heading: 'Ürünler',
       links: [
         { href: '#urunlerimiz', label: 'Fındık' },
-        { href: '#ceviz', label: 'Ceviz Ürünleri' },
+        { href: '#ceviz', label: 'Ceviz İçi' },
         { href: '#urunlerimiz', label: 'Antep Fıstığı' },
         { href: '#urunlerimiz', label: 'Kabak Çekirdeği İçi' },
         { href: '#urunlerimiz', label: 'Ayçekirdeği' },
@@ -329,12 +335,10 @@ export const tr: Dictionary = {
 
   meta: {
     siteName: 'Raymar Nuts',
-    title: 'Raymar Nuts — Uluslararası Kuruyemiş Ticareti',
+    title: 'Raymar Nuts | B2B Kuruyemiş Ticareti ve Tedariki',
     titleTemplate: '%s | Raymar Nuts',
-    // Written for the search snippet, not copied from the footer blurb — the
-    // two were byte-identical, so Google was shown footer boilerplate.
     description:
-      'Raymar Nuts; fındık, ceviz, antep fıstığı ve seçkin kuruyemiş gruplarında kurumsal tedarik ve ihracat yapan uluslararası ticaret şirketidir.',
+      'Raymar Nuts; ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyada kurumsal alıcılara yönelik B2B ticaret ve tedarik hizmeti sunar.',
     skipToContent: 'İçeriğe geç',
   },
 }

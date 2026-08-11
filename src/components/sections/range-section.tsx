@@ -70,6 +70,14 @@ export function RangeSection({ content }: { content: RangeContent }) {
                     <h3 className="mt-3.5 font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-normal text-raymar-green transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]">
                       {copy.name}
                     </h3>
+                    {/* Optional: the client supplies these one product at a
+                        time, so a card without a description keeps its old
+                        spacing rather than reserving an empty gap. */}
+                    {copy.description ? (
+                      <p className="mt-3 max-w-[330px] text-[14.5px] leading-[1.68] font-light text-raymar-ink/74">
+                        {copy.description}
+                      </p>
+                    ) : null}
                     <QuoteRequestButton
                       group={copy.name}
                       name={copy.name}

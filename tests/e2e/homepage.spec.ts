@@ -76,7 +76,7 @@ test.describe('homepage', () => {
     await page.goto('/tr')
 
     await expect(page.locator('h1')).toHaveCount(1)
-    await expect(page.locator('h1')).toContainText('Doğadan Seçilen Ürünler')
+    await expect(page.locator('h1')).toContainText('Kuruyemiş Tedarikinde')
     expect(await page.locator('h2').count()).toBeGreaterThan(4)
   })
 
