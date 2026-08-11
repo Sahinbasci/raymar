@@ -16,7 +16,7 @@ function LinkColumn({ column }: { column: FooterColumn }) {
           <Link
             key={`${link.href}-${link.label}`}
             href={link.href}
-            className="text-[14.5px] font-light text-raymar-white/90 transition-colors duration-300 hover:text-raymar-gold"
+            className="text-[14.5px] font-light text-raymar-white/90 transition-colors duration-300 hover:text-raymar-gold max-[719px]:py-1"
           >
             {link.label}
           </Link>
@@ -156,7 +156,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-[12.5px] font-light text-raymar-white transition-colors duration-300 hover:text-raymar-gold"
+                className="text-[12.5px] font-light text-raymar-white transition-colors duration-300 hover:text-raymar-gold max-[719px]:py-1"
               >
                 {link.label}
               </Link>

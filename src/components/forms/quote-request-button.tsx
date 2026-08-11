@@ -108,7 +108,7 @@ export function QuoteDetailLink({
     <a
       href="#teklif"
       onClick={() => requestQuote(group, name)}
-      className="group inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark"
+      className="group inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark max-[719px]:py-1.5"
     >
       {children}
       <span className="inline-flex text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:translate-x-[7px]">
