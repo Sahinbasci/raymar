@@ -7,6 +7,7 @@ import { PendingMedia } from '@/components/media/pending-media'
 import { Reveal } from '@/components/motion/reveal'
 import { CategoryLabel, SectionEyebrow } from '@/components/ui/eyebrow'
 import { walnutGroupIds, walnutProducts } from '@/data/products'
+import { formatTemplate } from '@/lib/cn'
 import type { WalnutContent } from '@/types/content'
 
 /**
@@ -109,7 +110,9 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
                             group={content.eyebrow}
                             name={copy.name}
                             variant="underline"
-                            ariaLabel={`${copy.name} için teklif talep et`}
+                            ariaLabel={formatTemplate(content.quoteCtaAriaTemplate, {
+                              product: copy.name,
+                            })}
                           >
                             {content.quoteCta}
                           </QuoteRequestButton>

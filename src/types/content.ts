@@ -6,7 +6,7 @@ import type {
 } from '@/data/products'
 
 export type SectionId =
-  'ust'
+  | 'ust'
   | 'giris'
   | 'kurumsal'
   | 'urunler'
@@ -105,6 +105,13 @@ export interface WalnutContent {
   readonly categoryLabel: string
   readonly detailsCta: string
   readonly quoteCta: string
+  /**
+   * Per-card accessible name for the quote CTA, since every card renders the
+   * same visible `quoteCta` label. A template string, not a function, for the
+   * same reason as `QuoteContent.prefillTemplate`: it crosses the
+   * server/client boundary. `{product}` is substituted by `formatTemplate`.
+   */
+  readonly quoteCtaAriaTemplate: string
   readonly footnote: string
   /** Shown on a grade whose photograph does not exist yet. */
   readonly imagePending: string
@@ -119,6 +126,8 @@ export interface RangeContent {
   readonly intro: string
   readonly categoryLabel: string
   readonly quoteCta: string
+  /** See `WalnutContent.quoteCtaAriaTemplate` — same mechanism, same reason. */
+  readonly quoteCtaAriaTemplate: string
   /** Shown on a card whose product has no photograph yet. */
   readonly imagePending: string
   readonly products: Readonly<Record<RangeProductId, ProductCopy>>

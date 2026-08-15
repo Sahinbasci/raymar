@@ -4,6 +4,7 @@ import { PendingMedia } from '@/components/media/pending-media'
 import { Reveal } from '@/components/motion/reveal'
 import { CategoryLabel, SectionEyebrow } from '@/components/ui/eyebrow'
 import { rangeProducts } from '@/data/products'
+import { formatTemplate } from '@/lib/cn'
 import type { RangeContent } from '@/types/content'
 
 /**
@@ -13,17 +14,15 @@ import type { RangeContent } from '@/types/content'
  *
  * The section is not split by origin. Hazelnut and pistachio are Turkish, so
  * the earlier "Seçkin İthal Ürünler" heading was simply wrong for two of the
- * five products; the range is presented as one group instead.
+ * six products; the range is presented as one group instead.
  *
- * Card geometry lives in `.range-grid` / `.range-media` (globals.css) because
- * the alternating baseline drop is keyed to `nth-child` position.
+ * Card geometry lives in `.range-grid` / `.range-media` (globals.css) — see the
+ * note there for why the design's alternating baseline drop is not carried
+ * over, and why no `nth-child` rule is needed as a result.
  */
 export function RangeSection({ content }: { content: RangeContent }) {
   return (
-    <section
-      id="urunlerimiz"
-      className="border-t border-raymar-green/8 bg-raymar-ivory"
-    >
+    <section id="urunlerimiz" className="border-t border-raymar-green/8 bg-raymar-ivory">
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-7.5 pt-19 pb-11 md:pt-25 md:pb-13 lg:pt-39.5 lg:pb-17">
           <div>
@@ -83,7 +82,9 @@ export function RangeSection({ content }: { content: RangeContent }) {
                       name={copy.name}
                       variant="arrow"
                       className="mt-4.5"
-                      ariaLabel={`${copy.name} için teklif talep et`}
+                      ariaLabel={formatTemplate(content.quoteCtaAriaTemplate, {
+                        product: copy.name,
+                      })}
                     >
                       {content.quoteCta}
                     </QuoteRequestButton>

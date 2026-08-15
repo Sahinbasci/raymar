@@ -84,7 +84,7 @@ export const tr: Dictionary = {
       'Ceviz içinden fındığa, Antep fıstığından çekirdek ürünleri ve makademyaya uzanan B2B ürün gamı.',
     cards: {
       findik: {
-        badge: '01 · Amiral Ürün',
+        badge: '01',
         title: 'Fındık',
         subtitle: 'Kabuklu ve İç',
         imageAlt: 'Fındık ürün grubu (temsili görsel)',
@@ -128,6 +128,8 @@ export const tr: Dictionary = {
     categoryLabel: 'Ceviz İçi',
     detailsCta: 'Detayları Gör',
     quoteCta: 'Teklif Talep Et',
+    // Wording unchanged from the literal it replaces — see `WalnutContent`.
+    quoteCtaAriaTemplate: '{product} için teklif talep et',
     // The second sentence is the CC BY-SA 4.0 attribution that `walnut-rice.jpg`
     // (the Pirinç card) legally requires. It is the only attributed image on the
     // site; remove this credit only when that photograph is replaced by an
@@ -179,6 +181,8 @@ export const tr: Dictionary = {
       'Ceviz içinin yanı sıra fındık, Antep fıstığı, kabak çekirdeği içi, ayçekirdeği içi, çerezlik ayçekirdeği ve makademya ürün gamımızda yer alır.',
     categoryLabel: 'Ürün Grubu',
     quoteCta: 'Teklif Talep Et',
+    // Wording unchanged from the literal it replaces — see `RangeContent`.
+    quoteCtaAriaTemplate: '{product} için teklif talep et',
     imagePending: 'Ürün görseli hazırlanıyor',
     products: {
       findik: {
@@ -221,7 +225,8 @@ export const tr: Dictionary = {
       'Kurumsal iş ortaklıkları',
       'Süreklilik',
     ],
-    closingLead: 'Ürün ve tedarik talebinizi paylaşın, ekibimiz sizinle iletişime geçsin.',
+    closingLead:
+      'Ürün ve tedarik talebinizi paylaşın, ekibimiz sizinle iletişime geçsin.',
     cta: 'Teklif Talep Et',
   },
 
@@ -330,11 +335,14 @@ export const tr: Dictionary = {
     phoneValue: '[Telefon bilgisi eklenecek]',
     emailValue: '[E-posta bilgisi eklenecek]',
     copyright: '© 2026 Raymar Nuts. Tüm hakları saklıdır.',
-    legalLinks: [
-      { href: '#teklif', label: 'Gizlilik Politikası' },
-      { href: '#teklif', label: 'KVKK Aydınlatma Metni' },
-      { href: '#teklif', label: 'Yasal Bilgiler' },
-    ],
+    // Empty until the pages exist. The three links here used to point at
+    // `#teklif` — the quotation form, not a privacy policy, a KVKK notice or
+    // legal information — so a visitor following any of them landed on a
+    // data-collection form instead of the document its label promised. An
+    // absent link reads as pre-launch; a misdirected one reads as a dark
+    // pattern. footer.tsx renders this unguarded, so `[]` is safe: it yields
+    // an empty flex container and the copyright row is unaffected.
+    legalLinks: [],
   },
 
   meta: {
