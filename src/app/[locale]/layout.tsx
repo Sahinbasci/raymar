@@ -134,14 +134,11 @@ export default async function LocaleLayout({
     >
       <head>
         {/*
-          Scroll reveals are server-rendered in their hidden state so the
-          animation has something to animate from. Without JavaScript that
-          state would never resolve and the page would read as blank below the
-          fold, so restore every revealing element unconditionally.
+          No `<noscript>` reveal rescue here any more. Scroll reveals used to be
+          server-rendered in their hidden state, which needed one; `Reveal` now
+          renders visible and hides an element only after JavaScript has
+          measured it below the fold, so there is nothing left to restore.
         */}
-        <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
-        </noscript>
         <JsonLd graph={organizationGraph({ locale, dictionary })} />
       </head>
       <body>

@@ -25,10 +25,27 @@ export function HeroSection({ content }: { content: HeroContent }) {
   // so a phone fetched the ~51 KB landscape poster it never shows on top of the
   // ~15 KB portrait one it does. `getImageProps` gives us Next's optimized
   // srcset/AVIF pipeline inside markup we control.
+  /*
+   * `loading: 'eager'` + `fetchPriority: 'high'` rather than `priority: true`.
+   *
+   * `priority` is deprecated in Next 16, but the reason to drop it here is that
+   * through `getImageProps` it was doing nothing at all: its only effects are
+   * suppressing `loading="lazy"` and setting `preload` on the *metadata* the
+   * `<Image>` component consumes to emit a `<link rel="preload">`. We take only
+   * `props`, so that link was never emitted and the LCP element shipped with no
+   * priority signal of any kind while the decorative header logo held the
+   * page's only image preload.
+   *
+   * The docs' warning against `loading="eager"` for art direction (image.md
+   * :1321) is about the two-`<Image>`-elements-hidden-by-CSS pattern, where it
+   * would fetch both. Inside a real `<picture>` the browser still resolves to a
+   * single source, which is why this file uses one in the first place.
+   */
   const posterCommon = {
     alt: content.posterAlt,
     fill: true as const,
-    priority: true,
+    loading: 'eager' as const,
+    fetchPriority: 'high' as const,
     sizes: '100vw',
   }
   const { props: desktopPoster } = getImageProps({

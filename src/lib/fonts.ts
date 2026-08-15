@@ -39,6 +39,15 @@ export const jost = Jost({
  * roughly a second. The display face is not needed to paint the first viewport
  * — the hero carries no serif text — so it loads on demand and `display: swap`
  * covers the gap with Georgia.
+ *
+ * No `fallback` array, deliberately. Passing one puts `next/font` into its
+ * manual-fallback mode, which skips the metric-adjusted `@font-face` it would
+ * otherwise generate — the build emitted no `ascent-override` or `size-adjust`
+ * at all, so every heading reflowed when the real face arrived. That matters
+ * more here than anywhere else on the site because this is the face that sets
+ * every heading, and it is the one face that is not preloaded. The Georgia /
+ * Times New Roman stack is not lost: `--font-display` in globals.css already
+ * spells it out after this variable.
  */
 export const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -47,7 +56,6 @@ export const cormorant = Cormorant_Garamond({
   display: 'swap',
   preload: false,
   variable: '--font-cormorant',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
 
 /*
@@ -63,5 +71,4 @@ export const cormorantItalic = Cormorant_Garamond({
   display: 'swap',
   preload: false,
   variable: '--font-cormorant-italic',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
