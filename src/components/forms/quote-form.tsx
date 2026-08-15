@@ -412,14 +412,27 @@ export function QuoteForm({ content }: QuoteFormProps) {
                 /*
                  * `appearance-none` drops the native caret with nothing to
                  * replace it, so the control read as plain text with no
-                 * indication it opens a menu. The gold chevron is painted as a
-                 * background image rather than an absolutely-positioned icon:
-                 * this `<select>` sits inside a flex-column `<label>` alongside
-                 * a *conditional* error `<span>`, so a child centred with
-                 * `top-1/2` would centre against the whole stack and jump the
-                 * moment `fieldError('product')` renders the error text.
+                 * indication it opens a menu.
+                 *
+                 * The replacement is the page's own chevron, not a new shape:
+                 * same geometry, viewBox and 1.3 stroke as `ChevronDown` in
+                 * components/ui/icons.tsx — the wide, shallow mark under the
+                 * hero cue — so the form speaks the same language as the rest
+                 * of the design rather than introducing a second arrow style.
+                 *
+                 * Painted as a background image rather than an absolutely
+                 * positioned child: this `<select>` sits in a flex column
+                 * beside a *conditional* error `<span>`, so a child centred
+                 * with `top-1/2` would centre against the whole stack and jump
+                 * down the moment an error renders.
+                 *
+                 * `bg-[length:...]` is not optional. An inline SVG with no
+                 * intrinsic width scales to the box when used as a background,
+                 * which is exactly what went wrong first time round — the mark
+                 * filled the full 48px field height. Pinning the size keeps it
+                 * at 13x6 regardless.
                  */
-                "appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2012%208%27%3E%3Cpath%20d%3D%27M1%201l5%205%205-5%27%20fill%3D%27none%27%20stroke%3D%27%23004c38%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E')] bg-[right_0.9rem_center] bg-no-repeat px-3 pr-9",
+                "appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2713%27%20height%3D%276%27%20viewBox%3D%270%200%2026%2011%27%3E%3Cpath%20d%3D%27M1%201l12%208.4L25%201%27%20fill%3D%27none%27%20stroke%3D%27%23004c38%27%20stroke-width%3D%271.3%27%20stroke-linecap%3D%27square%27%2F%3E%3C%2Fsvg%3E')] bg-[length:13px_6px] bg-[right_1.1rem_center] bg-no-repeat px-3 pr-10",
               )}
             >
               <option value="">{content.productPlaceholder}</option>

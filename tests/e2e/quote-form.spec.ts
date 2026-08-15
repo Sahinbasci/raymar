@@ -8,6 +8,18 @@ async function gotoForm(page: Page) {
   })
 }
 
+/**
+ * Budget for the success panel to replace the form after a submit.
+ *
+ * `submitQuoteRequest` sleeps 600ms on purpose so the loading state is
+ * exercised, and the panel swap is animated on top of that. Against the default
+ * 5s that left little headroom, and with seven projects running in parallel on
+ * one machine the two submitting tests were observed failing roughly once every
+ * eighteen full runs — never in isolation, which is the signature of contention
+ * rather than a product defect. Both assertions that wait on the panel use this.
+ */
+const SUBMIT_TIMEOUT = 15_000
+
 test.describe('quotation form', () => {
   test('blocks submission and reports missing required fields', async ({ page }) => {
     await gotoForm(page)
@@ -71,7 +83,7 @@ test.describe('quotation form', () => {
 
     await expect(
       page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' }),
-    ).toBeVisible()
+    ).toBeVisible({ timeout: SUBMIT_TIMEOUT })
     await expect(
       page.locator('#teklif').getByText('20 ton ceviz içi talebi.'),
     ).toBeVisible()
@@ -115,7 +127,7 @@ test.describe('quotation form', () => {
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
     await expect(
       page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' }),
-    ).toBeVisible()
+    ).toBeVisible({ timeout: SUBMIT_TIMEOUT })
 
     const leaked = logs.filter((line) => /gizli/i.test(line))
     expect(leaked, `leaked: ${leaked.join(' | ')}`).toEqual([])
