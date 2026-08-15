@@ -4,9 +4,6 @@ import { ArrowShort } from '@/components/ui/icons'
 import { cn } from '@/lib/cn'
 import { useQuoteRequest } from './quote-request-context'
 
-/** Header height plus breathing room, so the form is not tucked under it. */
-const SCROLL_OFFSET = 80
-
 interface QuoteRequestButtonProps {
   /** Product group that should be preselected in the form. */
   group: string
@@ -25,8 +22,16 @@ interface QuoteRequestButtonProps {
 
 /**
  * "Teklif Talep Et" affordance on a product card: records which product was
- * asked about, then scrolls to the form. A real `<button>`, because it performs
- * an action on the page rather than navigating to a new document.
+ * asked about, then hands off to the form.
+ *
+ * A real `<a href="#teklif">`, not a `<button>` with a manual `scrollTo` —
+ * this used to be the latter, which moved the viewport but never moved focus.
+ * A keyboard user who activated it landed on the form visually but stayed
+ * tabbing from wherever the button sat, so the next Tab threw them back up the
+ * page. Native fragment navigation both scrolls (globals.css already sets
+ * `scroll-behavior: smooth` and `scroll-padding-top: 96px`, with a
+ * `prefers-reduced-motion` override) and sets the browser's sequential focus
+ * navigation starting point, so the next Tab continues inside the form.
  */
 export function QuoteRequestButton({
   group,
@@ -37,24 +42,12 @@ export function QuoteRequestButton({
   ariaLabel,
 }: QuoteRequestButtonProps) {
   const { requestQuote } = useQuoteRequest()
-
-  const handleClick = () => {
-    requestQuote(group, name)
-
-    const target = document.getElementById('teklif')
-    if (!target) return
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({
-      top: target.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET,
-      behavior: prefersReduced ? 'auto' : 'smooth',
-    })
-  }
+  const handleClick = () => requestQuote(group, name)
 
   if (variant === 'arrow') {
     return (
-      <button
-        type="button"
+      <a
+        href="#teklif"
         onClick={handleClick}
         aria-label={ariaLabel}
         className={cn(
@@ -66,13 +59,13 @@ export function QuoteRequestButton({
         <span className="inline-flex text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:translate-x-[7px]">
           <ArrowShort />
         </span>
-      </button>
+      </a>
     )
   }
 
   return (
-    <button
-      type="button"
+    <a
+      href="#teklif"
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(
@@ -81,7 +74,7 @@ export function QuoteRequestButton({
       )}
     >
       {children}
-    </button>
+    </a>
   )
 }
 

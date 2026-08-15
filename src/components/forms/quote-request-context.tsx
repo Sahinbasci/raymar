@@ -15,6 +15,8 @@ export interface QuoteRequest {
 interface QuoteRequestValue {
   request: QuoteRequest | null
   requestQuote: (group: string, name: string) => void
+  /** Clears the last request so the form's own reset is not immediately reapplied. */
+  clearRequest: () => void
 }
 
 const QuoteRequestContext = createContext<QuoteRequestValue | null>(null)
@@ -32,7 +34,12 @@ export function QuoteRequestProvider({ children }: { children: ReactNode }) {
     setRequest({ group, name, token: Date.now() })
   }, [])
 
-  const value = useMemo(() => ({ request, requestQuote }), [request, requestQuote])
+  const clearRequest = useCallback(() => setRequest(null), [])
+
+  const value = useMemo(
+    () => ({ request, requestQuote, clearRequest }),
+    [request, requestQuote, clearRequest],
+  )
 
   return (
     <QuoteRequestContext.Provider value={value}>{children}</QuoteRequestContext.Provider>

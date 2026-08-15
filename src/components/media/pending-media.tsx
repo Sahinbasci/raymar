@@ -16,7 +16,10 @@ export function PendingMedia({ label }: { label: string }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-3.5 bg-raymar-tan px-4">
       <BrandEmblem width={26} className="opacity-45" />
-      <span className="text-center text-[11.5px] font-normal tracking-[0.2em] text-raymar-green/60 uppercase">
+      {/* `/60` measured 2.99:1 on this tan bed, under the 4.5:1 WCAG 1.4.3
+          needs for text. `/85` clears it at 5.13:1 while staying visually
+          recessive next to the emblem above. */}
+      <span className="text-center text-[11.5px] font-normal tracking-[0.2em] text-raymar-green/85 uppercase">
         {label}
       </span>
     </div>
