@@ -80,7 +80,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             linear one fades the very top so the curve does not collide with the
             container edge and leave a hard diagonal corner at each side, which
             is what a single radial mask produced. */}
-        <div className="absolute inset-0 [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)] [mask-composite:intersect] [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)]">
+        <div className="absolute inset-0 [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)] [mask-composite:intersect] [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)]">
           <MediaFrame image={footerBand} alt="" sizes="100vw" />
           {/* The veil is shaped around the copyright row rather than laid evenly
               over the band: light everywhere so the crop shows through, with a

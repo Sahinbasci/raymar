@@ -186,7 +186,12 @@ export function MarkPartnership(props: CredentialIconProps) {
     <CredentialFrame {...props}>
       <circle cx="17.2" cy="22" r="8.4" />
       <circle cx="26.8" cy="22" r="8.4" />
-      <path d="M22 15.4c1.6 1.8 2.5 4.1 2.5 6.6s-.9 4.8-2.5 6.6c-1.6-1.8-2.5-4.1-2.5-6.6s.9-4.8 2.5-6.6Z" fill="currentColor" stroke="none" opacity="0.9" />
+      <path
+        d="M22 15.4c1.6 1.8 2.5 4.1 2.5 6.6s-.9 4.8-2.5 6.6c-1.6-1.8-2.5-4.1-2.5-6.6s.9-4.8 2.5-6.6Z"
+        fill="currentColor"
+        stroke="none"
+        opacity="0.9"
+      />
     </CredentialFrame>
   )
 }

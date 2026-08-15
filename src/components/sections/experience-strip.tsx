@@ -2,12 +2,14 @@ import { Reveal } from '@/components/motion/reveal'
 import { MarkExperience, MarkNetwork, MarkPartnership } from '@/components/ui/icons'
 import type { ExperienceItem, ExperienceMark } from '@/types/content'
 
-const marks: Record<ExperienceMark, (props: { className?: string }) => React.ReactElement> =
-  {
-    experience: MarkExperience,
-    network: MarkNetwork,
-    partnership: MarkPartnership,
-  }
+const marks: Record<
+  ExperienceMark,
+  (props: { className?: string }) => React.ReactElement
+> = {
+  experience: MarkExperience,
+  network: MarkNetwork,
+  partnership: MarkPartnership,
+}
 
 /**
  * Three-column band of trading credentials between the statement and the

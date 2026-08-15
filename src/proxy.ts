@@ -48,10 +48,7 @@ export function proxy(request: NextRequest) {
   const first = segments[1]
   if (first) {
     const canonical = first.toLocaleLowerCase('en-US')
-    if (
-      canonical !== first &&
-      completeLocales.some((locale) => locale === canonical)
-    ) {
+    if (canonical !== first && completeLocales.some((locale) => locale === canonical)) {
       const url = request.nextUrl.clone()
       segments[1] = canonical
       url.pathname = segments.join('/')
