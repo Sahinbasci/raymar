@@ -43,43 +43,35 @@ Notes:
 
 - **No transcode was performed** on the desktop clip (`ffmpeg` is not available
   in this environment). The 16:9 asset is served to desktop only.
-- **Mobile does not download this video.** Since ~90% of traffic is mobile and
-  the clip is 1.73 MB / landscape, phones currently show the poster only
-  (`heroMedia.videoMobile` is `null`). A lightweight portrait cut is specified in
-  `docs/HERO_VIDEO_SPEC.md`; dropping it in switches mobile playback on with no
-  code change. Verified: a 390px viewport fetches 0 video bytes.
+- **Mobile now downloads its own cut, not this one.** This section originally
+  described a `null` `heroMedia.videoMobile` — phones showed the poster only,
+  since ~90% of traffic is mobile and this clip is 1.73 MB / landscape. The
+  portrait cut specified in `docs/HERO_VIDEO_SPEC.md` has since shipped as
+  `public/video/raymar-hero-mobile.mp4` (~784 KB) with a matching
+  `hero-poster-mobile.jpg`; phones below 720px load that instead of this file.
 - The clip carries a silent audio track. It is played muted, and `muted` is set
   as a property as well as an attribute so Safari honours autoplay.
 - The video ends on the official logo frame and loops back to the opening.
 
-## 3. Photography
+## 3. Photography from the design hand-off — mostly superseded
 
-All 14 JPEGs copied unmodified to `public/images/`. Intrinsic dimensions were
-verified against the `width`/`height` attributes declared in the design — **all
-14 match exactly**, so no aspect ratio was guessed.
+All 14 JPEGs from the design export were originally copied unmodified to
+`public/images/`, verified against the design's declared `width`/`height`
+(all 14 matched, so no aspect ratio was guessed).
 
-| File                      | Dimensions  | Size   | Used by                                               |
-| ------------------------- | ----------- | ------ | ----------------------------------------------------- |
-| `hazelnut-macro.jpg`      | 1500 × 1000 | 292 KB | Corporate portrait, flagship portrait, portfolio lead |
-| `hazelnut-shell.jpg`      | 1500 × 1000 | 539 KB | Flagship backdrop (parallax)                          |
-| `hero-poster.jpg`         | 1600 × 900  | 268 KB | Hero poster                                           |
-| `walnut-bulk.jpg`         | 1200 × 800  | 415 KB | Portfolio secondary, "Süper Lüks" card                |
-| `walnut-halves-macro.jpg` | 900 × 675   | 186 KB | "Bal Rengi" card                                      |
-| `walnut-burlap.jpg`       | 900 × 1200  | 203 KB | "Kızıl" card                                          |
-| `walnut-halves-white.jpg` | 900 × 600   | 79 KB  | "Pirinç" card                                         |
-| `walnut-texture.jpg`      | 900 × 600   | 274 KB | "Kırık" card                                          |
-| `walnut-basket.jpg`       | 900 × 1350  | 248 KB | "Lüks – Naturel" card                                 |
-| `walnut-shell.jpg`        | 900 × 600   | 85 KB  | "Çeyrek" card                                         |
-| `pumpkin-green.jpg`       | 900 × 600   | 191 KB | Portfolio tile + imported card                        |
-| `pecan.jpg`               | 900 × 1350  | 222 KB | Portfolio tile + imported card                        |
-| `macadamia-white.jpg`     | 900 × 600   | 61 KB  | Portfolio tile + imported card                        |
-| `sunflower-seed.jpg`      | 900 × 600   | 106 KB | Portfolio tile + imported card                        |
+**12 of the 14 have since been replaced** by the licensed stock photography in
+§3b below — the walnut, hazelnut, pumpkin and sunflower cards it lists cover
+the same slots these did — and **have been deleted from `public/images/`**,
+freeing ~2.8 MB that sat unreferenced after the replacement (confirmed against
+`src/data/products.ts` and every content file: nothing pointed at them any
+more).
 
-Crops (`object-position`) are transcribed verbatim into `src/data/products.ts`.
-Note that the same photograph is deliberately given **different** crops in
-different sections (e.g. `pecan.jpg` is `50% 30%` in the portfolio mosaic but
-`50% 26%` in the imported grid) — this is intentional in the design, not a
-transcription slip.
+Two survive because nothing replaced them:
+
+| File                  | Dimensions | Size   | Used by                                       |
+| --------------------- | ---------- | ------ | --------------------------------------------- |
+| `hero-poster.jpg`     | 1600 × 900 | 268 KB | Hero poster                                   |
+| `macadamia-white.jpg` | 900 × 600  | 61 KB  | Portfolio tile + `range-section` product card |
 
 Delivery: served through `next/image`, which emits AVIF/WebP at the widths
 declared in `next.config.ts`. The originals are untouched on disk.
@@ -93,27 +85,35 @@ sites are unreliable, and several candidates titled "shelled pistachio" were in
 fact in-shell. All are free for commercial use with no attribution required;
 credits are recorded here for provenance only.
 
-| Shipped as                | Photographer         | Source           | Licence          |
-| ------------------------- | -------------------- | ---------------- | ---------------- |
-| `hazelnut-kernel.jpg`     | Anil Karakaya        | Pexels 14017007  | Pexels License   |
-| `hazelnut-inshell.jpg`    | engin akyurt         | Unsplash         | Unsplash License |
-| `pistachio-kernel.jpg`    | Joanna Kosinska      | Unsplash         | Unsplash License |
-| `pistachio-inshell.jpg`   | Kairi Kaljo          | Unsplash         | Unsplash License |
-| `pumpkin-kernel.jpg`      | Karola G / Kaboompics| Pexels 4871089   | Pexels License   |
-| `sunflower-kernel.jpg`    | Vie Studio           | Pexels 7421201   | Pexels License   |
-| `sunflower-inshell.jpg`   | Ganajp               | Pexels 18328395  | Pexels License   |
-| `walnut-honey.jpg`        | engin akyurt         | Unsplash         | Unsplash License |
-| `walnut-broken.jpg`       | RGY23                | Pixabay 5852421  | Pixabay Content  |
-| `walnut-halves-pale.jpg`  | Ajale                | Pixabay 1049558  | Pixabay Content  |
-| `walnut-natural.jpg`      | Arina Krasnikova     | Pexels 6316688   | Pexels License   |
-| `walnut-quarter.jpg`      | Engin Akyurt         | Pexels 38571528  | Pexels License   |
-| `walnut-red.jpg`          | Tom Hermans          | Unsplash IbL3Zd62Q7Q | Unsplash License |
-| `walnut-rice.jpg`         | Bodhi Peace          | Wikimedia Commons | **CC BY-SA 4.0** ⚠ |
-| `pistachio-band-bulk.jpg` | Engin Akyurt         | Pexels 27644256  | Pexels License   |
+| Shipped as                | Photographer          | Source               | Licence            |
+| ------------------------- | --------------------- | -------------------- | ------------------ |
+| `hazelnut-kernel.jpg`     | Anil Karakaya         | Pexels 14017007      | Pexels License     |
+| `hazelnut-inshell.jpg`    | engin akyurt          | Unsplash             | Unsplash License   |
+| `pistachio-kernel.jpg`    | Joanna Kosinska       | Unsplash             | Unsplash License   |
+| `pistachio-inshell.jpg`   | Kairi Kaljo           | Unsplash             | Unsplash License   |
+| `pumpkin-kernel.jpg`      | Karola G / Kaboompics | Pexels 4871089       | Pexels License     |
+| `sunflower-kernel.jpg`    | Vie Studio            | Pexels 7421201       | Pexels License     |
+| `sunflower-inshell.jpg`   | Ganajp                | Pexels 18328395      | Pexels License     |
+| `walnut-honey.jpg`        | engin akyurt          | Unsplash             | Unsplash License   |
+| `walnut-broken.jpg`       | RGY23                 | Pixabay 5852421      | Pixabay Content    |
+| `walnut-halves-pale.jpg`  | Ajale                 | Pixabay 1049558      | Pixabay Content    |
+| `walnut-natural.jpg`      | Arina Krasnikova      | Pexels 6316688       | Pexels License     |
+| `walnut-quarter.jpg`      | Engin Akyurt          | Pexels 38571528      | Pexels License     |
+| `walnut-red.jpg`          | Tom Hermans           | Unsplash IbL3Zd62Q7Q | Unsplash License   |
+| `walnut-rice.jpg`         | Bodhi Peace           | Wikimedia Commons    | **CC BY-SA 4.0** ⚠ |
+| `pistachio-band-bulk.jpg` | Engin Akyurt          | Pexels 27644256      | Pexels License     |
 
-All were downscaled to a 1400px long edge at quality 62 (never upscaled: the two
-Pixabay files stay at their native 1280px) and are served through `next/image`,
-which emits 9–60 KB AVIF at the widths the layout actually requests.
+The first seven rows above were downscaled to a 1400px long edge at quality 62.
+**The remaining six were not** — `walnut-honey.jpg` and `walnut-natural.jpg`
+ship at 1800px, `walnut-quarter.jpg` at 1800px, `walnut-red.jpg` at 2400px,
+`walnut-rice.jpg` at 2600px (2600×2600, square) and `pistachio-band-bulk.jpg`
+at 3200px — measured directly off the shipped files, not carried over from
+this note. The two Pixabay files (`walnut-broken.jpg`, `walnut-halves-pale.jpg`)
+are smaller than the 1400px target and were correctly left at their native
+1280px rather than upscaled. All are served through `next/image`, which emits
+9–60 KB AVIF at the widths the layout actually requests — the oversized
+originals cost extra encode time and disk, not extra bytes on the wire, since
+`next/image` never serves a candidate wider than a slot requests.
 
 **Excluded on licence grounds.** Several better-composed pistachio and hazelnut
 candidates are hosted on `plus.unsplash.com` — that is Unsplash+, a paid
@@ -121,16 +121,17 @@ subscription licence, not the free Unsplash License, and none were used.
 
 **⚠ `walnut-rice.jpg` carries an attribution obligation.** It is the ONLY image
 on the site not under a no-attribution licence. CC BY-SA 4.0 requires:
-  1. **Attribution** — "Bodhi Peace, CC BY-SA 4.0, via Wikimedia Commons",
-     visible in a reasonable place (a credits line or the walnut-section
-     footnote).
-  2. **Share-alike** — the centre-crop is a derivative and must itself be
-     offered under CC BY-SA 4.0. This does NOT relicense the site or its code;
-     it binds only that one image file.
-Source: https://commons.wikimedia.org/wiki/File:Chopped_walnuts_on_board.jpg
-It was chosen only because it is the single genuinely rice-grade free photo in
-existence; its quality is below the rest of the set (harsh flash, warm cast) and
-it is a candidate for replacement by an own-shoot or a paid licence.
+
+1. **Attribution** — "Bodhi Peace, CC BY-SA 4.0, via Wikimedia Commons",
+   visible in a reasonable place (a credits line or the walnut-section
+   footnote).
+2. **Share-alike** — the centre-crop is a derivative and must itself be
+   offered under CC BY-SA 4.0. This does NOT relicense the site or its code;
+   it binds only that one image file.
+   Source: https://commons.wikimedia.org/wiki/File:Chopped_walnuts_on_board.jpg
+   It was chosen only because it is the single genuinely rice-grade free photo in
+   existence; its quality is below the rest of the set (harsh flash, warm cast) and
+   it is a candidate for replacement by an own-shoot or a paid licence.
 
 **Kızıl is a colour grade, not the red-pellicle cultivar.** `walnut-red.jpg`
 is a warm reddish-amber kernel bed, chosen to read distinctly redder than the
@@ -149,14 +150,20 @@ colour-grade kızıl stand-in) with the company's own product in one pass.
 These are marked as pending **in the approved design itself** and are reproduced
 verbatim rather than filled in. Do not treat them as final copy.
 
-| Placeholder                                                                                               | Appears in              |
-| --------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `[Telefon bilgisi eklenecek]`                                                                             | Contact block, footer   |
-| `[E-posta bilgisi eklenecek]`                                                                             | Contact block, footer   |
-| `[Politika metni eklenecek]`                                                                              | KVKK consent line       |
-| "Ürün detayları firma tarafından sağlanacak içerikle güncellenecektir."                                   | Flagship section        |
-| "Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır."                           | Walnut section footnote |
-| "Kurumsal geçmişe ilişkin doğrulanmış bilgiler firma tarafından sağlandığında bu bölüm güncellenecektir." | Trade story section     |
+| Placeholder                                                                     | Appears in              |
+| ------------------------------------------------------------------------------- | ----------------------- |
+| `[Telefon bilgisi eklenecek]`                                                   | Contact block, footer   |
+| `[E-posta bilgisi eklenecek]`                                                   | Contact block, footer   |
+| `[Politika metni eklenecek]`                                                    | KVKK consent line       |
+| "Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır." | Walnut section footnote |
+
+Two placeholders that were here at hand-off are gone, not because the client
+supplied real copy but because the sections carrying them changed shape: the
+"Flagship" section's placeholder note was removed when that section merged
+into `range-section` (see `docs/IMPLEMENTATION_PLAN.md` §3), and the trade
+story section's placeholder note was replaced outright — `tradeStory.intro`
+in `src/content/tr.ts` is now real copy, flagged in that file's own comment as
+new text making no factual claim beyond the client-confirmed 25 years.
 
 Every product image alt text carries "(temsili görsel)" — _representative image_
 — exactly as the design states. These are stock photographs, **not** Raymar

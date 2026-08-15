@@ -9,13 +9,13 @@ Kaynaklı ve doğrulanmış bulgular ile çıkarım olanlar ayrı ayrı işaretl
 
 Ölçüm, tahmin değil — üretim derlemesi üzerinde alındı.
 
-| | Değer |
-| --- | --- |
-| İndekslenebilir URL | **1** (`/tr`) |
-| Sitedeki toplam gövde metni | **547 kelime** |
-| Ürün detay sayfası | **0** |
-| İngilizce sayfa | **0** |
-| Blog / pazar notu | **0** |
+|                                | Değer                                                 |
+| ------------------------------ | ----------------------------------------------------- |
+| İndekslenebilir URL            | **1** (`/tr`)                                         |
+| Sitedeki toplam gövde metni    | **547 kelime**                                        |
+| Ürün detay sayfası             | **0**                                                 |
+| İngilizce sayfa                | **0**                                                 |
+| Blog / pazar notu              | **0**                                                 |
 | Sayfa içi bağlantıların tamamı | fragment (`#...`) — sitede gezinilecek ikinci URL yok |
 
 Bu noktadan başlayan bir site hiçbir rekabetçi terimde sıralanamaz. Google sayfa
@@ -66,6 +66,7 @@ kurulmayacak. Ceviz Türkçe B2B toptan hedefleyecek; fındık ve antep fıstı�
 İngilizce ihracat hedefleyecek.
 
 Ceviz için iki alternatif konumlandırma var, ikisi de gerçek:
+
 1. Teknik **kalite eşleme referansı** (aşağıda 6.3) — işlem coğrafyasından
    bağımsız olarak atıf ve bağlantı kazanır.
 2. Raymar'ı ceviz içi **ALICISI / ithalatçısı** olarak konumlayan sayfa — bu
@@ -119,15 +120,15 @@ kalite başına bir indekslenmiş sayfa, Raymar'ın yedi kalitesiyle birebir ör
 Mevcut sahibi olağanüstü zayıf — 157 kelimelik, şemasız, 2016 tarihli bir sayfayı
 geçmek alan otoritesi gerektirmiyor.
 
-| Terim | Not |
-| --- | --- |
-| `kırık ceviz içi toptan` | En zayıf SERP, en hızlı kazanç |
-| `pirinç ceviz içi toptan` | Aynı |
-| `çeyrek ceviz içi toptan` | Aynı |
-| `yarım beyaz ceviz içi toptan` | |
-| `lüks ceviz içi naturel toptan` | |
-| `kızıl ceviz içi toptan` | |
-| `bal rengi ceviz içi` | ⚠ **Tuzak** — bkz. 3.4 |
+| Terim                           | Not                            |
+| ------------------------------- | ------------------------------ |
+| `kırık ceviz içi toptan`        | En zayıf SERP, en hızlı kazanç |
+| `pirinç ceviz içi toptan`       | Aynı                           |
+| `çeyrek ceviz içi toptan`       | Aynı                           |
+| `yarım beyaz ceviz içi toptan`  |                                |
+| `lüks ceviz içi naturel toptan` |                                |
+| `kızıl ceviz içi toptan`        |                                |
+| `bal rengi ceviz içi`           | ⚠ **Tuzak** — bkz. 3.4         |
 
 `toptan` / `tedarik` eki **zorunlu**: çıplak terimler perakende niyetli ve Raymar
 1 kg'lık tüketici siparişi karşılamıyor.
@@ -139,11 +140,11 @@ giremez**: kalibre aralıkları (`11-13 mm`, `13-15 mm`), `randıman`, `elek`,
 
 ### 3.2 Kazanılabilir — İngilizce (sprint 2)
 
-| Öncelik | Alan | Gerekçe |
-| --- | --- | --- |
-| 1 | `pumpkin seed kernel` + çeşit (Ürgüp Sivrisi / Nevşehir snow-white) | **Saat başına kazanılabilirliği en yüksek sayfa** — mevcut sahipleri çöp dizinler |
-| 2 | `antep pistachio` (kabuklu + iç) | Gerçek, hafif rekabetli açıklık; Gaziantep menşe hikâyesi |
-| 3 | Fındık **şartname uzun kuyruğu** (proses × kalibre) | `blanched hazelnut kernel 11-13mm` gibi; birebir eşleşen çıplak bir mikro-site orada sıralanıyor, yani kazanılabilir olduğu kanıtlı |
+| Öncelik | Alan                                                                | Gerekçe                                                                                                                             |
+| ------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 1       | `pumpkin seed kernel` + çeşit (Ürgüp Sivrisi / Nevşehir snow-white) | **Saat başına kazanılabilirliği en yüksek sayfa** — mevcut sahipleri çöp dizinler                                                   |
+| 2       | `antep pistachio` (kabuklu + iç)                                    | Gerçek, hafif rekabetli açıklık; Gaziantep menşe hikâyesi                                                                           |
+| 3       | Fındık **şartname uzun kuyruğu** (proses × kalibre)                 | `blanched hazelnut kernel 11-13mm` gibi; birebir eşleşen çıplak bir mikro-site orada sıralanıyor, yani kazanılabilir olduğu kanıtlı |
 
 ### 3.3 Kapsam dışı — bilinçli olarak hedeflenmiyor
 
@@ -245,16 +246,32 @@ yazımı buna bağlı; uydurulamaz.
 - apple-icon, manifest, theme-color — resmi amblemden rasterize
 - Güvenlik başlıkları (CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy)
 
+### Yapıldı (sonradan eklendi)
+
+- **H1 değişimi.** Bu bölüm eskiden "Doğadan Seçilen Ürünler, Dünyaya
+  Güvenle." H1'ini ürün/niyet kelimesi taşımadığı için değişiklik önerisi
+  olarak listeliyordu. H1 artık "Kuruyemiş Tedarikinde 25 Yıllık Ticaret
+  Deneyimi" (`src/content/tr.ts`, `statement.headingLines`) — ürün kategorisi
+  ve rolü adlandırıyor. Şiirsel alt metin (`statement.body`) korunuyor.
+
+- **`completeLocales` kilidi.** `src/content/index.ts` artık build sırasında
+  assert ediyor: `'en'` yayına alınıp `en.ts` hâlâ Türkçeyi re-export ediyorsa
+  build patlıyor. Tetiklendiği doğrulandı — kilit olmadan tek karakterlik bir
+  değişiklik tüm siteyi `/en` altında "İngilizce çeviri" diye ikinci kez
+  yayınlıyordu.
+- **`favicon.ico`.** `src/app/favicon.ico` — resmi amblemden üretilmiş 16/32/48
+  px'lik çok boyutlu ICO. `/favicon.ico` yolunu doğrudan isteyen eski
+  istemciler ve tarayıcı dışı botlar artık 404 almıyor.
+- **CI.** `.github/workflows/ci.yml` — her push'ta lint, typecheck, build ve
+  üç motorda (Chromium/WebKit/Gecko) tam e2e + axe taraması.
+
 ### Yapılacak
 
-| İş | Not |
-| --- | --- |
-| **H1 değişimi** | Mevcut H1 "Doğadan Seçilen Ürünler, Dünyaya Güvenle." hiçbir ürün veya niyet kelimesi taşımıyor. Ronly'nin disiplini kopyalanmalı: ürün + rol + pazar adlandıran bir H1. **Onaylı tasarımı değiştirir — sahibinin kararı.** Şiirsel cümle hemen altına alınabilir. |
-| Ürün sayfaları | Her birine `Product` + `BreadcrumbList` şeması |
-| `completeLocales` kilidi | `en.ts` Türkçeyi aynen re-export ediyor; tek karakterlik bir değişiklik tüm siteyi `/en` altında ikinci kez yayınlar. Build-time assertion konmalı |
-| Accept-Language müzakeresi | `/en` yayına girince `/` müzakere edecek ve `Vary: Accept-Language` gönderecek — yoksa önündeki CDN bir dilin yönlendirmesini herkese önbellekler |
-| `favicon.ico` | Modern tarayıcılar `icon.svg` kullanıyor; eski istemciler için opsiyonel |
-| Analytics + Search Console + Bing Webmaster | Hiçbiri kurulu değil |
+| İş                                          | Not                                                                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ürün sayfaları                              | Her birine `Product` + `BreadcrumbList` şeması                                                                                                    |
+| Accept-Language müzakeresi                  | `/en` yayına girince `/` müzakere edecek ve `Vary: Accept-Language` gönderecek — yoksa önündeki CDN bir dilin yönlendirmesini herkese önbellekler |
+| Analytics + Search Console + Bing Webmaster | Hiçbiri kurulu değil                                                                                                                              |
 
 **Bing Webmaster özellikle önemli:** birden çok yapay zekâ motoru Bing indeksine
 yaslanıyor.
@@ -277,6 +294,7 @@ varlık bağlayıcı kısıttır. Üstelik Raymar/Marex ayrımı varlık çözü
 aktif olarak parçalıyor.
 
 **Yapılacak (sırayla, hepsi site dışı):**
+
 1. Tek ve **birebir aynı** isim dizesi: site footer'ı, LinkedIn şirket sayfası,
    ihracatçı birliği listelemesi, Europages, turkishexporter, ticaret-veri profilleri
 2. Tüzel kişi bağını makine-okunur yayınlamak — `legalName` alanında yapıldı
@@ -304,15 +322,15 @@ yüksek kaldıraçlı yatırım budur.**
 sistemine temiz eşleniyor. Bu eşlemeyi yayınlamak Raymar'ın üretebileceği tek
 en yüksek kaldıraçlı GEO varlığı — çünkü kimse yayınlamamış ve herkesin ihtiyacı var:
 
-| Türkçe | Uluslararası karşılık *(çıkarım — sektörle doğrulanmalı)* |
-| --- | --- |
-| Süper Lüks Yarım Beyaz | Extra Light Halves (LHP-80 kademesi) |
-| Lüks Naturel | Light |
-| Bal Rengi | Light Amber / Amber |
-| Kızıl | Amber |
-| Çeyrek | Quarters |
-| Kırık | Pieces |
-| Pirinç | Small pieces |
+| Türkçe                 | Uluslararası karşılık _(çıkarım — sektörle doğrulanmalı)_ |
+| ---------------------- | --------------------------------------------------------- |
+| Süper Lüks Yarım Beyaz | Extra Light Halves (LHP-80 kademesi)                      |
+| Lüks Naturel           | Light                                                     |
+| Bal Rengi              | Light Amber / Amber                                       |
+| Kızıl                  | Amber                                                     |
+| Çeyrek                 | Quarters                                                  |
+| Kırık                  | Pieces                                                    |
+| Pirinç                 | Small pieces                                              |
 
 **Şartname verisinin sayfa metni olarak yayınlanması** (4. bölüm) — bir motorun
 alıntılayabileceği olgu budur.
@@ -346,9 +364,9 @@ alıntılayabileceği olgu budur.
 
 Aylık iki yazı; ilk altı ay:
 
-1. Ceviz içi kalite rehberi — Türkçe adlar, uluslararası karşılıklar *(GEO çapa varlığı)*
+1. Ceviz içi kalite rehberi — Türkçe adlar, uluslararası karşılıklar _(GEO çapa varlığı)_
 2. Fındık kalibre ve randıman rehberi
-3. Aylık fındık pazar notu *(tekrarlayan — GEO'nun motoru)*
+3. Aylık fındık pazar notu _(tekrarlayan — GEO'nun motoru)_
 4. İç fındık: natürel, blanched, kavrulmuş — proses farkları
 5. Kuruyemişte nem ve aflatoksin: alıcı neye bakar
 6. Kabak çekirdeği içi çeşitleri: Ürgüp Sivrisi ve kar beyazı
@@ -356,7 +374,7 @@ Aylık iki yazı; ilk altı ay:
 8. Incoterms: FOB, CIF ve CFR kuruyemiş sevkiyatında ne demek
 9. Antep fıstığı boy sınıflandırması
 10. Türkiye fındık hasat sezonu takvimi
-11. Ceviz içi ithalatında menşe ve kalite farkları *(2.2'deki alıcı konumlandırması)*
+11. Ceviz içi ithalatında menşe ve kalite farkları _(2.2'deki alıcı konumlandırması)_
 12. Toptan kuruyemiş tedarikinde MOQ ve numune süreci
 
 Hepsi aynı anda hem klasik uzun kuyruk hem GEO atıf yüzeyi.
@@ -371,13 +389,13 @@ site şu an hiç çerez kullanmıyor, bu bir avantaj), teklif formu dönüşüm 
 
 Gerçek dönüşüm bir alıcıdan gelen e-postadır; işlem değil. KPI seti buna göre:
 
-| | 3 ay | 6 ay | 12 ay |
-| --- | --- | --- | --- |
-| İndekslenmiş URL | 25+ | 45+ | 70+ |
-| Ceviz kalite terimlerinde ilk 10 | 2–3 | 5–7 | 7/7 |
-| Aylık organik oturum | 150–400 | 500–1.200 | 1.500–3.500 |
-| Nitelikli teklif talebi / ay | 1–3 | 4–8 | 10–20 |
-| Dizin kaynaklı sorgu | ilk haftadan | — | — |
+|                                  | 3 ay         | 6 ay      | 12 ay       |
+| -------------------------------- | ------------ | --------- | ----------- |
+| İndekslenmiş URL                 | 25+          | 45+       | 70+         |
+| Ceviz kalite terimlerinde ilk 10 | 2–3          | 5–7       | 7/7         |
+| Aylık organik oturum             | 150–400      | 500–1.200 | 1.500–3.500 |
+| Nitelikli teklif talebi / ay     | 1–3          | 4–8       | 10–20       |
+| Dizin kaynaklı sorgu             | ilk haftadan | —         | —           |
 
 İngilizce head terimlerde 12 ayda sıralama **hedef değildir** (2.5, 3.3).
 
@@ -404,15 +422,15 @@ Sırasıyla, SEO'yu bloke etme derecesine göre:
 
 ## 10. Uygulama sırası
 
-| Faz | İş | Bağımlılık |
-| --- | --- | --- |
-| **0** | Alan adı, iletişim bilgisi, yasal metinler, formun gerçek uca bağlanması | müşteri |
-| **1** | Dizin listelemeleri (Europages, turkishexporter, Alibaba), LinkedIn, birlik listelemesi, Search Console + Bing | alan adı |
-| **2** | Yedi ceviz kalitesi sayfası + ceviz hub'ı, `Product` şeması | şartname verisi |
-| **3** | Fındık ve antep fıstığı sayfaları, kalite eşleme referansı | şartname verisi |
-| **4** | İngilizce (`/en`) — fındık, antep fıstığı, kabak çekirdeği önceliğiyle | çeviri onayı |
-| **5** | Aylık pazar notu ritmi başlar | sektör verisi |
-| **6** | Almanca, sonra İtalyanca | ticari karar |
+| Faz   | İş                                                                                                             | Bağımlılık      |
+| ----- | -------------------------------------------------------------------------------------------------------------- | --------------- |
+| **0** | Alan adı, iletişim bilgisi, yasal metinler, formun gerçek uca bağlanması                                       | müşteri         |
+| **1** | Dizin listelemeleri (Europages, turkishexporter, Alibaba), LinkedIn, birlik listelemesi, Search Console + Bing | alan adı        |
+| **2** | Yedi ceviz kalitesi sayfası + ceviz hub'ı, `Product` şeması                                                    | şartname verisi |
+| **3** | Fındık ve antep fıstığı sayfaları, kalite eşleme referansı                                                     | şartname verisi |
+| **4** | İngilizce (`/en`) — fındık, antep fıstığı, kabak çekirdeği önceliğiyle                                         | çeviri onayı    |
+| **5** | Aylık pazar notu ritmi başlar                                                                                  | sektör verisi   |
+| **6** | Almanca, sonra İtalyanca                                                                                       | ticari karar    |
 
 Faz 1 dışındaki her şey Faz 0'a bağlı. **Faz 1 en hızlı ilk sorguları getiren
 adımdır ve site içeriğinden bağımsız yürütülebilir.**

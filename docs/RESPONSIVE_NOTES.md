@@ -21,35 +21,47 @@ Two categories cannot be expressed cleanly that way and live in
 `@layer components` in `globals.css`:
 
 - rules keyed to **`nth-child` position** — experience-strip hairlines, walnut
-  image-well heights, imported-grid stagger;
+  image-well heights;
 - rules keyed to **viewport height** — hero frame and scroll cue.
+
+The range grid (single-variety products — hazelnut, pistachio, pumpkin, sunflower,
+macadamia) does **not** need an `nth-child` rule: the approved design's
+alternating 38px stagger was not carried over (see `.range-grid` in
+`globals.css` for why — it read as rhythm at four cards in one row, not at
+three cards over two), so the grid is plain, evenly-spaced columns.
 
 ## Layout ladder per section
 
-| Section                   | < 720                  | 720–1079                | ≥ 1080                 |
-| ------------------------- | ---------------------- | ----------------------- | ---------------------- |
-| Header nav                | burger                 | burger                  | full nav + lang + CTA  |
-| Header height             | 72 → 64 scrolled       | 88 → 76                 | 88 → 76                |
-| Statement padding         | 80 / 84                | 104 / 110               | 172 / 178              |
-| Experience strip          | 1 col                  | 2 cols                  | 4 cols                 |
-| Corporate intro           | 1 col                  | 1 col                   | 2 cols                 |
-| Flagship                  | 1 col                  | 1 col                   | 2 cols                 |
-| Portfolio mosaic          | 1 col                  | **2 cols (1.12fr 1fr)** | 2 cols (1.12fr 1fr)    |
-| Portfolio lead min-height | 420px                  | 540px                   | 660px                  |
-| Walnut grid               | 1 col                  | 2 cols (lead spans 2)   | 4 cols from 1240px     |
-| Walnut image well         | 230px                  | 300px lead / 256px      | 284px, 250px final row |
-| Imported grid             | **2 cols, no stagger** | 2 cols, staggered       | 4 cols, staggered      |
-| Trade story pillars       | 1 col                  | 2 cols                  | 5 cols                 |
-| Quote block               | 1 col                  | 1 col                   | 0.85fr / 1.15fr        |
-| Form fields               | 1 col                  | 2 cols                  | 2 cols                 |
-| Footer                    | 1 col                  | 2 cols                  | 1.4fr 1fr 1fr 1fr      |
+| Section                   | < 720              | 720–1079                | ≥ 1080                 |
+| ------------------------- | ------------------ | ----------------------- | ---------------------- |
+| Header nav                | burger             | burger                  | full nav + lang + CTA  |
+| Header height             | 72 → 64 scrolled   | 88 → 76                 | 88 → 76                |
+| Statement padding         | 80 / 84            | 104 / 110               | 172 / 178              |
+| Experience strip          | 1 col              | 3 cols                  | 3 cols                 |
+| Corporate intro           | 1 col              | 1 col                   | 2 cols                 |
+| Flagship                  | 1 col              | 1 col                   | 2 cols                 |
+| Portfolio mosaic          | 1 col              | **2 cols (1.12fr 1fr)** | 2 cols (1.12fr 1fr)    |
+| Portfolio lead min-height | 420px              | 540px                   | 660px                  |
+| Walnut grid               | 1 col              | 2 cols (lead spans 2)   | 4 cols from 1240px     |
+| Walnut image well         | 230px              | 300px lead / 256px      | 284px, 250px final row |
+| Range grid                | 2 cols, no stagger | 2 cols, no stagger      | 3 cols, no stagger     |
+| Trade story pillars       | 1 col              | 2 cols                  | 5 cols                 |
+| Quote block               | 1 col              | 1 col                   | 0.85fr / 1.15fr        |
+| Form fields               | 1 col              | 2 cols                  | 2 cols                 |
+| Footer                    | 1 col              | 2 cols                  | 1.4fr 1fr 1fr 1fr      |
 
 Two entries above are worth calling out because they are easy to get wrong:
 
 - The **portfolio mosaic** splits into two columns at the _tablet_ step, not the
   desktop one. An early implementation deferred it to 1080px; corrected.
-- The **imported grid** is two columns even on the smallest phones, and the 38px
-  stagger is suppressed there. Both match the design.
+- The **experience strip** is three columns, matching its three credentials
+  (Deneyim, Kapsam, Çalışma Modeli) — not four. It was drafted at four before
+  the strip's content settled; the ladder above was not updated to match. The
+  **range grid** was drafted with a staggered baseline the approved design
+  used at four cards in a row; at three cards over two rows it read as
+  misaligned rather than rhythmic, so the stagger was dropped (see the note
+  above `.range-grid` in `globals.css`) and this table was not updated then
+  either.
 
 ## Hero height
 
@@ -87,10 +99,11 @@ Automated in `tests/e2e/responsive.spec.ts` at **320, 360, 390, 430, 768, 1024,
   behind a modal dialog; the reading position is restored on close.
 - The hero uses `svh`, not `vh`, so the mobile browser chrome does not crop the
   scroll cue.
-- The hero video is **desktop-only**. Phones (< 720px) load no video and show
-  the poster, saving ~1.7 MB of cellular data; a portrait mobile cut can be
-  switched on later (`docs/HERO_VIDEO_SPEC.md`). Reduced motion and Data Saver
-  fall back to the poster on every viewport.
+- The hero video has separate desktop and mobile cuts: phones (< 720px) load a
+  portrait clip (`heroMedia.videoMobile`, ~784 KB) instead of the 1.73 MB
+  desktop clip, cut to the spec in `docs/HERO_VIDEO_SPEC.md`. Reduced motion
+  and Data Saver fall back to the poster on every viewport, and download
+  nothing.
 - Section top padding scales 76 / 100 / ~170px. The prototype left several
   section headers at a fixed 158–178px even on phones; see QA_REPORT.md.
 - Portfolio tile titles are sized by a **container query**, not the viewport.

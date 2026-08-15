@@ -40,22 +40,30 @@ Next.js App Router, TypeScript strict, Tailwind v4, Motion for React.
 
 ```
 src/
-  app/[locale]/     layout (document shell) · page · not-found
-  app/              globals.css · icon.svg · robots.ts · sitemap.ts
+  app/[locale]/     layout (document shell) · page
+  app/              global-not-found.tsx · globals.css · icon.svg ·
+                     apple-icon.png · manifest.ts · robots.ts · sitemap.ts
   components/
     layout/         header · mobile-drawer · language-switch · footer
     sections/       one file per approved section, in page order
     ui/             button · text-link · eyebrow · icons
-    media/          brand-logo · media-frame · hero-video
-    motion/         motion-provider · reveal · parallax-media · tokens
+    media/          brand-logo · media-frame · hero-video · pending-media
+    motion/         motion-provider · reveal · parallax-media · floating-motif · tokens
     forms/          quote-form · quote-request-context · quote-request-button
+    seo/            json-ld
   content/          tr.ts (complete) · en.ts (unpopulated) · index.ts
   data/             products.ts — ids, image paths, crops, card geometry
   hooks/            use-scroll-threshold · use-body-scroll-lock
-  lib/              i18n · fonts · site · cn · quote-submission
+  lib/              i18n · fonts · site · cn · schema · quote-submission
   types/            content.ts — the Dictionary contract
   proxy.ts          / → /tr
 ```
+
+`not-found` is deliberately absent from `app/[locale]/`: the only layout
+carrying `<html>` sits under that dynamic segment, so a route-level
+`not-found.tsx` there has nothing static to compose against and never renders
+for an unmatched URL. `app/global-not-found.tsx` is what actually serves every
+404 — see that file's own comment for why.
 
 **Server by default.** Every section is a Server Component. The client islands
 are only: the header (one boolean of scroll state + drawer), the hero video,
@@ -69,23 +77,31 @@ keyed by the same ids. No duplicated component tree per language. ✅
 
 ## 3. Component map
 
-| Design section       | Component                                     | Kind            |
-| -------------------- | --------------------------------------------- | --------------- |
-| Header + drawer      | `layout/header`, `layout/mobile-drawer`       | client          |
-| Hero                 | `sections/hero-section` + `media/hero-video`  | server + client |
-| Giriş Sözü           | `sections/statement-section`                  | server          |
-| Deneyim Şeridi       | `sections/experience-strip`                   | server          |
-| Kurumsal Giriş       | `sections/corporate-intro`                    | server          |
-| Fındık — Amiral Ürün | `sections/flagship-section`                   | server          |
-| Ürün Portföyü        | `sections/portfolio-section`                  | server          |
-| Ceviz Ürün Ailesi    | `sections/walnut-section`                     | server          |
-| Seçkin İthal Ürünler | `sections/imported-section`                   | server          |
-| 30 Yıl Hikâyesi      | `sections/trade-story-section`                | server          |
-| Teklif ve İletişim   | `sections/quote-section` + `forms/quote-form` | server + client |
-| Footer               | `layout/footer`                               | server          |
+| Design section     | Component                                     | Kind            |
+| ------------------ | --------------------------------------------- | --------------- |
+| Header + drawer    | `layout/header`, `layout/mobile-drawer`       | client          |
+| Hero               | `sections/hero-section` + `media/hero-video`  | server + client |
+| Giriş Sözü         | `sections/statement-section`                  | server          |
+| Deneyim Şeridi     | `sections/experience-strip`                   | server          |
+| Kurumsal Giriş     | `sections/corporate-intro`                    | server          |
+| Ürün Portföyü      | `sections/portfolio-section`                  | server          |
+| Ceviz Ürün Ailesi  | `sections/walnut-section`                     | server          |
+| Ürünlerimiz        | `sections/range-section`                      | server          |
+| 30 Yıl Hikâyesi    | `sections/trade-story-section`                | server          |
+| Teklif ve İletişim | `sections/quote-section` + `forms/quote-form` | server + client |
+| Footer             | `layout/footer`                               | server          |
+
+There is no dedicated "Fındık — Amiral Ürün" section and no separate "Seçkin
+İthal Ürünler" section: both collapsed into the single `range-section`
+(`id="urunlerimiz"`) during the build. Splitting them by "flagship vs.
+imported" put hazelnut and pistachio — both Turkish — under an "imported"
+heading, which was simply wrong; `range-section` presents every
+single-variety product (hazelnut, pistachio, pumpkin seed, sunflower,
+macademia) as one group instead, and the portfolio mosaic's hazelnut tile
+links straight into it.
 
 `PortfolioCard` is the only shared card abstraction — six instances at three
-scales. The walnut and imported cards are used once each per section and are
+scales. The walnut and range cards are used once each per section and are
 kept inline rather than abstracted.
 
 ## 4. Routes
@@ -122,12 +138,19 @@ CSS for everything else; `opacity`/`transform` only.
 
 ## 8. Test strategy
 
-Playwright against the **production build**, four viewport projects, plus a
-width-ladder spec that drives ten widths itself. Covers: console/network
-cleanliness, section order, locale redirect, desktop and mobile navigation,
-drawer focus trap and scroll lock, form validation and success, product→form
-prefill, no-overflow, hero fallback, reduced motion, logo integrity, and that
-form values never reach the console.
+Playwright against the **production build**, six projects — four Chromium
+(three desktop widths plus a real Pixel 7 touch device) and two **WebKit**
+(iPhone 14 and desktop Safari) — plus a width-ladder spec that drives ten
+widths itself. Covers: console/network cleanliness, section order, locale
+redirect and case-canonicalisation, the rendered 404 document, desktop and
+mobile navigation, drawer focus and scroll lock, form validation and success,
+product→form prefill, no-overflow, hero video playback _and_ its fallback,
+reduced motion, logo integrity, and that form values never reach the console.
+
+Note for anyone running the suite: build with `ALLOW_INSECURE_LAN=1`. The
+HTTPS-forcing headers are resolved into the routes manifest at **build** time,
+and WebKit — unlike Chromium — honours `upgrade-insecure-requests` against the
+plain-HTTP test server and drops the connection.
 
 ## 9. Known uncertainties
 
@@ -156,9 +179,14 @@ form values never reach the console.
 - [x] Quotation form with validation, states, honeypot, mock boundary
 - [x] Reveal + parallax motion system with fallbacks
 - [x] SEO metadata, sitemap, robots, favicon, OG image
-- [x] Playwright suite (94 tests across 4 viewports)
+- [x] Playwright suite (174 tests across 6 projects, Chromium + WebKit)
 - [x] Visual QA against the design at 390 / 768 / 1280 / 1440
+- [x] Cross-engine pass on WebKit (Safari's engine); throttled-4G measurement
 - [x] lint · typecheck · test · production build all pass
 - [ ] Client: confirm contact details, domain, font decision
 - [ ] Client: supply final product photography
 - [ ] Client: supply English copy
+- [ ] Connect the quotation form to a real endpoint (`src/lib/quote-submission.ts`
+      is still a documented mock — nothing is delivered today)
+- [ ] Legal pages (KVKK / privacy / terms); `footer.legalLinks` is empty until
+      they exist

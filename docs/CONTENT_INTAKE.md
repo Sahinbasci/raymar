@@ -4,6 +4,14 @@ Sitedeki tüm placeholder / stok / doğrulanmamış içeriği gerçeğiyle deği
 için hazırlanmış soru listesi. Cevapları hazırlayıp (AI ile taslak çıkarabilirsin)
 geri ver; ben ilgili dosyalara işlerim.
 
+> **Durum notu.** Bu form yazıldıktan sonra site birkaç yapısal değişiklik
+> geçirdi: "30 yıl" sorusu **25 yıl olarak cevaplanıp** tüm metinlere işlendi
+> (K1 altında not düşüldü); "Fındık — Amiral Ürün" bölümü ayrı bir bölüm olmaktan
+> çıkıp `range-section` ("Ürünlerimiz") içine katıldı; o birleşik bölüm artık 4
+> değil **6** ürün taşıyor (Pikan Cevizi çıktı, Antep Fıstığı ve Ayçekirdeği iki
+> ayrı karta bölündü — iç ve çerezlik). İlgili maddeler aşağıda güncellendi;
+> geri kalanı hâlâ geçerli.
+
 ## Nasıl kullanılır
 
 Her alanın yanında **etiketi** var:
@@ -27,14 +35,13 @@ Her alanın sonundaki `kod.yolu` → içeriğin kaynak dosyadaki yeri
 Bu üç karar cevaplanmadan gerisini yazmak boşa gider; çünkü metnin her yerine
 yayılıyorlar.
 
-### K1. "30 yıl" gerçek mi? 🔴 [FİRMA VERİSİ]
+### K1. "30 yıl" gerçek mi? ✅ CEVAPLANDI — 25 yıl
 
-"30 yıllık deneyim" ifadesi **8 ayrı yerde** geçiyor (hero eyebrow, deneyim
-şeridi, kurumsal başlık, fındık bölümü, ticaret bölümü, footer). Kurumsal kimlik
-kılavuzunda **kuruluş yılı yazmıyor**, bu yüzden doğrulayamıyorum.
-
-- Firma kaç yıllık? (kesin sayı) → tüm "30" değerleri buna göre güncellenir.
-- Kuruluş yılı nedir? (ör. 1994) — yapısal veri (SEO) ve gerekiyorsa metin için.
+Cevaplandı: **25 yıl**. Sitedeki her yer buna göre güncellendi (hero, deneyim
+şeridi, kurumsal başlık) — "30" hiçbir yerde kalmadı. Kuruluş yılı hâlâ
+kurumsal kimlik kılavuzunda yazmadığı ve ayrıca sağlanmadığı için sitede
+**hiçbir yerde iddia edilmiyor** (bilinçli tercih — bkz. `docs/ASSET_AUDIT.md`
+§5). Sağlanırsa yapısal veriye (SEO/JSON-LD) eklenebilir.
 
 ### K2. Hangi tüzel kişilik + domain? 🔴 [FİRMA VERİSİ]
 
@@ -74,13 +81,13 @@ Tasarımda **7 ceviz içi** + **4 ithal ürün** var, adları tasarımdan geldi.
 
 ---
 
-## 3. Giriş Sözü (Ana başlık) 🟡 [DOLDUR]
+## 3. Giriş Sözü (Ana başlık) ✅ GÜNCELLENDİ
 
 **Nerede:** Videonun altındaki koyu yeşil blok. Sayfanın **tek H1**'i.
-**Şu an:**
+**Şu an** (eski "Doğadan Seçilen Ürünler, Dünyaya Güvenle." yerine güncellendi):
 
-> "Doğadan Seçilen Ürünler, Dünyaya Güvenle."
-> "Fındık başta olmak üzere ceviz ve seçkin ithal kuruyemiş gruplarında uzun yıllara dayanan uluslararası ticaret deneyimi."
+> "Kuruyemiş Tedarikinde 25 Yıllık Ticaret Deneyimi"
+> "Ceviz içi başta olmak üzere fındık, Antep fıstığı, çekirdek ürünleri ve makademyada kurumsal alıcılara yönelik B2B ticaret yürütüyoruz."
 
 - Ana başlık kalsın mı, yoksa alternatif ister misin? (**2 satır, 4–8 kelime**,
   kısa ve iddialı) → `statement.headingLines`
@@ -118,29 +125,22 @@ Her kutu: küçük etiket + büyük değer + kısa açıklama.
 
 ---
 
-## 6. Fındık — Amiral Ürün 🟡 [DOLDUR]
+## 6. Fındık — Amiral Ürün — KALDIRILDI, ARTIK SORULMUYOR
 
-**Nerede:** Koyu yeşil, fındık fotoğrafı bleed.
-**Şu an:**
-
-> Başlık: "Uzmanlığımızın merkezinde fındık var."
-> Metin: "Fındık, Raymar'ın ürün portföyünün ve ticari deneyiminin merkezinde yer alır."
-> 🔴 Not (placeholder): "Ürün detayları firma tarafından sağlanacak içerikle güncellenecektir."
-
-- Başlık (**~5–8 kelime**) → `flagship.heading`
-- Metin (**1–2 cümle**) → `flagship.body`
-- 🔴 **Placeholder not** yerine ne yazsın? Fındık hakkında **gerçek** detay:
-  menşe (ör. Giresun/Ordu), tip (Levant, Giresun kalite), sunum şekilleri
-  (natürel/kavrulmuş/beyazlatılmış), kalibre, ambalaj. Yoksa notu **tamamen
-  kaldırırım**. → `flagship.note`
-- "Fındık Ürünlerini İncele" butonu kalsın mı? → `flagship.cta`
+Ayrı bir "Fındık — Amiral Ürün" bölümü artık yok: build sırasında bölüm 9'daki
+("Seçkin İthal Ürünler") ile birleştirilip tek bir `range-section`
+("Ürünlerimiz") oldu — gerekçesi hazelnut/pistachio'nun Türkiye kaynaklı olup
+"ithal" başlığı altında yanlış konumlanmasıydı. Bu maddedeki sorular (başlık,
+metin, placeholder not, CTA) geçersiz; aşağıdaki madde 9'a bakın.
 
 ---
 
 ## 7. Ürün Portföyü (Mozaik) 🟢 [ONAYLI]
 
 **Nerede:** "Üç ana ürün grubu" başlıklı kart mozaiği (Fındık büyük + Ceviz + 4 küçük).
-**Şu an:** Onaylı.
+**Şu an:** Onaylı. Fındık kartının rozeti eskiden "01 · Amiral Ürün" idi,
+artık sade **"01"** — düzyazının tamamı ceviz içini öne çıkardığı için rozet
+onunla çelişiyordu (bkz. madde 6).
 
 - Başlık ve giriş cümlesi kalsın mı? → `portfolio.heading` / `portfolio.intro`
 - Kartların üstündeki rozet/alt yazılar ("01 · Amiral Ürün", "Yedi ürün grubu",
@@ -165,32 +165,33 @@ Lüks–Naturel · Çeyrek Ceviz İçi.
 
 ---
 
-## 9. Seçkin İthal Ürünler (4 kart) 🔴 [FİRMA VERİSİ]
+## 9. Ürünlerimiz (6 kart, eskiden "Seçkin İthal Ürünler" + Fındık — birleşti) 🔴 [FİRMA VERİSİ]
 
-**Nerede:** Kırık beyaz zemin, 4 dikey kart.
-**Şu an:** Kabak Çekirdeği İçi · Pikan Cevizi · Makademya · Ayçekirdeği.
+**Nerede:** Krem zemin, tek satırlık ürün kartı ızgarası (`range-section`).
+**Şu an:** Fındık · Antep Fıstığı · Kabak Çekirdeği İçi · Ayçekirdeği İçi ·
+Çerezlik Ayçekirdeği · Makademya — 4 değil **6 kart**. "Pikan Cevizi" listeden
+çıktı; Antep Fıstığı ve Ayçekirdeği artık ikişer ayrı karta bölünmüş durumda
+(iç ve çerezlik). Fındık da eskiden ayrı bir "Amiral Ürün" bölümüydü, şimdi bu
+ızgaranın bir kartı (bkz. madde 6).
 
-- Bu 4 ürün doğru mu, ekleme/çıkarma var mı? 🔴 → `imported.products`
-- Başlık "Seçkin İthal Ürünler" + giriş cümlesi kalsın mı? → `imported.heading` / `imported.intro`
+- Bu 6 ürün doğru mu, ekleme/çıkarma var mı? 🔴 → `range.products`
+- Başlık "Ürünlerimiz" + giriş cümlesi kalsın mı? → `range.heading` / `range.intro`
 - Her ürün için (istersen) menşe ülke eklenebilir — **sadece gerçekse**. 🔴
 
 ---
 
-## 10. 30 Yıl / Uluslararası Ticaret 🔴 [FİRMA VERİSİ] + 🟡 [DOLDUR]
+## 10. 25 Yıl / Uluslararası Ticaret ✅ GÜNCELLENDİ
 
-**Nerede:** Koyu yeşil, 5 sütunlu "sütunlar" + büyük "30".
+**Nerede:** Koyu yeşil, 5 sütunlu "sütunlar". Büyük "30" rakam motifi
+**kaldırıldı** — component artık böyle bir alan render etmiyor.
 **Şu an:**
 
-> Başlık: "30 yıldır uluslararası kuruyemiş ticaretinin içindeyiz."
+> Başlık: "Kuruyemiş ticaretini çeyrek asırdır aynı disiplinle yürütüyoruz."
 > 5 sütun: Uzun soluklu ticari deneyim · Ürün bilgisi · Uluslararası ticaret yaklaşımı · Kurumsal iş ortaklıkları · Süreklilik
-> Büyük sayı: **30** "yıllık ticaret deneyimi"
-> 🔴 Not (placeholder): "Kurumsal geçmişe ilişkin doğrulanmış bilgiler firma tarafından sağlandığında bu bölüm güncellenecektir."
+> Giriş cümlesi K1'in cevabı olan 25 yılı zaten içeriyor; placeholder not **tamamen kaldırıldı**, uydurma değil.
 
-- Başlık + büyük "30" → **K1**. 🔴 → `tradeStory.heading` / `tradeStory.statValue`
-- 5 sütun (değer önermeleri) kalsın mı, sizin gerçek güçlü yanlarınızla değişsin mi?
-  (**her biri 2–4 kelime**) → `tradeStory.pillars`
-- 🔴 **Placeholder not** yerine gerçek kurumsal geçmiş cümlesi (ihracat yaptığınız
-  bölgeler, iş modeliniz vb. — **doğrulanabilir**). Yoksa **kaldırırım**. → `tradeStory.note`
+- Başlık + 5 sütun kalsın mı, gerçek güçlü yanlarınızla değişsin mi?
+  → `tradeStory.heading` / `tradeStory.pillars`
 
 ---
 
@@ -231,8 +232,11 @@ Lüks–Naturel · Çeyrek Ceviz İçi.
 - Slogan "Tane Tane Lezzetler" kalsın mı? (kılavuzda **tırnak içinde** geçiyor —
   tırnaklı mı istersin?) → `footer.tagline`
 - Telefon / e-posta → **K11** ile aynı. 🔴 → `footer.phoneValue` / `footer.emailValue`
-- Alt linkler: Gizlilik Politikası · KVKK Aydınlatma Metni · Yasal Bilgiler →
-  **bkz. K14 (yasal metinler)**.
+- Alt linkler (Gizlilik Politikası · KVKK Aydınlatma Metni · Yasal Bilgiler)
+  **kaldırıldı**: üçü de var olmayan sayfalar yerine teklif formuna gidiyordu —
+  ziyaretçiyi "gizlilik politikası" diye tıklattığı yerde veri toplama
+  formuna düşürüyordu. Gerçek sayfalar gelince (**bkz. K14**) `footer.legalLinks`
+  yeniden doldurulur.
 
 ---
 

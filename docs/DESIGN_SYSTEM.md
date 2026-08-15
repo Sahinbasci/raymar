@@ -56,6 +56,34 @@ Every text/background pair in use was measured. All pass WCAG AA; most pass AAA.
 ivory is only 1.9:1, so gold-family _text_ on light surfaces uses the darker
 tone while gold _rules and marks_ keep the corporate value.
 
+#### Four pairs corrected after an audit
+
+These were below threshold and are now fixed. Each ratio was computed from the
+composited value — an alpha step over its actual backdrop, not the solid token —
+because that is what a reader's eye receives.
+
+| Pair                                  | Was  | Now  | Threshold        |
+| ------------------------------------- | ---- | ---- | ---------------- |
+| Placeholder text on ivory field       | 3.19 | 4.97 | 4.5 (1.4.3)      |
+| Placeholder text on white focus field | 3.24 | 5.11 | 4.5 (1.4.3)      |
+| Form field border on its panel        | 1.32 | 3.32 | 3.0 (**1.4.11**) |
+| `PendingMedia` caption on tan bed     | 2.99 | 5.15 | 4.5 (1.4.3)      |
+
+Two details worth keeping:
+
+- The field border is judged against **1.4.11 Non-text Contrast**, not 1.4.3.
+  A control's boundary is what tells a low-vision reader where the input _is_;
+  at `green/16` it was effectively invisible against the panel. `green/60`
+  clears 3:1 on both surfaces the border meets — the ivory resting fill (3.32)
+  and the white focus fill (3.39).
+- The placeholder needed checking on **two** backdrops, because `quote-form.tsx`
+  swaps the field background to white on focus. A value that passed on ivory
+  alone could still fail the moment the reader focused the field.
+
+An axe-core scan now guards all of this — see `docs/QA_REPORT.md`. Note it
+samples only after reveal animations settle: mid-fade, a correct heading
+measures as low as 1.17:1 and reads as a false failure.
+
 ## Typography
 
 Two families, both self-hosted through `next/font` (`src/lib/fonts.ts`).
@@ -185,8 +213,16 @@ value, so nothing re-renders during scroll.
 scrolling globally, and `Reveal` resolves instantly.
 
 Crucially, `Reveal` **does not** branch to a different element under reduced
-motion. The server always renders the hidden `initial` state, and React
-hydration does not clear inline styles that the client render omits — branching
-would leave `opacity: 0` stuck on the node and hide the content permanently.
-Reduced motion instead sets the animation duration to zero. There is also a
-`<noscript>` rule that restores `[data-reveal]` when JavaScript never runs.
+motion — it uses a single `<m>` element throughout, and reduced motion sets
+the animation duration to zero rather than swapping the tree.
+
+`Reveal` also does not server-render a hidden state any more. It used to:
+`initial` was `opacity: 0` on the server, which put dozens of transparent
+nodes into the prerendered HTML and made every section below the hero wait on
+JavaScript hydrating before becoming visible — measured at close to three
+seconds of blank page on a throttled 4G phone. `Reveal` now renders visible by
+default; on mount it measures whether it is still comfortably below the fold,
+and only _then_ opts into hiding-then-animating-in. A visitor with no
+JavaScript, slow JavaScript, or a already-scrolled-past position never sees
+anything hidden. There is no longer a `<noscript>` rescue rule for this in
+`[locale]/layout.tsx` — nothing is hidden by default for it to rescue.

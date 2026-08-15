@@ -5,48 +5,84 @@ All checks below were run against the **production build** (`next build` +
 
 ## Tested viewports
 
-| Width × height                                                       | Method                                         |
-| -------------------------------------------------------------------- | ---------------------------------------------- |
-| 320 / 360 / 390 / 430 / 768 / 1024 / 1280 / 1440 / 1728 / 1920 × 900 | Automated width ladder (overflow, hero height) |
-| 390 × 844                                                            | Playwright project + visual review             |
-| 768 × 1024                                                           | Playwright project + visual review             |
-| 1280 × 800                                                           | Playwright project + visual review             |
-| 1440 × 900                                                           | Playwright project + visual review             |
-| 1280 × 420 / 560 / 680 / 900                                         | Short-window scroll-cue check                  |
+| Width × height                                                       | Engine / method                                  |
+| -------------------------------------------------------------------- | ------------------------------------------------ |
+| 320 / 360 / 390 / 430 / 768 / 1024 / 1280 / 1440 / 1728 / 1920 × 900 | Automated width ladder (overflow, hero height)   |
+| 412 × 839 @2.625× (Pixel 7, real touch)                              | Chromium project + visual review                 |
+| 390 × 664 (iPhone 14, real touch)                                    | **WebKit** project                               |
+| 768 × 1024                                                           | Chromium project + visual review                 |
+| 1280 × 800                                                           | Chromium project + visual review                 |
+| 1440 × 900                                                           | Chromium, **WebKit and Firefox** + visual review |
+| 1280 × 420 / 560 / 680 / 900                                         | Short-window scroll-cue check                    |
+
+The two mobile projects use real device descriptors, not a resized desktop
+browser: earlier they set only the viewport, so every "mobile" assertion —
+including the 44px touch-target check — actually ran hover-capable,
+mouse-driven and at 1× DPR.
 
 ## Automated results
 
-**94 passed, 0 failed**, stable across repeated full runs. 26 skips are
+**229 passed, 0 failed** across seven projects covering all three engines
+(Chromium, WebKit, Gecko), stable across repeated full runs. 44 skips are
 intentional viewport gates (desktop-only tests on mobile projects and vice
 versa).
 
 Covered: no console errors, no ≥400 responses, section order, `/`→`/tr`
-redirect, `/en` correctly 404s, single `h1`, desktop nav, header inversion,
-mobile drawer (open, focus trap, Escape, scroll lock + position restore, link
-dismissal), CTA targets, form validation (required / email / KVKK), successful
-submission and summary, product→form prefill, form values never logged, no
-horizontal overflow, hero height bounds, scroll cue above fold, 44px touch
-targets, reduced motion, hero poster fallback, lazy-loading, logo aspect ratio.
+redirect (307, deliberately not 308), `/tR` case-canonicalisation (308), `/en`
+correctly 404s and renders the branded 404 document, single `h1`, desktop nav,
+header inversion, mobile drawer (open, initial focus, Escape, scroll lock and
+position restore, link dismissal), CTA targets, form validation (required /
+e-mail / KVKK), successful submission and summary, product→form prefill, form
+values never logged, no horizontal overflow, hero height bounds, scroll cue
+above fold, 44px touch targets, reduced motion, hero video actually playing
+(not merely its fallback), hero poster fallback, lazy-loading, logo aspect
+ratio.
+
+### Automated accessibility scan
+
+`tests/e2e/accessibility.spec.ts` runs axe-core against WCAG 2.0/2.1/2.2 A+AA
+on four surfaces — the resting homepage, the quotation form in its _error_
+state, the open mobile drawer and the 404 page — in every project. **Zero
+violations.**
+
+It complements rather than replaces the manual pass below: axe detects roughly
+a third of real WCAG failures and none of the judgement calls. Note that the
+scan waits for reveal animations to settle before sampling — its first run
+reported a heading at 1.17:1 that was simply being measured mid-fade, and a
+fixed timeout would only have moved that flake around rather than removed it.
 
 ## Section-by-section visual comparison
 
 Compared against `design-source/…/Raymar Ana Sayfa.dc.html` at 1440, 1280, 768
 and 390.
 
-| Section         | Result                                                                                                            |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Header          | ✅ Transparent over hero, ivory when scrolled; logo variant swap, nav/CTA/burger inversion, heights 88→76 / 72→64 |
-| Hero            | ✅ Full-bleed video, correct scrims, cue with gold gradient rule and bobbing chevron                              |
-| Giriş Sözü      | ✅ Left-aligned, asymmetric, Cormorant `clamp(44–88px)`, gold eyebrow rule, both CTAs                             |
-| Deneyim Şeridi  | ✅ 4 → 2 → 1 columns, gold hairlines between cells only                                                           |
-| Kurumsal Giriş  | ✅ Circular portrait with parallax, gold emblem in the left negative space                                        |
-| Fındık Flagship | ✅ 52%-width photographic bleed at 50% opacity, horizontal green gradient, 4:5 portrait                           |
-| Ürün Portföyü   | ✅ 1.12fr/1fr mosaic, index badges, serif titles, sliding arrows                                                  |
-| Ceviz Ürünleri  | ✅ Lead card spans 2 columns with taller well; 7 cards; footnote                                                  |
-| Seçkin İthal    | ✅ 4:5 crops, 38px alternating stagger, no card beds                                                              |
-| 30 Yıl Hikâyesi | ✅ Centre gold line, 5 pillars with alternating dot opacity, 136px gold "30"                                      |
-| Teklif          | ✅ 0.85fr/1.15fr asymmetry, all fields, KVKK, placeholders verbatim                                               |
-| Footer          | ✅ Emblem watermark at 7%, italic gold tagline, 3 link columns, legal row                                         |
+| Section          | Result                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Header           | ✅ Transparent over hero, ivory when scrolled; logo variant swap, nav/CTA/burger inversion, heights 88→76 / 72→64 |
+| Hero             | ✅ Full-bleed video, correct scrims, cue with gold gradient rule and bobbing chevron                              |
+| Giriş Sözü       | ✅ Left-aligned, asymmetric, Cormorant `clamp(44–88px)`, gold eyebrow rule, both CTAs                             |
+| Deneyim Şeridi   | ✅ 3 → 3 → 1 columns, gold hairlines between cells only                                                           |
+| Kurumsal Giriş   | ✅ Circular portrait with parallax, gold emblem in the left negative space                                        |
+| Ürün Portföyü    | ✅ 1.12fr/1fr mosaic, index badges, serif titles, sliding arrows                                                  |
+| Ceviz Ürünleri   | ✅ Lead card spans 2 columns with taller well; 7 cards; footnote                                                  |
+| Ürünlerimiz      | ✅ 3 → 2 → 2 column grid, no stagger, hairline under each card instead of a bed                                   |
+| Ticaret Hikâyesi | ✅ Centre gold line, 5 pillars with alternating dot opacity                                                       |
+| Teklif           | ✅ 0.85fr/1.15fr asymmetry, all fields, KVKK, placeholders verbatim                                               |
+| Footer           | ✅ Emblem watermark at 7%, italic gold tagline, 3 link columns                                                    |
+
+Three rows changed since the original comparison, all deliberately:
+
+- The **"Fındık Flagship"** and **"Seçkin İthal"** sections no longer exist
+  separately; both were merged into `range-section` ("Ürünlerimiz") — see
+  `docs/IMPLEMENTATION_PLAN.md` §3. The alternating 38px stagger the "Seçkin
+  İthal" review recorded went with them, for the reason noted above
+  `.range-grid` in `globals.css`.
+- The trade-story section's closing **136px gold numeral was removed** — it was
+  the page's third restatement of the same figure, which the heading and the
+  experience strip already carry.
+- The footer's **legal link row is empty**: the three links named pages that do
+  not exist and pointed at the quotation form instead. `footer.legalLinks`
+  refills once real KVKK / privacy / terms pages are supplied.
 
 ## Defects found and fixed during QA
 
@@ -64,6 +100,22 @@ and 390.
    `<noscript>` rule so content is visible with JavaScript disabled entirely.
    The header threshold gained an equivalent fallback — without it a silent
    observer leaves white navigation on an ivory background.
+   **Partly superseded since:** the underlying design this patched — hiding
+   content on the server and revealing it on the client — was itself the larger
+   problem (see `docs/DESIGN_SYSTEM.md` § Reduced motion). `Reveal` no longer
+   hides anything server-side, so the `<noscript>` rule is gone: nothing is
+   hidden by default for it to rescue.
+
+   **The 4s timer stays and is still load-bearing.** `Reveal` can still hide an
+   element on the client — the ones measured below the fold at mount — and if
+   the observer never reports for one of those, the timer is what shows it.
+   Observed during the final device sweep: at 768×1024, scrolling the page a
+   full viewport per animation frame outran the observer for two section
+   eyebrows, which stayed at `opacity: 0` past 3s and were then shown by the
+   fallback (hidden count 2 → 0 between 3s and 6s). No real visitor scrolls
+   that fast, and the content arrived either way — which is precisely the
+   safety net doing its job rather than a defect.
+
 4. **Portfolio mosaic split one breakpoint too late.** The design splits it into
    two columns at 720px; it had been deferred to 1080px. Corrected.
 5. **Portfolio tile titles crowded.** 21px forced a three-line wrap at 390px and
@@ -89,7 +141,12 @@ and 390.
 - No autoplaying audio; the hero video is muted by attribute and property.
 - Reduced motion preserves all content and hierarchy (asserted, not assumed).
 
-Not done: no screen-reader pass with VoiceOver/NVDA, and no automated axe run.
+Automated axe scan: see § Automated accessibility scan above — zero violations
+across four surfaces in every project.
+
+Still not done: no screen-reader pass with VoiceOver/NVDA. That is the one
+remaining accessibility gap, and it is the kind axe cannot close — whether the
+announcements actually make sense in order is a listening judgement.
 
 ## Performance (production build, 1440×900, local)
 
@@ -125,7 +182,30 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
   opens and closes instantly — degraded, not broken.
 - **Container queries** are used for the portfolio tile titles (all current
   evergreen browsers).
-- Verified in Chromium only. **Not yet verified on real Safari or Firefox.**
+- **All three engines now run in CI and locally.** `playwright.config.ts` adds
+  `webkit-iphone` and `webkit-desktop-1440` (Safari's engine — which every iOS
+  browser embeds, whatever its name) and `firefox-desktop-1440` (Gecko).
+  Not real hardware, but the actual rendering and JS engines rather than
+  Chromium alone. Firefox passed on the first run with no changes needed. Three
+  things worth recording from the WebKit pass:
+  - The hero video's fetch behaviour differs from what its own comments once
+    assumed (`preload="none"` does not block `video.load()`'s fetch in any of
+    the three engines — confirmed by tracing media events; all reach `canplay`
+    and start playback with no user gesture).
+  - **WebKit issues two requests for the clip, and that is correct.** It sends
+    `Range: bytes=0-1` first — two bytes, to learn the length and confirm the
+    server supports ranges — then `Range: bytes=0-<end>` for the file. Measured
+    over the wire: 1,816,094 bytes against a 1,816,092-byte file, i.e. **two
+    bytes of overhead, not a second download**. Chromium and Firefox use a
+    single open-ended `Range: bytes=0-`. Do not "fix" the request count.
+  - **Safari's default keyboard behaviour excludes links and buttons from the
+    Tab order** — only form fields are included unless the visitor has "Full
+    Keyboard Access" turned on system-wide. This is not a defect in the mobile
+    drawer's focus trap (confirmed separately: `showModal()`'s own initial
+    focus placement, and Escape-to-close, both work correctly in WebKit); it
+    means a Tab-driven walk through the drawer's links specifically is a macOS/
+    iOS system preference, not something this site controls. The Playwright
+    suite accounts for this per-project rather than asserting it universally.
 
 ## Known limitations and open items
 
@@ -134,15 +214,35 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
 2. All product photography is stock, labelled "temsili görsel".
 3. The quotation form posts to a documented mock; no messages are delivered.
    `src/lib/quote-submission.ts` marks where the endpoint connects.
-4. `NEXT_PUBLIC_SITE_URL` must be set before launch or canonical/OG URLs will
-   point at localhost.
+4. `NEXT_PUBLIC_SITE_URL` must be set before launch — the build now refuses to
+   run without it rather than silently baking in localhost.
 5. Cormorant Garamond is not in the brand manual (DIN-only) — needs ratification.
 6. The slogan renders without quotation marks, matching the approved design; the
    manual states it should always carry them. Left as designed.
-7. **Logo clear space.** The manual requires 3X on all sides (≈24px at the
-   header's 172px logo). The design's 88px header satisfies this, but its
-   scrolled (76px → 18px) and mobile (64px → 12px) states do not. Preserved as
-   approved rather than silently altering the design; flagged for sign-off.
+7. **Logo clear space — now compliant in every state.** The manual requires 3X
+   of clear space on all four sides, where X is 1/22 of the lockup's width.
+   This entry previously assumed a 172px logo and put the requirement at ≈24px;
+   the header logo is actually 107.7px wide, so X = 4.9px and the requirement
+   is **14.7px**. Measured against that, only one of the four header states
+   fell short — the scrolled bar on phones, at 12px. It was fixed by scaling
+   that one state's lockup to 36px (see the comment in `header.tsx`), which
+   lowers the requirement to 13.2px and raises the available space to 14px.
+   Measured after the fix:
+
+   | State             | Header | Lockup   | Needs 3X | Top / bottom |
+   | ----------------- | ------ | -------- | -------- | ------------ |
+   | Desktop, at rest  | 89px   | 107.7×40 | 14.7px   | 24 / 25 ✅   |
+   | Desktop, scrolled | 77px   | 107.7×40 | 14.7px   | 18 / 19 ✅   |
+   | Mobile, at rest   | 73px   | 107.7×40 | 14.7px   | 16 / 17 ✅   |
+   | Mobile, scrolled  | 65px   | 97×36    | 13.2px   | 14 / 15 ✅   |
+
+   The lockup's aspect ratio measures 2.693 in all four states, i.e. the
+   artwork is never deformed — the manual's other hard rule.
+
 8. No English locale. `/en` 404s until `src/content/en.ts` is filled and `'en'`
-   is added to `completeLocales`.
+   is added to `completeLocales`. Doing the second without the first now fails
+   the build — `src/content/index.ts` asserts it, because `en.ts` re-exports
+   the Turkish dictionary and publishing it would serve the Turkish site again
+   under `/en` as a declared English translation.
 9. No automated visual-regression baselines; comparison was manual.
+10. No screen-reader pass (VoiceOver/NVDA) — see § Accessibility.
