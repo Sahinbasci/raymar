@@ -16,10 +16,12 @@ import { heroMedia } from '@/data/products'
  *
  * Responsive delivery (90% of traffic is mobile):
  *   - Desktop loads the approved 16:9 clip.
- *   - Phones load `heroMedia.videoMobile` — a portrait, lightweight cut. Until
- *     that file exists it is `null`, and the hero then shows the poster only on
- *     phones: nothing is downloaded, saving ~1.7 MB of cellular data per visit.
- *   - Reduced motion and Data Saver also fall back to the poster.
+ *   - Phones load `heroMedia.videoMobile` — a portrait, lightweight cut
+ *     (~784 KB) in place of the 1.73 MB desktop clip. The source is re-picked
+ *     on every `mobil`-breakpoint crossing, not just once at mount, so a
+ *     rotated phone never gets stuck on the wrong cut.
+ *   - Reduced motion and Data Saver fall back to the poster on every
+ *     viewport and download nothing.
  *
  * The `<video>` element is always in the DOM (so its decorative semantics are
  * stable) but its `src` is assigned in the effect, so no clip is fetched on a
@@ -52,13 +54,9 @@ export function HeroVideo() {
     const video = videoRef.current
     if (!video) return
 
-    const isMobile = window.matchMedia(MOBILE_QUERY).matches
-    const source = isMobile ? heroMedia.videoMobile : heroMedia.video
-
-    // No clip for this viewport (mobile before the light cut ships), reduced
-    // motion, or Data Saver: leave the poster in place and download nothing.
-    if (!source || reduced || prefersLightMedia()) {
-      // `playing` is already false; just make sure nothing is mid-play.
+    // Reduced motion or Data Saver: leave the poster in place and download
+    // nothing, regardless of viewport.
+    if (reduced || prefersLightMedia()) {
       video.pause()
       return
     }
@@ -66,7 +64,6 @@ export function HeroVideo() {
     // Safari honours the property, not just the attribute, for muted autoplay.
     video.muted = true
     video.defaultMuted = true
-    video.src = source
 
     const play = () => {
       void video.play().catch(() => {
@@ -79,15 +76,47 @@ export function HeroVideo() {
       if (!document.hidden) play()
     }
 
+    const mobileQuery = window.matchMedia(MOBILE_QUERY)
+
+    /*
+     * Re-run on every `mobil` breakpoint crossing, not just at mount — a
+     * width-only check taken once left a phone rotated mid-visit on whichever
+     * clip it started with: portrait-to-landscape kept the light cut (fine),
+     * but landscape-to-portrait kept the 1.73 MB desktop clip downloading on a
+     * phone, exactly the cellular cost this component exists to avoid.
+     */
+    const applySource = () => {
+      const source = mobileQuery.matches ? heroMedia.videoMobile : heroMedia.video
+
+      // No clip for this viewport (mobile before the light cut ships): leave
+      // the poster in place and download nothing.
+      if (!source) {
+        video.pause()
+        return
+      }
+      // Same clip already assigned (or being fetched) — a no-op resize inside
+      // the same bucket must not re-trigger a download.
+      if (video.src.endsWith(source)) return
+
+      // Cleared *before* the new source loads, not after: `playing` gates the
+      // element's opacity, and leaving it `true` across the swap would hold
+      // the old, now-stale frame on screen instead of the poster while the new
+      // clip buffers.
+      setPlaying(false)
+      video.src = source
+      // `preload="none"` in the markup keeps the video off the critical path;
+      // loading starts only once this effect runs, post-hydration.
+      video.load()
+    }
+
     video.addEventListener('playing', onPlaying)
     video.addEventListener('canplay', onCanPlay)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pointerdown', play, { once: true })
     window.addEventListener('keydown', play, { once: true })
+    mobileQuery.addEventListener('change', applySource)
 
-    // `preload="none"` in the markup keeps the video off the critical path;
-    // loading starts only once the page has hydrated.
-    video.load()
+    applySource()
 
     return () => {
       video.removeEventListener('playing', onPlaying)
@@ -95,6 +124,7 @@ export function HeroVideo() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointerdown', play)
       window.removeEventListener('keydown', play)
+      mobileQuery.removeEventListener('change', applySource)
     }
   }, [reduced])
 

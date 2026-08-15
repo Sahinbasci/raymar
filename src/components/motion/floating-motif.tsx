@@ -38,14 +38,20 @@ interface FloatingMotifProps {
  * The motif is `hidden lg:block` in every caller, but a mounted component still
  * runs its `useScroll` subscription — a per-frame scroll/resize callback against
  * a `display:none` element — on the phones where it is never shown. Gating the
- * whole subtree on the `lg` media query keeps the hooks from mounting at all
- * below 1024px, so nothing subscribes to scroll on mobile.
+ * whole subtree on the same `lg` breakpoint keeps the hooks from mounting at
+ * all below it, so nothing subscribes to scroll on mobile or tablet.
+ *
+ * 1080px, not Tailwind's default 1024px `lg` — this project redefines
+ * `--breakpoint-lg` to 1080px (globals.css), which is what every caller's
+ * `lg:block` actually compiles to. The gate has to match or there is a
+ * 56px-wide window where the element is mounted (and animating) while still
+ * `display:none`.
  */
 export function FloatingMotif(props: FloatingMotifProps) {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
+    const mq = window.matchMedia('(min-width: 1080px)')
     const update = () => setEnabled(mq.matches)
     update()
     mq.addEventListener('change', update)

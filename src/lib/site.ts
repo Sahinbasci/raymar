@@ -26,7 +26,16 @@ if (process.env.NODE_ENV === 'production' && !configuredSiteUrl) {
   )
 }
 
-export const siteUrl = configuredSiteUrl ?? 'http://localhost:3000'
+/*
+ * Trailing slashes stripped at this single export point, so every consumer
+ * (sitemap, robots, JSON-LD, canonical, hreflang) inherits the normalization
+ * rather than each concatenation site needing its own. A `NEXT_PUBLIC_SITE_URL`
+ * supplied with a trailing slash is the one malformation `new URL()` accepts
+ * silently — the guard above only catches a missing/invalid value — and it
+ * would otherwise produce a doubled slash everywhere this is concatenated with
+ * a leading-slash path, desynchronizing those URLs from the canonical.
+ */
+export const siteUrl = (configuredSiteUrl ?? 'http://localhost:3000').replace(/\/+$/, '')
 
 export const ogImage = {
   url: '/brand/raymar-og.png',

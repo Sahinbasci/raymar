@@ -74,7 +74,12 @@ const nextConfig: NextConfig = {
      * ever reach this rung, so the cost is confined to those two.
      */
     deviceSizes: [360, 430, 640, 768, 1024, 1280, 1440, 1728, 1920, 2880],
-    imageSizes: [96, 148, 256, 320, 384, 480, 640],
+    // No `640` here — it already sits in `deviceSizes`. With both lists
+    // carrying it, every responsive `srcset` on the site shipped a duplicated
+    // `640w` candidate. `384` and `480` stay: neither appears in
+    // `deviceSizes`, and each adds ladder granularity between the 360 and 640
+    // device rungs.
+    imageSizes: [96, 148, 256, 320, 384, 480],
     // The source files are content-stable: a photograph is only ever replaced
     // by shipping a different filename. Next's 4-hour default would have the
     // optimizer re-encode the same twenty images several times a day.
@@ -132,7 +137,8 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()',
+            value:
+              'camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()',
           },
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
         ],

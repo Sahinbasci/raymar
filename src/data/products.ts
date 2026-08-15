@@ -364,11 +364,11 @@ export const heroMedia = {
   /** Desktop cut — the approved 16:9 clip, byte-for-byte. */
   video: '/video/raymar-hero.mp4',
   /**
-   * Portrait, lightweight mobile cut. `null` until it is produced, and while it
-   * is null the hero shows the poster only on phones — no video is downloaded,
-   * which saves ~1.7 MB of cellular data per visit. Drop the file in and set the
-   * path here to switch it on. See docs/HERO_VIDEO_SPEC.md for the exact
-   * production spec.
+   * Portrait, lightweight mobile cut (~784 KB, vs. 1.73 MB for the desktop
+   * clip below) — produced to the spec in docs/HERO_VIDEO_SPEC.md. Typed as
+   * nullable rather than required: if a future cut is ever pulled, `null`
+   * makes the hero fall back to showing the poster only on phones rather than
+   * requesting a missing file.
    */
   videoMobile: '/video/raymar-hero-mobile.mp4' as string | null,
   poster: '/images/hero-poster.jpg',

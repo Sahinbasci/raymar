@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import { BrandLogo } from '@/components/media/brand-logo'
 import { getDictionary } from '@/content'
@@ -28,6 +28,15 @@ const dictionary = getDictionary(defaultLocale)
 export const metadata: Metadata = {
   title: dictionary.notFound.metaTitle,
   robots: { index: false, follow: false },
+}
+
+/** Mirrors `[locale]/layout.tsx` — see the comment there. Without this the 404
+ *  was the one page on the site with no `theme-color`. */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#004c38' },
+    { media: '(prefers-color-scheme: dark)', color: '#004c38' },
+  ],
 }
 
 export default function GlobalNotFound() {
