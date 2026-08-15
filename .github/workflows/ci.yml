@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+# A second push to the same branch makes the first run's result irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Required: src/lib/site.ts fails the build without it, deliberately, so
+      # that a deploy can never bake localhost into canonical/OG/sitemap URLs.
+      # This value is only ever used to satisfy that guard in CI.
+      NEXT_PUBLIC_SITE_URL: https://example.com
+      # Keeps `upgrade-insecure-requests` and HSTS out of the routes manifest.
+      # Those headers are resolved at BUILD time, and WebKit — unlike Chromium —
+      # honours the upgrade against Playwright's plain-HTTP server and drops the
+      # connection, so without this the WebKit projects cannot reach the site.
+      ALLOW_INSECURE_LAN: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      # Cached by the resolved browser versions, so a Playwright bump busts it
+      # but an ordinary dependency change does not. Three engines are ~400 MB.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit firefox
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      # `--with-deps` also installs the system libraries the browsers need; on a
+      # cache hit those libraries are still missing from the runner image, so
+      # they have to be installed separately.
+      - name: Install browser system dependencies
+        run: pnpm exec playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
+      # The Playwright config's `webServer` runs `pnpm start`, which serves
+      # whatever `.next` already holds — so the build has to happen here, with
+      # the env above, rather than being left to the test run.
+      - run: pnpm build
+
+      - run: pnpm test
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
