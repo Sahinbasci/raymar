@@ -82,9 +82,25 @@ test.describe('responsive integrity', () => {
       }
     }
   })
+})
+
+/*
+ * Was inside `responsive integrity` above, which the whole-file `test.skip`
+ * confines to whichever project reports `viewport.width === 1440` — today
+ * that is `desktop-1440` alone. The test then called `setViewportSize({390,
+ * 844})` on that desktop-Chrome context, which resizes the viewport but not
+ * the browser's touch capability: `hasTouch` stays `false`, so "44px touch
+ * target" was really being asserted in a context that could never receive a
+ * touch event. Its own describe, gated on viewport width like the sibling
+ * `mobile navigation` block in navigation.spec.ts, runs it in every project
+ * narrow enough to be a phone — today `mobile-pixel7` and `webkit-iphone`,
+ * both real touch devices — and drops the manual resize in favour of
+ * whichever mobile viewport that project already provides.
+ */
+test.describe('touch targets', () => {
+  test.skip(({ viewport }) => (viewport?.width ?? 0) >= 1080, 'narrow layout only')
 
   test('touch targets in the mobile drawer are large enough', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/tr')
     await page.getByRole('button', { name: 'Menüyü aç' }).click()
 

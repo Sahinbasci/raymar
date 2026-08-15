@@ -75,6 +75,35 @@ test.describe('hero media', () => {
     expect(state.tabIndex).toBe(-1)
   })
 
+  test('actually plays once hydrated, under default motion', async ({ page }) => {
+    // The primary assertion is the request itself, not a codec- or
+    // engine-specific playback state: every prior "does it play" gap in this
+    // suite asserted only the fallback path (paused under reduced motion,
+    // opacity 0 when blocked), so a regression that stopped the clip from
+    // *starting* at all — like `preload="none"` gaining an unconditional
+    // `autoplay`-only trigger — still passed the suite green. Whatever
+    // triggers playback, it must produce a network request for the clip.
+    const clipRequest = page.waitForRequest(/\/video\/raymar-hero.*\.mp4/)
+    await page.goto('/tr')
+    await clipRequest
+
+    // Every project in this config runs on Chromium or WebKit, both of which
+    // support the clip's H.264 profile and reach `HAVE_FUTURE_DATA` (3)
+    // quickly once the request lands. Polled, not sampled once, so this does
+    // not race the `canplay` event.
+    await expect
+      .poll(
+        () =>
+          page
+            .locator('video')
+            .evaluate((el: HTMLVideoElement) => !el.paused && el.readyState >= 3),
+        { timeout: 8000, message: 'hero video never reached a playing state' },
+      )
+      .toBe(true)
+
+    await expect(page.locator('video')).toHaveCSS('opacity', '1')
+  })
+
   test('poster fallback carries the hero when the video cannot load', async ({
     page,
   }) => {

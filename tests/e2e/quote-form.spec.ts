@@ -19,7 +19,9 @@ test.describe('quotation form', () => {
     await expect(alert).toContainText('zorunlu alanları')
 
     // Still on the form; the success panel must not appear.
-    await expect(page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' })).toHaveCount(0)
+    await expect(
+      page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' }),
+    ).toHaveCount(0)
   })
 
   test('rejects a malformed email address', async ({ page }) => {
@@ -67,7 +69,9 @@ test.describe('quotation form', () => {
 
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
 
-    await expect(page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' })).toBeVisible()
+    await expect(
+      page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' }),
+    ).toBeVisible()
     await expect(
       page.locator('#teklif').getByText('20 ton ceviz içi talebi.'),
     ).toBeVisible()
@@ -89,7 +93,7 @@ test.describe('quotation form', () => {
     await page
       .locator('#urunlerimiz article')
       .filter({ hasText: 'Makademya' })
-      .getByRole('button', { name: 'Teklif Talep Et' })
+      .getByRole('link', { name: 'Teklif Talep Et' })
       .click()
 
     await expect(page.getByLabel('İlgilenilen Ürün *')).toHaveValue('Makademya')
@@ -109,7 +113,9 @@ test.describe('quotation form', () => {
     await page.getByLabel('Talep Mesajı *').fill('Gizli mesaj.')
     await page.locator('#teklif').getByRole('checkbox').check()
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
-    await expect(page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' })).toBeVisible()
+    await expect(
+      page.locator('#teklif').getByRole('heading', { name: 'Talebiniz alındı.' }),
+    ).toBeVisible()
 
     const leaked = logs.filter((line) => /gizli/i.test(line))
     expect(leaked, `leaked: ${leaked.join(' | ')}`).toEqual([])

@@ -52,7 +52,7 @@ test.describe('desktop navigation', () => {
 test.describe('mobile navigation', () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) >= 1080, 'narrow layout only')
 
-  test('drawer opens, traps focus, and closes on Escape', async ({ page }) => {
+  test('drawer opens, traps focus, and closes on Escape', async ({ page }, testInfo) => {
     await page.goto('/tr')
 
     const burger = page.getByRole('button', { name: 'Menüyü aç' })
@@ -73,11 +73,33 @@ test.describe('mobile navigation', () => {
       .catch(() => false)
     expect(headerReachable).toBe(false)
 
-    await page.keyboard.press('Tab')
-    const focusInsideDrawer = await page.evaluate(
+    // `showModal()`'s own initial-focus placement — engine-agnostic, and
+    // confirmed correct on both Chromium and WebKit (it lands on the close
+    // button, the dialog's first focusable descendant).
+    const initialFocusInsideDrawer = await page.evaluate(
       () => document.activeElement?.closest('dialog') !== null,
     )
-    expect(focusInsideDrawer).toBe(true)
+    expect(initialFocusInsideDrawer).toBe(true)
+
+    /*
+     * The rest of the focus-trap check presses Tab and expects it to stay
+     * inside the dialog — true on Chromium and Firefox, where Tab includes
+     * links and buttons in the default focus order. It is not true on Safari:
+     * macOS and iOS only put form controls in the default Tab order unless the
+     * visitor has "Full Keyboard Access" turned on system-wide, and
+     * Playwright's WebKit faithfully reproduces that default — confirmed with
+     * a bare three-`<a>` HTML page outside this app entirely, where Tab never
+     * left `document.body` either. Asserting it here on `webkit-*` projects
+     * would be testing a macOS/iOS system preference, not this component; the
+     * dialog's own focus trap already proved correct above.
+     */
+    if (!testInfo.project.name.startsWith('webkit')) {
+      await page.keyboard.press('Tab')
+      const focusInsideDrawer = await page.evaluate(
+        () => document.activeElement?.closest('dialog') !== null,
+      )
+      expect(focusInsideDrawer).toBe(true)
+    }
 
     await page.keyboard.press('Escape')
     await expect(drawer).toBeHidden()
