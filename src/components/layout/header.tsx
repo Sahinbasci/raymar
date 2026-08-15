@@ -60,10 +60,23 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
         className="group/header fixed inset-x-0 top-0 z-[90] border-b border-raymar-white/14 bg-transparent transition-[background-color,border-color] duration-[450ms] ease-out data-[solid=true]:border-raymar-green/12 data-[solid=true]:bg-raymar-ivory"
       >
         <div className="shell flex h-18 items-center gap-4 group-data-[solid=true]/header:h-16 md:h-22 md:gap-7 md:group-data-[solid=true]/header:h-19">
+          {/*
+            The 0.9 scale applies to one state only: the scrolled header on
+            phones. The brand manual requires 3X of clear space on all four
+            sides of the lockup, where X is 1/22 of its width. At the full 40px
+            height that is 14.7px, and the scrolled mobile bar is 64px tall,
+            leaving (64 − 40) / 2 = 12px — the one combination on the site that
+            falls short. Scaling to 36px brings the requirement down to 13.2px
+            and the available space up to 14px. Every other state already
+            complies (desktop 24/25px, desktop scrolled 18/19px, mobile at rest
+            16/17px), so none of them is touched. `origin-left` keeps the
+            lockup's left edge fixed, so the horizontal clear space and the
+            optical alignment with the nav below are unchanged.
+          */}
           <Link
             href={`/${locale}#ust`}
             aria-label={header.homeAriaLabel}
-            className="relative block h-10 w-[108px] flex-none"
+            className="relative block h-10 w-[108px] flex-none origin-left transition-transform duration-[450ms] ease-out group-data-[solid=true]/header:scale-90 md:group-data-[solid=true]/header:scale-100"
           >
             <BrandLogo
               variant="white-gold"
