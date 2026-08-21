@@ -4,11 +4,14 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef } from 'react'
 import { BrandLogo } from '@/components/media/brand-logo'
 import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock'
+import type { Locale } from '@/lib/i18n'
 import type { HeaderContent, NavItem } from '@/types/content'
 
 interface MobileDrawerProps {
   open: boolean
   onClose: () => void
+  /** Prefixes the section links, so they also work from the legal pages. */
+  locale: Locale
   nav: readonly NavItem[]
   header: HeaderContent
 }
@@ -26,7 +29,7 @@ interface MobileDrawerProps {
  * Where a browser does not support them the drawer simply appears and
  * disappears instantly, which is a graceful degradation, not a broken state.
  */
-export function MobileDrawer({ open, onClose, nav, header }: MobileDrawerProps) {
+export function MobileDrawer({ open, onClose, locale, nav, header }: MobileDrawerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   useBodyScrollLock(open)
@@ -72,7 +75,7 @@ export function MobileDrawer({ open, onClose, nav, header }: MobileDrawerProps) 
           {nav.map((item) => (
             <Link
               key={item.id}
-              href={`#${item.id}`}
+              href={`/${locale}#${item.id}`}
               onClick={onClose}
               className="border-b border-raymar-green/12 py-5 font-[family-name:var(--font-display)] text-3xl font-light text-raymar-green transition-colors duration-300 hover:text-raymar-gold-dark"
             >
@@ -82,7 +85,7 @@ export function MobileDrawer({ open, onClose, nav, header }: MobileDrawerProps) 
         </nav>
 
         <Link
-          href="#teklif"
+          href={`/${locale}#teklif`}
           onClick={onClose}
           className="mt-auto flex min-h-[62px] items-center justify-center gap-3 rounded-none bg-raymar-green text-xs font-normal tracking-[0.2em] text-raymar-white uppercase transition-colors duration-300 hover:bg-raymar-green-hover"
         >

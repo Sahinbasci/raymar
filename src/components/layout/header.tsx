@@ -14,6 +14,17 @@ interface SiteHeaderProps {
   locale: Locale
   nav: readonly NavItem[]
   header: HeaderContent
+  /**
+   * Forces the ivory state from the first paint, for pages that open on a light
+   * surface instead of the hero.
+   *
+   * The transparent state exists to let the header sit over the hero video, and
+   * it only works because something dark is behind it. On a page that opens on
+   * ivory the same styling paints white on `#f8f5ee` — a 1.06:1 contrast ratio,
+   * i.e. an invisible navigation until the visitor happens to scroll. Pages
+   * without a hero pass `alwaysSolid`.
+   */
+  alwaysSolid?: boolean
 }
 
 /**
@@ -29,8 +40,14 @@ interface SiteHeaderProps {
  * network request and cannot flash an empty box. They are stacked in a fixed
  * 172x40 box, so the header never reflows when the state changes.
  */
-export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
-  const solid = useScrollThreshold(48)
+export function SiteHeader({
+  locale,
+  nav,
+  header,
+  alwaysSolid = false,
+}: SiteHeaderProps) {
+  const scrolled = useScrollThreshold(48)
+  const solid = alwaysSolid || scrolled
   const [menuOpen, setMenuOpen] = useState(false)
 
   /*
@@ -99,10 +116,18 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
             aria-label={header.navAriaLabel}
             className="ml-auto hidden items-center gap-[34px] lg:flex"
           >
+            {/*
+              Locale-absolute, not a bare `#section` fragment. The header also
+              renders on the legal pages, where none of these section ids
+              exist — a bare fragment there resolves against the current
+              document and simply does nothing, stranding the visitor. With
+              the locale prefix the link navigates home and then scrolls,
+              which is identical behaviour on the homepage itself.
+            */}
             {nav.map((item) => (
               <Link
                 key={item.id}
-                href={`#${item.id}`}
+                href={`/${locale}#${item.id}`}
                 className="text-[12.5px] font-normal tracking-[0.14em] text-raymar-white uppercase transition-colors duration-[450ms] group-data-[solid=true]/header:text-raymar-green hover:!text-raymar-gold"
               >
                 {item.label}
@@ -117,7 +142,7 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
           />
 
           <Link
-            href="#teklif"
+            href={`/${locale}#teklif`}
             className="hidden flex-none items-center gap-2.5 rounded-none bg-raymar-gold px-7 py-[15px] text-xs font-normal tracking-[0.18em] text-raymar-green-deep uppercase transition-colors duration-300 group-data-[solid=true]/header:bg-raymar-green group-data-[solid=true]/header:text-raymar-white lg:inline-flex"
           >
             {header.cta}
@@ -142,6 +167,7 @@ export function SiteHeader({ locale, nav, header }: SiteHeaderProps) {
       <MobileDrawer
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
+        locale={locale}
         nav={nav}
         header={header}
       />
