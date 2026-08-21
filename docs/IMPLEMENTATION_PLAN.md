@@ -188,5 +188,9 @@ plain-HTTP test server and drops the connection.
 - [ ] Client: supply English copy
 - [ ] Connect the quotation form to a real endpoint (`src/lib/quote-submission.ts`
       is still a documented mock — nothing is delivered today)
-- [ ] Legal pages (KVKK / privacy / terms); `footer.legalLinks` is empty until
-      they exist
+- [x] Legal pages — KVKK aydınlatma metni, gizlilik politikası, çerez politikası
+      at `src/app/[locale]/<slug>/`, slugs in `src/lib/legal.ts`, drafted text in
+      `src/content/tr.ts` under `legal`. Linked from the footer and from the
+      form's consent line; in the sitemap; covered by `tests/e2e/legal.spec.ts`
+      and scanned by axe. **Drafted, not reviewed by counsel** — see the note
+      above `legal` in `tr.ts` for what the text does and does not claim

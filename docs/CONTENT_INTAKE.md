@@ -232,11 +232,12 @@ Lüks–Naturel · Çeyrek Ceviz İçi.
 - Slogan "Tane Tane Lezzetler" kalsın mı? (kılavuzda **tırnak içinde** geçiyor —
   tırnaklı mı istersin?) → `footer.tagline`
 - Telefon / e-posta → **K11** ile aynı. 🔴 → `footer.phoneValue` / `footer.emailValue`
-- Alt linkler (Gizlilik Politikası · KVKK Aydınlatma Metni · Yasal Bilgiler)
-  **kaldırıldı**: üçü de var olmayan sayfalar yerine teklif formuna gidiyordu —
-  ziyaretçiyi "gizlilik politikası" diye tıklattığı yerde veri toplama
-  formuna düşürüyordu. Gerçek sayfalar gelince (**bkz. K14**) `footer.legalLinks`
-  yeniden doldurulur.
+- Alt linkler ✅ **artık gerçek sayfalara gidiyor**: KVKK Aydınlatma Metni ·
+  Gizlilik Politikası · Çerez Politikası. Bir dönem tamamen kaldırılmışlardı,
+  çünkü üçü de var olmayan sayfalar yerine teklif formuna gidiyordu —
+  ziyaretçiyi "gizlilik politikası" diye tıklattığı yerde veri toplama formuna
+  düşürüyordu. Metinler yazıldı; senden gereken tek şey bir hukukçu incelemesi
+  ve KVKK başvuruları için yayımlanacak e-posta/KEP adresi (**bkz. K11**).
 
 ---
 

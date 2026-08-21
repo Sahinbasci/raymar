@@ -409,7 +409,11 @@ Sırasıyla, SEO'yu bloke etme derecesine göre:
    alan adı olmadan hiçbir SEO işi kalıcı değil
 2. **Telefon + e-posta** — hâlâ köşeli parantezli; rakipler numarayı başlık
    etiketine koyuyor
-3. **KVKK aydınlatma metni, gizlilik politikası, çerez politikası**
+3. ~~**KVKK aydınlatma metni, gizlilik politikası, çerez politikası**~~ —
+   **yazıldı ve yayımlandı**; üçü de `/tr/` altında indekslenebilir sayfalar,
+   footer ve form onay satırından bağlı, sitemap'te. Müşteriden kalan tek şey
+   bir hukukçu incelemesi ve KVKK başvuruları için bir e-posta/KEP adresi
+   (metinde yeri hazır, açıklanınca eklenecek)
 4. **Ürün şartname verisi** (4. bölüm listesi) — ürün sayfaları buna bağlı,
    uydurulamaz
 5. **"25 yıl"ın dayanağı** — sayısal kurumsal iddia belgelenebilir olmalı
@@ -424,7 +428,7 @@ Sırasıyla, SEO'yu bloke etme derecesine göre:
 
 | Faz   | İş                                                                                                             | Bağımlılık      |
 | ----- | -------------------------------------------------------------------------------------------------------------- | --------------- |
-| **0** | Alan adı, iletişim bilgisi, yasal metinler, formun gerçek uca bağlanması                                       | müşteri         |
+| **0** | Alan adı, iletişim bilgisi, formun gerçek uca bağlanması (yasal metinler yayımlandı)                           | müşteri         |
 | **1** | Dizin listelemeleri (Europages, turkishexporter, Alibaba), LinkedIn, birlik listelemesi, Search Console + Bing | alan adı        |
 | **2** | Yedi ceviz kalitesi sayfası + ceviz hub'ı, `Product` şeması                                                    | şartname verisi |
 | **3** | Fındık ve antep fıstığı sayfaları, kalite eşleme referansı                                                     | şartname verisi |

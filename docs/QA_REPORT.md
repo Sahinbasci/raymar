@@ -80,9 +80,11 @@ Three rows changed since the original comparison, all deliberately:
 - The trade-story section's closing **136px gold numeral was removed** — it was
   the page's third restatement of the same figure, which the heading and the
   experience strip already carry.
-- The footer's **legal link row is empty**: the three links named pages that do
-  not exist and pointed at the quotation form instead. `footer.legalLinks`
-  refills once real KVKK / privacy / terms pages are supplied.
+- The footer's **legal link row now points at real pages**. It briefly stood
+  empty: the three links named documents that did not exist and pointed at the
+  quotation form instead, so a visitor clicking "Gizlilik Politikası" landed on
+  the form collecting their data. The three pages have since been written and
+  the links restored.
 
 ## Defects found and fixed during QA
 
@@ -209,8 +211,9 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
 
 ## Known limitations and open items
 
-1. Telephone, e-mail and the KVKK policy text remain the design's placeholders —
-   see ASSET_AUDIT.md §4 for why, and what the client must confirm.
+1. Telephone and e-mail remain the design's placeholders — see ASSET_AUDIT.md §4
+   for why, and what the client must confirm. The legal texts they used to be
+   grouped with have since been written (item 11).
 2. All product photography is stock, labelled "temsili görsel".
 3. The quotation form posts to a documented mock; no messages are delivered.
    `src/lib/quote-submission.ts` marks where the endpoint connects.
@@ -246,3 +249,13 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
    under `/en` as a declared English translation.
 9. No automated visual-regression baselines; comparison was manual.
 10. No screen-reader pass (VoiceOver/NVDA) — see § Accessibility.
+11. **The legal texts are drafted, not reviewed by counsel.** KVKK aydınlatma
+    metni, gizlilik politikası and çerez politikası are written and published
+    from verified facts only — the legal entity, Mersis and tax numbers from the
+    identity manual, the exact fields the form collects, the security headers
+    actually set, and the confirmed absence of cookies or third-party analytics.
+    They follow KVKK's statutory structure (Art. 10 disclosure order, Art. 11
+    rights, TTK Art. 82 retention). Two things they deliberately do not claim: a
+    connected form backend, and a KVKK application e-mail or KEP address, since
+    neither exists yet. Both need adding to the text the moment they do. A
+    lawyer's pass is still worth having before these become load-bearing.

@@ -154,8 +154,12 @@ verbatim rather than filled in. Do not treat them as final copy.
 | ------------------------------------------------------------------------------- | ----------------------- |
 | `[Telefon bilgisi eklenecek]`                                                   | Contact block, footer   |
 | `[E-posta bilgisi eklenecek]`                                                   | Contact block, footer   |
-| `[Politika metni eklenecek]`                                                    | KVKK consent line       |
 | "Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır." | Walnut section footnote |
+
+`[Politika metni eklenecek]` is gone from this table: the consent line now links
+to the real KVKK aydınlatma metni and gizlilik politikası pages rather than
+promising a document that did not exist. See QA_REPORT.md item 11 for the
+standing caveat on those texts.
 
 Two placeholders that were here at hand-off are gone, not because the client
 supplied real copy but because the sections carrying them changed shape: the
