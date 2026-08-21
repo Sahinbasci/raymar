@@ -122,4 +122,28 @@ test.describe('accessibility', () => {
       violations.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n'),
     ).toEqual([])
   })
+
+  /*
+   * The legal pages carry the site's longest continuous prose and its only
+   * compliance obligation, which makes them the pages a screen-reader user is
+   * most likely to be sent to directly. They are also the pages most easily
+   * forgotten in a design pass, so they are scanned explicitly rather than
+   * assumed to inherit the homepage's result.
+   */
+  for (const slug of [
+    'kvkk-aydinlatma-metni',
+    'gizlilik-politikasi',
+    'cerez-politikasi',
+  ]) {
+    test(`/tr/${slug} has no violations`, async ({ page }) => {
+      await page.goto(`/tr/${slug}`)
+
+      const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze()
+
+      expect(
+        violations,
+        violations.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n'),
+      ).toEqual([])
+    })
+  }
 })
