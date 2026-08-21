@@ -428,7 +428,7 @@ Sırasıyla, SEO'yu bloke etme derecesine göre:
 
 | Faz   | İş                                                                                                             | Bağımlılık      |
 | ----- | -------------------------------------------------------------------------------------------------------------- | --------------- |
-| **0** | Alan adı, iletişim bilgisi, formun gerçek uca bağlanması (yasal metinler yayımlandı)                           | müşteri         |
+| **0** | Alan adı, iletişim bilgisi, form teslimat hedefinin seçilmesi (endpoint hazır, yasal metinler yayımlandı)      | müşteri         |
 | **1** | Dizin listelemeleri (Europages, turkishexporter, Alibaba), LinkedIn, birlik listelemesi, Search Console + Bing | alan adı        |
 | **2** | Yedi ceviz kalitesi sayfası + ceviz hub'ı, `Product` şeması                                                    | şartname verisi |
 | **3** | Fındık ve antep fıstığı sayfaları, kalite eşleme referansı                                                     | şartname verisi |

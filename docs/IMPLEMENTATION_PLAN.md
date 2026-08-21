@@ -159,7 +159,10 @@ plain-HTTP test server and drops the connection.
 2. **Telephone / e-mail / domain.** Real values exist in the manual but under
    MAREX and `marasintl.com`. Left as the design's placeholders. — ASSET_AUDIT.md
 3. **No production domain.** `NEXT_PUBLIC_SITE_URL` must be set before launch.
-4. **No submission backend.** The form uses a documented mock.
+4. **Submission delivery is unconfigured.** The endpoint is built
+   (`src/app/api/quote/route.ts`); it needs either the Resend variables or
+   `QUOTE_WEBHOOK_URL` set in the deployment environment. Until then it returns
+   503 and the form shows its error state — never a false success.
 5. **All product photography is stock**, labelled "temsili görsel".
 6. **The slogan** is rendered without quotation marks, as in the approved design;
    the manual states it should always carry them.
@@ -186,8 +189,12 @@ plain-HTTP test server and drops the connection.
 - [ ] Client: confirm contact details, domain, font decision
 - [ ] Client: supply final product photography
 - [ ] Client: supply English copy
-- [ ] Connect the quotation form to a real endpoint (`src/lib/quote-submission.ts`
-      is still a documented mock — nothing is delivered today)
+- [x] Quotation endpoint — `src/app/api/quote/route.ts`, with server-side
+      validation, honeypot accept-and-drop, per-IP rate limiting and delivery
+      via Resend or a webhook. Refuses with 503 when unconfigured rather than
+      reporting a false success
+- [ ] Client: choose and configure a delivery target (see `.env.example`) — the
+      one remaining launch blocker
 - [x] Legal pages — KVKK aydınlatma metni, gizlilik politikası, çerez politikası
       at `src/app/[locale]/<slug>/`, slugs in `src/lib/legal.ts`, drafted text in
       `src/content/tr.ts` under `legal`. Linked from the footer and from the

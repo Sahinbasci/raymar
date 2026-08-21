@@ -215,8 +215,14 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
    for why, and what the client must confirm. The legal texts they used to be
    grouped with have since been written (item 11).
 2. All product photography is stock, labelled "temsili görsel".
-3. The quotation form posts to a documented mock; no messages are delivered.
-   `src/lib/quote-submission.ts` marks where the endpoint connects.
+3. **The quotation endpoint needs a delivery target before launch.**
+   `src/app/api/quote/route.ts` validates, drops honeypot hits, rate-limits per
+   IP and delivers via Resend or a webhook — but only once one of those is
+   configured (see `.env.example`). With neither set it returns 503 and the form
+   shows its error state. This replaced a mock that resolved `{ ok: true }`
+   unconditionally, i.e. thanked every buyer for an enquiry it had discarded.
+   Refusing loudly is the intended unconfigured behaviour, not a gap; the gap is
+   that nobody has chosen where enquiries should land.
 4. `NEXT_PUBLIC_SITE_URL` must be set before launch — the build now refuses to
    run without it rather than silently baking in localhost.
 5. Cormorant Garamond is not in the brand manual (DIN-only) — needs ratification.

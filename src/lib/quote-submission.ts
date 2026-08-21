@@ -1,22 +1,19 @@
 /**
  * Quotation submission boundary.
  *
- * ============================ NOT A REAL ENDPOINT ============================
- * No submission backend exists for this site yet. `submitQuoteRequest` is a
- * clearly isolated mock: it resolves after a short delay and DOES NOTHING with
- * the payload. Nothing is emailed, stored or transmitted, and the UI must not
- * claim otherwise beyond the approved success copy.
+ * This used to be a documented mock that resolved `{ ok: true }` without doing
+ * anything, which meant the site thanked every buyer for an enquiry it had just
+ * thrown away. It now posts to `src/app/api/quote/route.ts`, which delivers the
+ * message and refuses — loudly — when it has nowhere to send it.
  *
- * TO CONNECT PRODUCTION:
- *   1. Add a route handler at `src/app/api/quote/route.ts` (or point at the
- *      client's CRM / mail relay).
- *   2. Replace the body of `submitQuoteRequest` with the `fetch` to it.
- *   3. Add spam mitigation server-side — the honeypot field below is submitted
- *      as `website` and must be rejected when non-empty; a token check
- *      (Turnstile / reCAPTCHA) should be added at the same time.
- * The form component needs no changes: it already renders loading, error and
- * success states off this function's promise.
- * ============================================================================
+ * TO GO LIVE, set one of these in the deployment environment:
+ *
+ *   RESEND_API_KEY + QUOTE_TO_EMAIL + QUOTE_FROM_EMAIL   (e-mail)
+ *   QUOTE_WEBHOOK_URL                                     (CRM / Zapier / n8n)
+ *
+ * With neither configured the endpoint returns 503 and the form shows its error
+ * state. That is the intended behaviour: a visitor who is told the message
+ * failed can pick up the phone, whereas one who is told it succeeded cannot.
  */
 
 export interface QuotePayload {
@@ -39,14 +36,34 @@ export interface QuoteResult {
 /** Name of the honeypot input, kept in one place for the form and the server. */
 export const HONEYPOT_FIELD = 'website'
 
+/**
+ * Caps how long the visitor is left watching a spinner.
+ *
+ * Without this, a hung upstream leaves the button in its loading state
+ * indefinitely and the form cannot be retried or corrected — the one state a
+ * lead-capture form must never get stuck in.
+ */
+const TIMEOUT_MS = 15_000
+
 export async function submitQuoteRequest(payload: QuotePayload): Promise<QuoteResult> {
-  // Silently accept-and-drop honeypot hits so bots get no signal.
-  if (payload.website.trim() !== '') {
-    return { ok: true }
+  try {
+    const response = await fetch('/api/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+
+    if (!response.ok) return { ok: false }
+
+    const result = (await response.json()) as Partial<QuoteResult>
+    return { ok: result.ok === true }
+  } catch {
+    /*
+     * Network failure, timeout, or malformed response. Deliberately swallowed
+     * rather than logged: the payload is in scope here, and the form's own test
+     * asserts that no submitted value ever reaches the console.
+     */
+    return { ok: false }
   }
-
-  // Mock latency so the loading state is exercised in development and tests.
-  await new Promise((resolve) => setTimeout(resolve, 600))
-
-  return { ok: true }
 }
