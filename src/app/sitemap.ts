@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { completeLocales, defaultLocale, localeTags } from '@/lib/i18n'
+import { legalSlugs } from '@/lib/legal'
 import { siteUrl } from '@/lib/site'
 
 /**
@@ -15,19 +16,42 @@ import { siteUrl } from '@/lib/site'
  */
 const lastModified = new Date()
 
+/** Builds the hreflang cluster for one path suffix ('' for the homepage). */
+function alternatesFor(suffix: string) {
+  return {
+    languages: {
+      ...Object.fromEntries(
+        completeLocales.map((code) => [localeTags[code], `${siteUrl}/${code}${suffix}`]),
+      ),
+      'x-default': `${siteUrl}/${defaultLocale}${suffix}`,
+    },
+  }
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  return completeLocales.map((locale) => ({
+  const home = completeLocales.map((locale) => ({
     url: `${siteUrl}/${locale}`,
     lastModified,
     changeFrequency: 'monthly' as const,
     priority: 1,
-    alternates: {
-      languages: {
-        ...Object.fromEntries(
-          completeLocales.map((code) => [localeTags[code], `${siteUrl}/${code}`]),
-        ),
-        'x-default': `${siteUrl}/${defaultLocale}`,
-      },
-    },
+    alternates: alternatesFor(''),
   }))
+
+  /*
+   * The legal pages are listed so they can be indexed and found, but at a low
+   * priority and a yearly cadence: they are real, linked destinations rather
+   * than content anyone searches for, and advertising them as frequently
+   * changing would spend crawl budget that belongs to the product pages.
+   */
+  const legal = completeLocales.flatMap((locale) =>
+    Object.values(legalSlugs).map((slug) => ({
+      url: `${siteUrl}/${locale}/${slug}`,
+      lastModified,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+      alternates: alternatesFor(`/${slug}`),
+    })),
+  )
+
+  return [...home, ...legal]
 }

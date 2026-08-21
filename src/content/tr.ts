@@ -1,3 +1,4 @@
+import { legalPath } from '@/lib/legal'
 import type { Dictionary } from '@/types/content'
 
 /**
@@ -273,7 +274,10 @@ export const tr: Dictionary = {
     otherProductOption: 'Diğer',
     consentText:
       'KVKK ve gizlilik politikası kapsamında verilerimin işlenmesine onay veriyorum.',
-    consentPolicyNote: '[Politika metni eklenecek]',
+    consentLinks: [
+      { href: legalPath('tr', 'kvkk'), label: 'KVKK Aydınlatma Metni' },
+      { href: legalPath('tr', 'gizlilik'), label: 'Gizlilik Politikası' },
+    ],
     submit: 'Talebi Gönder',
     requiredNote: '* Zorunlu alanlar',
     errorGeneric: 'Lütfen zorunlu alanları eksiksiz ve doğru doldurun.',
@@ -335,14 +339,229 @@ export const tr: Dictionary = {
     phoneValue: '[Telefon bilgisi eklenecek]',
     emailValue: '[E-posta bilgisi eklenecek]',
     copyright: '© 2026 Raymar Nuts. Tüm hakları saklıdır.',
-    // Empty until the pages exist. The three links here used to point at
-    // `#teklif` — the quotation form, not a privacy policy, a KVKK notice or
-    // legal information — so a visitor following any of them landed on a
-    // data-collection form instead of the document its label promised. An
-    // absent link reads as pre-launch; a misdirected one reads as a dark
-    // pattern. footer.tsx renders this unguarded, so `[]` is safe: it yields
-    // an empty flex container and the copyright row is unaffected.
-    legalLinks: [],
+    // Real pages now exist under src/app/[locale]/(legal)/ — see
+    // src/lib/legal.ts for the slugs. These used to point at `#teklif` (the
+    // quotation form), which sent a visitor reading "Gizlilik Politikası"
+    // straight into the form that collects their data instead of the
+    // document its label promised.
+    legalLinks: [
+      { href: legalPath('tr', 'kvkk'), label: 'KVKK Aydınlatma Metni' },
+      { href: legalPath('tr', 'gizlilik'), label: 'Gizlilik Politikası' },
+      { href: legalPath('tr', 'cerez'), label: 'Çerez Politikası' },
+    ],
+  },
+
+  /*
+   * Drafted from verified facts only: the legal entity, Mersis number, tax
+   * office and address transcribed in docs/ASSET_AUDIT.md §5 from the
+   * corporate identity manual; the exact fields the quote form collects
+   * (src/components/forms/quote-form.tsx); the security headers actually set
+   * in next.config.ts; and the confirmed absence of cookies, localStorage or
+   * any third-party analytics anywhere in this codebase.
+   *
+   * Two things this text does NOT claim, because they are not yet true:
+   *   - A connected form backend. `submitQuoteRequest` (src/lib/quote-submission.ts)
+   *     is still a documented mock; nothing is transmitted anywhere yet. The
+   *     KVKK metni describes the processing model a connected form will
+   *     follow, in category terms (internal personnel, no named vendor),
+   *     rather than naming a specific e-mail or CRM provider that does not
+   *     exist yet.
+   *   - A company e-mail or KEP address for KVKK applications — none has been
+   *     supplied (see quote.phoneValue / footer.emailValue). The postal
+   *     address and the quote form itself remain valid application channels
+   *     until one is announced.
+   *
+   * This is a drafted legal text grounded in KVKK's actual statutory
+   * structure (Art. 10 disclosure order, Art. 11 rights, TTK Art. 82 retention
+   * citation) — not filler — but it has not been reviewed by counsel. Treat it
+   * the same as any other client-owned legal document on this site: publishable
+   * as a good-faith draft, worth a lawyer's pass before it is load-bearing.
+   */
+  legal: {
+    kvkk: {
+      metaTitle: 'KVKK Aydınlatma Metni',
+      metaDescription:
+        'Raymar Nuts teklif formu aracılığıyla işlenen kişisel verilere ilişkin 6698 sayılı KVKK kapsamındaki aydınlatma metni.',
+      eyebrow: 'Yasal',
+      lastUpdatedLabel: 'Son güncelleme',
+      heading: 'KVKK Aydınlatma Metni',
+      lastUpdated: '2026-08-21',
+      intro: [
+        'İşbu Aydınlatma Metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") m. 10 ile Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ uyarınca, bu internet sitesi ("Site") üzerindeki teklif formu aracılığıyla işlenen kişisel verileriniz hakkında sizi bilgilendirmek amacıyla hazırlanmıştır.',
+      ],
+      sections: [
+        {
+          heading: '1. Veri Sorumlusunun Kimliği',
+          paragraphs: [
+            'Kişisel verileriniz, veri sorumlusu sıfatıyla Marex Dış Tic. Ltd. Şti. ("Şirket") tarafından, Raymar Nuts markası altında yürütülen ticari faaliyetler kapsamında, aşağıda açıklanan amaç ve yöntemlerle işlenmektedir.',
+          ],
+          list: [
+            'Unvan: Marex Dış Tic. Ltd. Şti.',
+            'Mersis No: 0612100813400001',
+            'Vergi Dairesi / No: Atışalanı Vergi Dairesi, 612 100 8134',
+            'Adres: Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul',
+          ],
+        },
+        {
+          heading: '2. İşlenen Kişisel Veriler ve Toplanma Yöntemi',
+          paragraphs: [
+            'Teklif formunu doldurmanız halinde, formda yer alan ve tarafınızca girilen aşağıdaki veriler, elektronik ortamda ve doğrudan sizin tarafınızdan sağlanmak suretiyle işlenir:',
+          ],
+          list: [
+            'Kimlik bilgisi: ad ve soyad',
+            'İletişim bilgisi: e-posta adresi, telefon numarası (belirtmeniz halinde), ülke bilgisi',
+            'Mesleki / ticari bilgi: firma unvanı, ilgilendiğiniz ürün grubu',
+            'Talep içeriği: formda yazdığınız talep mesajı',
+          ],
+        },
+        {
+          heading: '3. Kişisel Verilerin İşlenme Amaçları',
+          paragraphs: ['Kişisel verileriniz aşağıdaki amaçlarla işlenir:'],
+          list: [
+            'İlettiğiniz teklif talebinin değerlendirilmesi ve yanıtlanması',
+            'Tarafınızla ticari amaçlı iletişim kurulması ve olası bir iş ilişkisinin yürütülmesi',
+            'Taleplere ilişkin kayıtların tutulması',
+            'Şirketin ticari faaliyetlerinden doğan hukuki yükümlülüklerin (örn. ticari yazışmaların saklanması) yerine getirilmesi',
+          ],
+        },
+        {
+          heading: '4. Kişisel Verilerin İşlenmesinin Hukuki Sebebi',
+          paragraphs: [
+            'Kişisel verileriniz, teklif formunu göndermeden önce işaretlediğiniz onay kutusuyla verdiğiniz açık rızanız (KVKK m. 5/1) hukuki sebebine dayanılarak işlenmektedir. Onay kutusunu işaretlemediğiniz sürece form gönderilmez. Talebiniz gönderildikten sonra rızanızı geri çekmek isterseniz, 7. maddede açıklanan başvuru yollarını kullanabilirsiniz.',
+          ],
+        },
+        {
+          heading: '5. Kişisel Verilerin Aktarılması',
+          paragraphs: [
+            'Talep formuyla ilettiğiniz kişisel veriler, yalnızca talebinizin değerlendirilmesi ve yanıtlanması amacıyla Şirket bünyesinde bu konuda yetkili personel tarafından görülür. Bu veriler, açık rızanız veya kanunda öngörülen istisnai haller dışında üçüncü kişi veya kurumlarla paylaşılmaz, yurt dışına aktarılmaz.',
+            "Şirketin talep süreçlerini yürütmek üzere ileride bir e-posta gönderim hizmeti veya müşteri ilişkileri yönetimi (CRM) sistemi gibi bir hizmet sağlayıcıdan destek alması halinde, bu durum işbu metne yansıtılacak ve söz konusu aktarım KVKK'nın öngördüğü şartlara uygun şekilde yürütülecektir.",
+          ],
+        },
+        {
+          heading: '6. Kişisel Verilerin Saklama Süresi',
+          paragraphs: [
+            'Kişisel verileriniz, işlenme amacının gerektirdiği süre boyunca ve her hâlükârda ilgili mevzuatta öngörülen azami süreler — örneğin, ticari yazışmalara ilişkin olarak 6102 sayılı Türk Ticaret Kanunu m. 82 uyarınca öngörülen 10 yıllık saklama yükümlülüğü — ile sınırlı olarak saklanır. Bu sürelerin sonunda kişisel verileriniz silinir, yok edilir veya anonim hale getirilir.',
+          ],
+        },
+        {
+          heading: '7. KVKK Madde 11 Kapsamındaki Haklarınız',
+          paragraphs: ['KVKK m. 11 uyarınca Şirkete başvurarak:'],
+          list: [
+            'Kişisel verilerinizin işlenip işlenmediğini öğrenme',
+            'İşlenmişse buna ilişkin bilgi talep etme',
+            'İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme',
+            'Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme',
+            'Eksik veya yanlış işlenmişse düzeltilmesini isteme',
+            "KVKK m. 7'de öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme",
+            'Düzeltme, silme ve yok etme taleplerinin, verilerin aktarıldığı üçüncü kişilere de bildirilmesini isteme',
+            'İşlenen verilerin münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme',
+            'Kanuna aykırı işlenmesi sebebiyle zarara uğramanız halinde zararın giderilmesini talep etme',
+          ],
+        },
+        {
+          heading: '8. Başvuru Yöntemi',
+          paragraphs: [
+            'Yukarıda sayılan haklarınıza ilişkin taleplerinizi, kimliğinizi tevsik edici belgelerle birlikte yazılı olarak Şirketin "Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul" adresine iletebilir veya Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz. Şirketçe açıklanacak bir e-posta veya KEP (Kayıtlı Elektronik Posta) adresi üzerinden başvuru imkânı, bu bilgiler yayımlandığında burada duyurulacaktır.',
+            "Başvurunuz, talebin niteliğine göre en kısa sürede ve her hâlükârda KVKK'da öngörülen otuz (30) gün içinde sonuçlandırılır.",
+          ],
+        },
+      ],
+    },
+    gizlilik: {
+      metaTitle: 'Gizlilik Politikası',
+      metaDescription:
+        'Raymar Nuts internet sitesinin kişisel verilerin korunmasına ve ziyaretçi gizliliğine ilişkin uygulamalarını açıklayan gizlilik politikası.',
+      eyebrow: 'Yasal',
+      lastUpdatedLabel: 'Son güncelleme',
+      heading: 'Gizlilik Politikası',
+      lastUpdated: '2026-08-21',
+      intro: [
+        'Bu Gizlilik Politikası, Marex Dış Tic. Ltd. Şti. ("Şirket", "Raymar Nuts") tarafından işletilen bu internet sitesini ("Site") ziyaret ettiğinizde kişisel verilerinizin nasıl ele alındığını açıklar. Teklif formu aracılığıyla işlenen verilerin KVKK kapsamındaki işlenme amaçları, hukuki sebepleri ve haklarınız için KVKK Aydınlatma Metni\'ni inceleyebilirsiniz; bu Politika onu tamamlayan, daha genel bir çerçeve sunar.',
+      ],
+      sections: [
+        {
+          heading: 'Bu Site Kişisel Verilerinizi Nasıl Toplar',
+          paragraphs: [
+            'Site, ziyaretçilerinden kimlik doğrulama, üyelik veya benzeri bir işlem talep etmez. Kişisel verileriniz, yalnızca teklif formunu kendi isteğinizle doldurup gönderdiğinizde, formda yer alan alanlarla sınırlı olarak toplanır. Siteyi yalnızca gezinerek (form doldurmadan) ziyaret etmeniz halinde tarafınıza ait herhangi bir kişisel veri toplanmaz.',
+          ],
+        },
+        {
+          heading: 'Çerezler',
+          paragraphs: [
+            "Site herhangi bir çerez (cookie) kullanmamaktadır. Ayrıntılı bilgi için Çerez Politikası'nı inceleyebilirsiniz.",
+          ],
+        },
+        {
+          heading: 'Üçüncü Taraf Hizmetleri ve Analitik',
+          paragraphs: [
+            'Bu Site şu anda herhangi bir üçüncü taraf analitik, reklam veya izleme hizmeti (örn. Google Analytics, reklam pikseli) kullanmamaktadır. Sitede kullanılan yazı tipleri (fontlar) sunucu üzerinden servis edilir; bu nedenle sayfayı görüntülemeniz herhangi bir üçüncü taraf yazı tipi sağlayıcısına istek gönderilmesine yol açmaz.',
+          ],
+        },
+        {
+          heading: 'Teknik Güvenlik Önlemleri',
+          paragraphs: [
+            'Site, aktarım güvenliğini sağlamak amacıyla HTTPS (SSL/TLS) üzerinden hizmet verecek şekilde yapılandırılmıştır. Sunucu yanıtlarında; içerik güvenliği politikası (Content-Security-Policy), HTTP Strict Transport Security (HSTS), tıklama hırsızlığı (clickjacking) saldırılarına karşı X-Frame-Options, içerik türü koklamasını (MIME sniffing) engelleyen X-Content-Type-Options ve tarayıcı izinlerini kısıtlayan Permissions-Policy gibi güvenlik başlıkları uygulanmaktadır.',
+          ],
+        },
+        {
+          heading: 'Barındırma (Hosting) Kaynaklı Teknik Kayıtlar',
+          paragraphs: [
+            'Her internet sitesinde olduğu gibi, siteyi barındıran sunucu; güvenlik ve arıza tespiti amacıyla IP adresi, tarayıcı ve işletim sistemi bilgisi, erişim tarihi/saati gibi standart teknik günlük (log) kayıtlarını tutabilir. Bu kayıtlar barındırma hizmet sağlayıcısının kendi güvenlik uygulamaları kapsamında oluşur; Şirket tarafından pazarlama veya profil oluşturma amacıyla kullanılmaz.',
+          ],
+        },
+        {
+          heading: 'Politikada Değişiklik',
+          paragraphs: [
+            'Bu Gizlilik Politikası, Site\'de sunulan hizmetlerdeki veya ilgili mevzuattaki değişikliklere bağlı olarak güncellenebilir. Güncel sürüm her zaman bu sayfada yayımlanır; sayfanın üst kısmındaki "son güncelleme" tarihi buna göre değişir.',
+          ],
+        },
+        {
+          heading: 'İletişim',
+          paragraphs: [
+            'Gizlilik uygulamalarımıza ilişkin sorularınız için Site üzerindeki teklif formunu kullanarak veya Şirket adresimize yazılı olarak başvurabilirsiniz.',
+          ],
+        },
+      ],
+    },
+    cerez: {
+      metaTitle: 'Çerez Politikası',
+      metaDescription:
+        'Raymar Nuts internet sitesinin çerez (cookie) kullanmadığını açıklayan çerez politikası.',
+      eyebrow: 'Yasal',
+      lastUpdatedLabel: 'Son güncelleme',
+      heading: 'Çerez Politikası',
+      lastUpdated: '2026-08-21',
+      intro: [
+        'Bu Çerez Politikası, bu internet sitesinin ("Site") çerez kullanımına ilişkin uygulamasını açıklar.',
+      ],
+      sections: [
+        {
+          heading: 'Çerez Kullanılmamaktadır',
+          paragraphs: [
+            'Bu Site, ziyaretiniz sırasında hiçbir çerez (cookie) yerleştirmez. Sitede; oturum çerezi, tercih çerezi, performans/analitik çerez, reklam veya hedefleme çerezi ile herhangi bir üçüncü taraf çerezi bulunmamaktadır.',
+            "Bu nedenle Site'yi ziyaret etmeniz için herhangi bir çerez onayı vermeniz gerekmez ve Site'de bir çerez onay bandı gösterilmez.",
+          ],
+        },
+        {
+          heading: 'Benzer Teknolojiler',
+          paragraphs: [
+            'Site, tarayıcınızın yerel depolama alanlarını (localStorage, sessionStorage) da kullanmamaktadır. Teklif formuna girdiğiniz bilgiler yalnızca formu doldurduğunuz sırada tarayıcı belleğinde tutulur; sayfayı yenilediğinizde veya kapattığınızda bu bilgiler saklanmaz.',
+          ],
+        },
+        {
+          heading: 'İleride Çerez Kullanılması Hâlinde',
+          paragraphs: [
+            "Şirket, ileride site trafiğini ölçmek veya kullanıcı deneyimini iyileştirmek amacıyla çerez veya benzeri teknolojiler kullanmaya karar verirse, bu Politika güncellenecek; zorunlu olmayan çerezler için 6698 sayılı Kanun ve ilgili mevzuat uyarınca açık rızanızın alınacağı bir çerez onay mekanizması Site'ye eklenecektir.",
+          ],
+        },
+        {
+          heading: 'İletişim',
+          paragraphs: [
+            'Bu Politika hakkındaki sorularınız için Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz.',
+          ],
+        },
+      ],
+    },
   },
 
   meta: {

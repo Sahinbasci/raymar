@@ -170,7 +170,8 @@ export interface QuoteContent {
   readonly productOptions: readonly string[]
   readonly otherProductOption: string
   readonly consentText: string
-  readonly consentPolicyNote: string
+  /** Links to the legal pages the consent statement refers to, e.g. KVKK and privacy. */
+  readonly consentLinks: readonly LinkItem[]
   readonly submit: string
   readonly requiredNote: string
   readonly errorGeneric: string
@@ -207,6 +208,35 @@ export interface FooterColumn {
   readonly links: readonly LinkItem[]
 }
 
+/** One clause of a legal page — a heading, its prose, and an optional list. */
+export interface LegalSection {
+  readonly heading: string
+  readonly paragraphs: readonly string[]
+  /** Rendered as an unordered list under the paragraphs, when present. */
+  readonly list?: readonly string[]
+}
+
+export interface LegalPageContent {
+  readonly metaTitle: string
+  readonly metaDescription: string
+  /** Small caption above the title, e.g. "Yasal". */
+  readonly eyebrow: string
+  /** Prefixes the rendered revision date, e.g. "Son güncelleme". */
+  readonly lastUpdatedLabel: string
+  /** The page's one `<h1>`. */
+  readonly heading: string
+  /** ISO date (YYYY-MM-DD); the page renders it localised. */
+  readonly lastUpdated: string
+  readonly intro: readonly string[]
+  readonly sections: readonly LegalSection[]
+}
+
+export interface LegalContent {
+  readonly kvkk: LegalPageContent
+  readonly gizlilik: LegalPageContent
+  readonly cerez: LegalPageContent
+}
+
 export interface FooterContent {
   readonly logoAlt: string
   readonly blurb: string
@@ -235,6 +265,7 @@ export interface Dictionary {
   readonly quote: QuoteContent
   readonly notFound: NotFoundContent
   readonly footer: FooterContent
+  readonly legal: LegalContent
   readonly meta: {
     readonly siteName: string
     readonly title: string

@@ -526,9 +526,34 @@ export function QuoteForm({ content }: QuoteFormProps) {
             className="mt-0.5 h-4.5 w-4.5 flex-none accent-raymar-green"
           />
           <span className="text-[13px] leading-[1.6] font-light text-raymar-ink/82">
+            {/*
+              The links sit inside the element that names the checkbox, which
+              is deliberate: a visitor must be able to reach the documents they
+              are consenting to without leaving the form. They open in a new
+              tab so a part-filled form is never discarded to read them.
+
+              `onClick={stopPropagation}` is required. This whole block is
+              inside the wrapping `<label>`, so a click anywhere in it — the
+              links included — would otherwise be forwarded to the checkbox and
+              silently toggle consent while the visitor was only trying to read
+              the policy.
+            */}
             <span id={`${fieldId('consent')}-label`}>
               {content.consentText}{' '}
-              <span className="text-raymar-ink/70">{content.consentPolicyNote}</span>
+              {content.consentLinks.map((link, index) => (
+                <span key={link.href}>
+                  {index > 0 ? <span className="text-raymar-ink/70"> · </span> : null}
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(event) => event.stopPropagation()}
+                    className="text-raymar-gold-dark underline underline-offset-2 transition-colors duration-300 hover:text-raymar-green"
+                  >
+                    {link.label}
+                  </a>
+                </span>
+              ))}
             </span>
             {fieldError('consent') ? (
               <span
