@@ -1,21 +1,29 @@
 /**
  * Locale configuration.
  *
- * Turkish is the only locale with approved copy. English is declared here so
- * that routing, metadata and the header language switch are already
- * locale-driven, but it is deliberately NOT in `completeLocales` — no English
- * corporate copy has been supplied and none may be invented or machine
- * translated. Adding `'en'` to `completeLocales` is the single switch that
- * publishes the English site once `src/content/en.ts` is filled in.
+ * Both locales are published. English was held back while `src/content/en.ts`
+ * still re-exported the Turkish dictionary — publishing then would have served
+ * the Turkish site twice under two hreflang-linked URLs, which is duplicate
+ * content announced as deliberate. That file now carries a real translation and
+ * sets `englishCopyApproved`, which `src/content/index.ts` checks at build time,
+ * so this list and that flag cannot drift apart silently.
  */
 export const locales = ['tr', 'en'] as const
 
 export type Locale = (typeof locales)[number]
 
+/**
+ * Turkish stays the default, and `/` keeps redirecting here.
+ *
+ * That redirect is a 307 precisely so this stays reversible: nothing about it
+ * is cached permanently in a returning visitor's browser, so `/` can become an
+ * Accept-Language negotiation later without anyone being stuck on the wrong
+ * locale.
+ */
 export const defaultLocale: Locale = 'tr'
 
 /** Locales whose content is approved and therefore publicly routable. */
-export const completeLocales: readonly Locale[] = ['tr']
+export const completeLocales: readonly Locale[] = ['tr', 'en']
 
 /**
  * BCP-47 tags used for `<html lang>` and metadata alternates.
