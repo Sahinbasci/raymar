@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { LegalPage } from '@/components/sections/legal-page'
 import { getDictionary } from '@/content'
 import { isLocale } from '@/lib/i18n'
-import { legalSlugs } from '@/lib/legal'
+import { legalAlternates } from '@/lib/legal'
 
 /**
  * The folder name must equal `legalSlugs.kvkk` — `tests/e2e/legal.spec.ts`
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   return {
     title: legal.kvkk.metaTitle,
     description: legal.kvkk.metaDescription,
-    alternates: { canonical: `/${locale}/${legalSlugs.kvkk}` },
+    alternates: legalAlternates(locale, 'kvkk'),
   }
 }
 
@@ -32,5 +32,11 @@ export default async function KvkkPage({ params }: PageParams) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
 
-  return <LegalPage locale={locale} content={getDictionary(locale).legal.kvkk} />
+  return (
+    <LegalPage
+      locale={locale}
+      content={getDictionary(locale).legal.kvkk}
+      slugKey="kvkk"
+    />
+  )
 }

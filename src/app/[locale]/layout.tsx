@@ -18,7 +18,7 @@ import '../globals.css'
 
 /**
  * Root layout. Every route lives under `[locale]`, so this is the document
- * shell; `/` is redirected to the default locale by `src/proxy.ts`.
+ * shell; `/` is redirected to the default locale by `public/.htaccess`.
  */
 
 export function generateStaticParams() {
@@ -98,15 +98,26 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       description: meta.description,
       images: [ogImage.url],
     },
+    /*
+     * `max-snippet: -1` and `max-image-preview: large` lift the caps on how
+     * much of the page may be quoted in a rich result or an AI Overview. Since
+     * the goal here is to be quoted, capping that would work directly against
+     * it — and there is no confidential copy on the site to protect.
+     *
+     * Set on the generic `robots` as well as `googleBot`, not only on the
+     * latter. Bingbot honours the same directives and is what ChatGPT's search
+     * reads the web through, so a site that lifts the caps for Google alone
+     * leaves them capped for a large share of the answer engines this markup
+     * exists to reach. Google keeps its own tag because `googlebot` overrides
+     * `robots` for it, and dropping the specific tag would be a silent
+     * downgrade for the crawler that matters most.
+     */
     robots: {
       index: true,
       follow: true,
-      /*
-       * `max-snippet: -1` and `max-image-preview: large` lift the caps on how
-       * much of the page may be quoted in a rich result or an AI Overview.
-       * Since the goal here is to be quoted, capping that would work directly
-       * against it — and there is no confidential copy on the site to protect.
-       */
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
       googleBot: {
         index: true,
         follow: true,

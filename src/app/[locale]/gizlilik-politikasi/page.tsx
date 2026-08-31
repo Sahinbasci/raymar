@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { LegalPage } from '@/components/sections/legal-page'
 import { getDictionary } from '@/content'
 import { isLocale } from '@/lib/i18n'
-import { legalSlugs } from '@/lib/legal'
+import { legalAlternates } from '@/lib/legal'
 
 /** Folder name must equal `legalSlugs.gizlilik`; asserted in tests/e2e/legal.spec.ts. */
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   return {
     title: legal.gizlilik.metaTitle,
     description: legal.gizlilik.metaDescription,
-    alternates: { canonical: `/${locale}/${legalSlugs.gizlilik}` },
+    alternates: legalAlternates(locale, 'gizlilik'),
   }
 }
 
@@ -28,5 +28,11 @@ export default async function GizlilikPage({ params }: PageParams) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
 
-  return <LegalPage locale={locale} content={getDictionary(locale).legal.gizlilik} />
+  return (
+    <LegalPage
+      locale={locale}
+      content={getDictionary(locale).legal.gizlilik}
+      slugKey="gizlilik"
+    />
+  )
 }
