@@ -1,4 +1,5 @@
 import { QuoteForm } from '@/components/forms/quote-form'
+import { ContactMap } from '@/components/media/contact-map'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionEyebrow } from '@/components/ui/eyebrow'
 import type { QuoteContent } from '@/types/content'
@@ -13,6 +14,24 @@ import type { QuoteContent } from '@/types/content'
  * See docs/ASSET_AUDIT.md.
  */
 export function QuoteSection({ content }: { content: QuoteContent }) {
+  /*
+   * Built from `mapQuery` — the postal address alone — and NOT from the
+   * `addressLines` the visitor reads above it.
+   *
+   * Joining those lines was the original approach and it pinned the wrong
+   * building: the first line is the legal name, and with a company name
+   * leading the query Maps resolved it to a similarly named but unrelated
+   * business nearby instead of geocoding the address. The two fields say
+   * different things on purpose — one is what a person reads, the other is
+   * what a geocoder needs.
+   *
+   * `output=embed` is the keyless Maps embed form: no API key, no billing
+   * account, and it renders identically to one that has both.
+   */
+  const mapEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(
+    content.mapQuery,
+  )}&output=embed`
+
   return (
     <section id="teklif" className="bg-raymar-cream">
       <div className="shell">
@@ -53,9 +72,12 @@ export function QuoteSection({ content }: { content: QuoteContent }) {
                     <div className="text-xs font-normal tracking-[0.24em] text-raymar-ink/78 uppercase">
                       {content.phoneLabel}
                     </div>
-                    <div className="mt-2.25 text-[14.5px] font-light text-raymar-ink/76">
+                    <a
+                      href="tel:+905419236403"
+                      className="mt-2.25 block text-[14.5px] font-light text-raymar-ink/76 transition-colors duration-300 hover:text-raymar-green"
+                    >
                       {content.phoneValue}
-                    </div>
+                    </a>
                   </div>
                   <div>
                     <div className="text-xs font-normal tracking-[0.24em] text-raymar-ink/78 uppercase">
@@ -66,6 +88,11 @@ export function QuoteSection({ content }: { content: QuoteContent }) {
                     </div>
                   </div>
                 </div>
+                <ContactMap
+                  label={content.mapLabel}
+                  title={content.mapTitle}
+                  embedSrc={mapEmbedSrc}
+                />
               </div>
             </Reveal>
           </div>

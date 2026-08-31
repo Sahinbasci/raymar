@@ -1,5 +1,226 @@
+import { countries } from '@/data/countries'
 import { legalPath } from '@/lib/legal'
 import type { Dictionary } from '@/types/content'
+
+/**
+ * Turkish display name per country id, in the same order as
+ * `src/data/countries.ts` for easy cross-reference. Built as a lookup so the
+ * quote form can render `<option value={id}>{name}</option>` and resolve the
+ * calling code for the same id independently.
+ */
+const countryNames: Record<string, string> = {
+  TR: 'Türkiye',
+  AF: 'Afganistan',
+  AL: 'Arnavutluk',
+  DZ: 'Cezayir',
+  AD: 'Andorra',
+  AO: 'Angola',
+  AG: 'Antigua ve Barbuda',
+  AR: 'Arjantin',
+  AM: 'Ermenistan',
+  AU: 'Avustralya',
+  AT: 'Avusturya',
+  AZ: 'Azerbaycan',
+  BS: 'Bahamalar',
+  BH: 'Bahreyn',
+  BD: 'Bangladeş',
+  BB: 'Barbados',
+  BY: 'Belarus',
+  BE: 'Belçika',
+  BZ: 'Belize',
+  BJ: 'Benin',
+  BT: 'Bhutan',
+  BO: 'Bolivya',
+  BA: 'Bosna Hersek',
+  BW: 'Botsvana',
+  BR: 'Brezilya',
+  BN: 'Brunei',
+  BG: 'Bulgaristan',
+  BF: 'Burkina Faso',
+  BI: 'Burundi',
+  KH: 'Kamboçya',
+  CM: 'Kamerun',
+  CA: 'Kanada',
+  CV: 'Yeşil Burun Adaları',
+  CF: 'Orta Afrika Cumhuriyeti',
+  TD: 'Çad',
+  CL: 'Şili',
+  CN: 'Çin',
+  CO: 'Kolombiya',
+  KM: 'Komorlar',
+  CG: 'Kongo Cumhuriyeti',
+  CD: 'Kongo Demokratik Cumhuriyeti',
+  CR: 'Kosta Rika',
+  CI: 'Fildişi Sahili',
+  HR: 'Hırvatistan',
+  CU: 'Küba',
+  CY: 'Kıbrıs',
+  CZ: 'Çekya',
+  DK: 'Danimarka',
+  DJ: 'Cibuti',
+  DM: 'Dominika',
+  DO: 'Dominik Cumhuriyeti',
+  EC: 'Ekvador',
+  EG: 'Mısır',
+  SV: 'El Salvador',
+  GQ: 'Ekvator Ginesi',
+  ER: 'Eritre',
+  EE: 'Estonya',
+  SZ: 'Esvatini',
+  ET: 'Etiyopya',
+  FJ: 'Fiji',
+  FI: 'Finlandiya',
+  FR: 'Fransa',
+  GA: 'Gabon',
+  GM: 'Gambiya',
+  GE: 'Gürcistan',
+  DE: 'Almanya',
+  GH: 'Gana',
+  GR: 'Yunanistan',
+  GD: 'Grenada',
+  GT: 'Guatemala',
+  GN: 'Gine',
+  GW: 'Gine-Bissau',
+  GY: 'Guyana',
+  HT: 'Haiti',
+  HN: 'Honduras',
+  HK: 'Hong Kong',
+  HU: 'Macaristan',
+  IS: 'İzlanda',
+  IN: 'Hindistan',
+  ID: 'Endonezya',
+  IR: 'İran',
+  IQ: 'Irak',
+  IE: 'İrlanda',
+  IL: 'İsrail',
+  IT: 'İtalya',
+  JM: 'Jamaika',
+  JP: 'Japonya',
+  JO: 'Ürdün',
+  KZ: 'Kazakistan',
+  KE: 'Kenya',
+  KI: 'Kiribati',
+  KW: 'Kuveyt',
+  KG: 'Kırgızistan',
+  LA: 'Laos',
+  LV: 'Letonya',
+  LB: 'Lübnan',
+  LS: 'Lesoto',
+  LR: 'Liberya',
+  LY: 'Libya',
+  LI: 'Lihtenştayn',
+  LT: 'Litvanya',
+  LU: 'Lüksemburg',
+  MO: 'Makao',
+  MG: 'Madagaskar',
+  MW: 'Malavi',
+  MY: 'Malezya',
+  MV: 'Maldivler',
+  ML: 'Mali',
+  MT: 'Malta',
+  MH: 'Marshall Adaları',
+  MR: 'Moritanya',
+  MU: 'Mauritius',
+  MX: 'Meksika',
+  FM: 'Mikronezya',
+  MD: 'Moldova',
+  MC: 'Monako',
+  MN: 'Moğolistan',
+  ME: 'Karadağ',
+  MA: 'Fas',
+  MZ: 'Mozambik',
+  MM: 'Myanmar',
+  NA: 'Namibya',
+  NR: 'Nauru',
+  NP: 'Nepal',
+  NL: 'Hollanda',
+  NZ: 'Yeni Zelanda',
+  NI: 'Nikaragua',
+  NE: 'Nijer',
+  NG: 'Nijerya',
+  MK: 'Kuzey Makedonya',
+  NO: 'Norveç',
+  OM: 'Umman',
+  PK: 'Pakistan',
+  PW: 'Palau',
+  PA: 'Panama',
+  PG: 'Papua Yeni Gine',
+  PY: 'Paraguay',
+  PE: 'Peru',
+  PH: 'Filipinler',
+  PL: 'Polonya',
+  PT: 'Portekiz',
+  QA: 'Katar',
+  RO: 'Romanya',
+  RU: 'Rusya',
+  RW: 'Ruanda',
+  KN: 'Saint Kitts ve Nevis',
+  LC: 'Saint Lucia',
+  VC: 'Saint Vincent ve Grenadinler',
+  WS: 'Samoa',
+  SM: 'San Marino',
+  ST: 'Sao Tome ve Principe',
+  SA: 'Suudi Arabistan',
+  SN: 'Senegal',
+  RS: 'Sırbistan',
+  SC: 'Seyşeller',
+  SL: 'Sierra Leone',
+  SG: 'Singapur',
+  SK: 'Slovakya',
+  SI: 'Slovenya',
+  SB: 'Solomon Adaları',
+  SO: 'Somali',
+  ZA: 'Güney Afrika',
+  KR: 'Güney Kore',
+  SS: 'Güney Sudan',
+  ES: 'İspanya',
+  LK: 'Sri Lanka',
+  SD: 'Sudan',
+  SR: 'Surinam',
+  SE: 'İsveç',
+  CH: 'İsviçre',
+  SY: 'Suriye',
+  TW: 'Tayvan',
+  TJ: 'Tacikistan',
+  TZ: 'Tanzanya',
+  TH: 'Tayland',
+  TL: 'Doğu Timor',
+  TG: 'Togo',
+  TO: 'Tonga',
+  TT: 'Trinidad ve Tobago',
+  TN: 'Tunus',
+  TM: 'Türkmenistan',
+  TV: 'Tuvalu',
+  UG: 'Uganda',
+  UA: 'Ukrayna',
+  AE: 'Birleşik Arap Emirlikleri',
+  GB: 'Birleşik Krallık',
+  US: 'Amerika Birleşik Devletleri',
+  UY: 'Uruguay',
+  UZ: 'Özbekistan',
+  VU: 'Vanuatu',
+  VA: 'Vatikan',
+  VE: 'Venezuela',
+  VN: 'Vietnam',
+  YE: 'Yemen',
+  ZM: 'Zambiya',
+  ZW: 'Zimbabve',
+}
+
+/**
+ * `Record<CountryId, string>` built from `countries`, not hand-typed against
+ * the type — so adding or removing a country in the data file cannot silently
+ * drift out of sync with the name list here. Throws at module load (i.e. at
+ * build time) if a name is missing, rather than shipping an English fallback
+ * or an empty option silently.
+ */
+const quoteCountryOptions = Object.fromEntries(
+  countries.map(({ id }) => {
+    const name = countryNames[id]
+    if (!name) throw new Error(`countryNames is missing an entry for "${id}"`)
+    return [id, name]
+  }),
+) as Dictionary['quote']['countryOptions']
 
 /**
  * Turkish is the approved, complete locale.
@@ -12,8 +233,8 @@ import type { Dictionary } from '@/types/content'
 export const tr: Dictionary = {
   nav: [
     { id: 'ust', label: 'Ana Sayfa' },
-    { id: 'kurumsal', label: 'Kurumsal' },
-    { id: 'urunler', label: 'Ürünler' },
+    { id: 'hakkimizda', label: 'Hakkımızda' },
+    { id: 'urunlerimiz', label: 'Ürünler' },
     { id: 'ticaret', label: 'Uluslararası Ticaret' },
     { id: 'teklif', label: 'İletişim' },
   ],
@@ -26,7 +247,10 @@ export const tr: Dictionary = {
     openMenu: 'Menüyü aç',
     closeMenu: 'Menüyü kapat',
     cta: 'Teklif Talep Et',
-    localePending: 'İngilizce içerik hazırlanıyor',
+    // Yalnızca `completeLocales` dışında bir dil olduğunda gösterilir. İki dil
+    // de yayında olduğu için şu an hiç render edilmiyor; metin bu yüzden
+    // dilden bağımsız tutuldu — "İngilizce hazırlanıyor" demek artık yanlış.
+    localePending: 'İçerik hazırlanıyor',
   },
 
   hero: {
@@ -38,8 +262,8 @@ export const tr: Dictionary = {
     // Set in title case; `.eyebrow` uppercases it in CSS, and the document is
     // lang="tr-TR" so the i/İ mapping is the Turkish one.
     eyebrow: 'B2B Kuruyemiş Ticareti',
-    headingLines: ['Kuruyemiş Tedarikinde', '25 Yıllık Ticaret Deneyimi'],
-    body: 'Ceviz içi başta olmak üzere fındık, Antep fıstığı, çekirdek ürünleri ve makademyada kurumsal alıcılara yönelik B2B ticaret yürütüyoruz.',
+    headingLines: ['Kuruyemiş Tedariğinde', '30 Yılı Aşkın Ticaret Deneyimi'],
+    body: 'Ceviz içi başta olmak üzere makadamya ve pikan ürünlerinde, kurumsal müşterilerimize güvenilir ve sürdürülebilir tedarik çözümleri sunuyoruz.',
     primaryCta: 'Ürünleri Keşfet',
     secondaryCta: 'Teklif Talep Et',
   },
@@ -50,8 +274,8 @@ export const tr: Dictionary = {
     {
       mark: 'experience',
       label: 'Deneyim',
-      value: '25 Yıl',
-      caption: 'Uluslararası kuruyemiş ticaretinde çeyrek asırlık birikime sahibiz.',
+      value: '30 Yılı Aşkın',
+      caption: 'Uluslararası kuruyemiş ticaretinde 30 yılı aşkın tecrübeye sahibiz.',
     },
     {
       // The value carries the whole noun phrase. Split as label "Ticaret Ağı"
@@ -71,106 +295,58 @@ export const tr: Dictionary = {
   ],
 
   corporateIntro: {
-    eyebrow: 'Kurumsal',
-    headingLines: ['Kuruyemiş Ticaretinde', '25 Yıllık Deneyim'],
-    body: 'Raymar Nuts, Marex Dış Tic. Ltd. Şti. çatısı altında; ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyanın B2B ticaretini yürütür.',
-    link: 'Kurumsal Bilgiler',
-    imageAlt: 'Fındık makro çekimi — temsili görsel',
-  },
-
-  portfolio: {
-    eyebrow: 'Ürün Portföyü',
-    heading: 'Kurumsal alımlar için geniş kuruyemiş portföyü',
-    intro:
-      'Ceviz içinden fındığa, Antep fıstığından çekirdek ürünleri ve makademyaya uzanan B2B ürün gamı.',
-    cards: {
-      findik: {
-        badge: '01',
-        title: 'Fındık',
-        subtitle: 'Kabuklu ve İç',
-        imageAlt: 'Fındık ürün grubu (temsili görsel)',
-      },
-      ceviz: {
-        badge: '02',
-        title: 'Ceviz İçi',
-        subtitle: '7 Ayrı Kalite',
-        imageAlt: 'Ceviz içi ürün grubu (temsili görsel)',
-      },
-      'kabak-cekirdegi': {
-        badge: '',
-        title: 'Kabak Çekirdeği İçi',
-        imageAlt: 'Kabak çekirdeği içi (temsili görsel)',
-      },
-      'antep-fistigi': {
-        badge: '',
-        title: 'Antep Fıstığı',
-        imageAlt: 'Antep Fıstığı',
-      },
-      makademya: {
-        badge: '',
-        title: 'Makademya',
-        imageAlt: 'Makademya (temsili görsel)',
-      },
-      aycekirdegi: {
-        badge: '',
-        title: 'Ayçekirdeği',
-        imageAlt: 'Ayçekirdeği (temsili görsel)',
-      },
-    },
+    eyebrow: 'Hakkımızda',
+    headingLines: ['Kuruyemiş Ticaretinde', '30 Yılı Aşkın Deneyim'],
+    // Client-supplied "Hakkımızda" copy, verbatim (2026-08-29) — one string
+    // per paragraph, not one long string, so it renders as the source text's
+    // own four paragraphs rather than a single run-on block.
+    body: [
+      '30 yılı aşkın süredir kuruyemiş ticaretinin içinde yer alan köklü bir geleneğin temsilcisi olarak faaliyet gösteriyoruz. Sektörün farklı kademelerinde yıllar içinde edindiğimiz bilgi, deneyim ve ticari birikimi bugün Raymar Nuts çatısı altında müşterilerimizle buluşturuyoruz.',
+      "Türkiye'nin seçkin kuruyemiş ürünlerini uluslararası pazarlara ihraç ederken, dünyanın farklı bölgelerinden özenle tedarik ettiğimiz ürünleri de Raymar Nuts güvencesiyle Türkiye pazarına sunuyoruz.",
+      'Endüstriyel gıda üreticilerine yönelik hammadde tedariğimizin yanı sıra; paketlenerek doğrudan tüketiciye sunulmaya uygun çerezlik kuruyemiş çeşitlerinin de toptan satışını gerçekleştiriyoruz.',
+      'Kalite, güvenilirlik ve sorumluluk anlayışını işimizin temelinde tutuyor; müşterilerimizle uzun vadeli ve sürdürülebilir iş birlikleri kurmayı hedefliyoruz. Kuruyemiş sektöründe faaliyet gösteren değerli firmalarla iş ortağı olarak birlikte büyümekten memnuniyet duyuyoruz.',
+    ],
+    // Points at #ticaret, not a "Hakkımızda" section of its own — "Kurumsal
+    // Bilgiler" named a section that no longer exists after the rename.
+    link: 'Ticaret Yaklaşımımız',
+    imageAlt: 'Ceviz içi makro çekimi — temsili görsel',
   },
 
   walnut: {
     // Also the value the walnut cards send as the requested product group, so
     // it has to stay byte-identical to its entry in `quote.productOptions`.
     eyebrow: 'Ceviz İçi',
-    heading: 'Ceviz İçinde Yedi Ayrı Kalite',
-    intro:
-      'Bal Rengi, Kızıl, Pirinç, Kırık, Süper Lüks Yarım Beyaz, Lüks Naturel ve Çeyrek olmak üzere yedi farklı ceviz içi kalitesi sunulur.',
+    heading: 'Ceviz İçinde Dört Ayrı Kalite',
     categoryLabel: 'Ceviz İçi',
     detailsCta: 'Detayları Gör',
     quoteCta: 'Teklif Talep Et',
     // Wording unchanged from the literal it replaces — see `WalnutContent`.
     quoteCtaAriaTemplate: '{product} için teklif talep et',
-    // The second sentence is the CC BY-SA 4.0 attribution that `walnut-rice.jpg`
-    // (the Pirinç card) legally requires. It is the only attributed image on the
-    // site; remove this credit only when that photograph is replaced by an
-    // own-shoot or a no-attribution licence. See docs/ASSET_AUDIT.md.
-    footnote:
-      'Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır. Pirinç görseli: Bodhi Peace, Wikimedia Commons, CC BY-SA 4.0.',
     imagePending: 'Ürün görseli hazırlanıyor',
     // One group today, using the label the approved design already applies to
     // every walnut card. Further groups must be named by Raymar.
     groups: {
       'ceviz-ici': 'Ceviz İçi Ürünleri',
     },
+    // Keys and order follow `walnutProductIds` — a size ladder, largest to
+    // smallest. Bal Rengi, Kızıl, Süper Lüks and Lüks Naturel were removed
+    // with the reduction to four grades.
     products: {
-      'bal-rengi': {
-        name: 'Bal Rengi Ceviz İçi',
-        imageAlt: 'Bal Rengi Ceviz İçi (temsili görsel)',
-      },
-      kizil: {
-        name: 'Kızıl Ceviz İçi',
-        imageAlt: 'Kızıl Ceviz İçi (temsili görsel)',
-      },
-      pirinc: {
-        name: 'Pirinç Ceviz İçi',
-        imageAlt: 'Pirinç Ceviz İçi (temsili görsel)',
-      },
-      kirik: {
-        name: 'Kırık Ceviz İçi',
-        imageAlt: 'Kırık Ceviz İçi (temsili görsel)',
-      },
-      'super-luks-yarim-beyaz': {
-        name: 'Süper Lüks – Yarım Beyaz Ceviz İçi',
-        imageAlt: 'Süper Lüks – Yarım Beyaz Ceviz İçi (temsili görsel)',
-      },
-      'luks-naturel': {
-        name: 'Lüks Ceviz İçi – Naturel',
-        imageAlt: 'Lüks Ceviz İçi – Naturel (temsili görsel)',
+      yarim: {
+        name: 'Yarım Ceviz İçi',
+        imageAlt: 'Yarım ceviz içi — bütün yarım kernel, dökme',
       },
       ceyrek: {
         name: 'Çeyrek Ceviz İçi',
-        imageAlt: 'Çeyrek Ceviz İçi (temsili görsel)',
+        imageAlt: 'Çeyrek ceviz içi — iri parçalı, dökme',
+      },
+      kirik: {
+        name: 'Kırık Ceviz İçi',
+        imageAlt: 'Kırık ceviz içi — ihracat kolisinde dökme',
+      },
+      pirinc: {
+        name: 'Pirinç Ceviz İçi',
+        imageAlt: 'Pirinç ceviz içi — en ince boy, dökme',
       },
     },
   },
@@ -178,56 +354,56 @@ export const tr: Dictionary = {
   range: {
     eyebrow: 'Ürün Grupları',
     heading: 'Ürünlerimiz',
-    intro:
-      'Ceviz içinin yanı sıra fındık, Antep fıstığı, kabak çekirdeği içi, ayçekirdeği içi, çerezlik ayçekirdeği ve makademya ürün gamımızda yer alır.',
     categoryLabel: 'Ürün Grubu',
     quoteCta: 'Teklif Talep Et',
     // Wording unchanged from the literal it replaces — see `RangeContent`.
     quoteCtaAriaTemplate: '{product} için teklif talep et',
     imagePending: 'Ürün görseli hazırlanıyor',
+    // Keyed in display order — see `rangeProductIds` in data/products.ts.
     products: {
-      findik: {
-        name: 'Fındık',
-        imageAlt: 'Kabuklu fındık',
-        description:
-          'Kabuklu ve iç fındık seçenekleri, kurumsal alım ve B2B ticaret talepleri kapsamında sunulur.',
-      },
-      'antep-fistigi': {
-        name: 'Antep Fıstığı',
-        imageAlt: 'Antep Fıstığı',
+      makademya: { name: 'Makadamya', imageAlt: 'Makadamya' },
+      pikan: {
+        name: 'Pikan Cevizi',
+        imageAlt: 'Pikan cevizi — kabuklu ve iç, yakın çekim',
       },
       'kabak-cekirdegi': {
         name: 'Kabak Çekirdeği İçi',
         imageAlt: 'Kabak Çekirdeği İçi',
       },
       'aycekirdegi-ic': {
-        name: 'Ayçekirdeği İçi',
-        imageAlt: 'Ayçekirdeği İçi',
+        name: 'Ay Çekirdeği İçi',
+        imageAlt: 'Ay Çekirdeği İçi',
       },
       'aycekirdegi-cerezlik': {
-        name: 'Çerezlik Ayçekirdeği',
-        imageAlt: 'Çerezlik Ayçekirdeği',
+        name: 'Çerezlik Ay Çekirdeği',
+        imageAlt: 'Çerezlik Ay Çekirdeği',
       },
-      makademya: { name: 'Makademya', imageAlt: 'Makademya' },
+      'antep-fistigi': {
+        name: 'Antep Fıstığı',
+        imageAlt: 'Antep Fıstığı',
+      },
     },
   },
 
   tradeStory: {
     eyebrow: 'Uluslararası Ticaret',
-    heading: 'Kuruyemiş ticaretini çeyrek asırdır aynı disiplinle yürütüyoruz.',
-    // NEW COPY — written here, not transcribed from the approved design. It
-    // makes no factual claim beyond the 25 years the client confirmed.
+    // Client copy, 2026-08-31. "30" as a numeral, not "otuz", at their request.
+    heading:
+      'Kuruyemiş ticaretinde 30 yılı aşkın deneyimimizi, titizlik ve güvene dayalı bir anlayışla sürdürüyoruz.',
     intro:
-      'Bu iş; ürünü tanımayı, doğru kaynağa ulaşmayı ve verilen sözü zamanında tutmayı gerektirir. Ticaret yaklaşımımızı beş başlıkta topluyoruz.',
+      'Doğru ürün seçimi, güvenilir kaynaklar ve uzun vadeli iş ilişkileri; ticaret yaklaşımımızın temelini oluşturuyor.',
+    // Başlık düzeni (her kelimenin ilk harfi büyük). "İş" noktalı İ ile —
+    // Türkçede i'nin büyüğü İ'dir; CSS `text-transform` kullanılmıyor, çünkü
+    // tarayıcının dil eşlemesine güvenmek yerine metin doğrudan doğru yazıldı.
     pillars: [
-      'Uzun soluklu ticari deneyim',
-      'Ürün bilgisi',
-      'Uluslararası ticaret yaklaşımı',
-      'Kurumsal iş ortaklıkları',
-      'Süreklilik',
+      'Uzun Soluklu Ticari Deneyim',
+      'Güçlü Ürün Bilgisi',
+      'Uluslararası Ticaret Deneyimi',
+      'Güvenilir İş Ortaklıkları',
+      'Sürdürülebilir Ticaret Anlayışı',
     ],
     closingLead:
-      'Ürün ve tedarik talebinizi paylaşın, ekibimiz sizinle iletişime geçsin.',
+      'Ürün ve tedarik ihtiyaçlarınızı bizimle paylaşın, ekibimiz size uygun seçeneklerle dönüş yapsın.',
     cta: 'Teklif Talep Et',
   },
 
@@ -243,15 +419,20 @@ export const tr: Dictionary = {
       'Esenler / İstanbul',
     ],
     phoneLabel: 'Telefon',
-    phoneValue: '[Telefon bilgisi eklenecek]',
+    phoneValue: '+90 (541) 923 64 03',
     emailLabel: 'E-posta',
-    emailValue: '[E-posta bilgisi eklenecek]',
+    emailValue: 'info@raymarnuts.com',
     fields: {
       name: { label: 'Ad Soyad', placeholder: 'Adınız ve soyadınız' },
       company: { label: 'Firma', placeholder: 'Firma adı' },
-      country: { label: 'Ülke', placeholder: 'Ülke' },
+      // No `placeholder`: the field is a `<select>` now, and its placeholder
+      // *option* is `countryPlaceholder` below, not an input placeholder.
+      country: { label: 'Ülke' },
       email: { label: 'E-posta', placeholder: 'ornek@firma.com' },
-      phone: { label: 'Telefon', placeholder: '+90' },
+      // No hardcoded "+90": the dial code is now shown as its own prefix,
+      // driven by the selected country, so the placeholder only needs to
+      // describe what belongs in the input itself.
+      phone: { label: 'Telefon', placeholder: 'Telefon numarası' },
       product: { label: 'İlgilenilen Ürün' },
       message: {
         label: 'Talep Mesajı',
@@ -261,19 +442,40 @@ export const tr: Dictionary = {
     productPlaceholder: 'Seçiniz',
     // Must stay in exact sync with the product card names: `quote-form.tsx`
     // matches the requested group against this list by string equality, and a
-    // miss drops the visitor silently into "Diğer".
+    // miss drops the visitor silently into "Diğer". Order matches the
+    // homepage's own product priority — see `rangeProductIds`.
     productOptions: [
-      'Fındık',
-      'Ceviz İçi',
-      'Antep Fıstığı',
+      'Makadamya',
+      'Pikan Cevizi',
       'Kabak Çekirdeği İçi',
-      'Ayçekirdeği İçi',
-      'Çerezlik Ayçekirdeği',
-      'Makademya',
+      'Ay Çekirdeği İçi',
+      'Çerezlik Ay Çekirdeği',
+      'Antep Fıstığı',
+      'Ceviz İçi',
     ],
     otherProductOption: 'Diğer',
+    countryPlaceholder: 'Seçiniz',
+    countryOptions: quoteCountryOptions,
+    mapLabel: 'Konum',
+    mapTitle: 'Raymar Nuts konumu — Google Haritalar',
+    // Şirket adı bilerek yok: sorgunun başında olduğunda Google Haritalar
+    // yakındaki benzer adlı başka bir firmanın işletme kaydına eşleyip yanlış
+    // binayı işaretliyordu. Yalnız posta adresi verilince doğru noktaya
+    // geliyor. Bkz. `QuoteContent['mapQuery']`.
+    mapQuery:
+      'Oruçreis Mah. Vadi Cad. No:108, İstanbul Ticaret Sarayı, 34235 Giyimkent, Esenler, İstanbul',
+    /*
+     * The consent line names the cross-border transfer explicitly.
+     *
+     * KVKK m. 9 requires explicit consent for a transfer abroad, and explicit
+     * consent has to be specific and informed. The quotation form reaches the
+     * company through Brevo, whose infrastructure is in France, so the
+     * transfer is not a hypothetical — it happens on every submission. Relying
+     * on the linked aydınlatma metni alone to carry that fact would leave the
+     * tick box consenting to something it does not mention.
+     */
     consentText:
-      'KVKK ve gizlilik politikası kapsamında verilerimin işlenmesine onay veriyorum.',
+      'KVKK ve gizlilik politikası kapsamında verilerimin işlenmesine ve talebimin iletilmesi amacıyla yurt dışına aktarılmasına onay veriyorum.',
     consentLinks: [
       { href: legalPath('tr', 'kvkk'), label: 'KVKK Aydınlatma Metni' },
       { href: legalPath('tr', 'gizlilik'), label: 'Gizlilik Politikası' },
@@ -305,28 +507,29 @@ export const tr: Dictionary = {
   footer: {
     logoAlt: 'Raymar Nuts',
     blurb:
-      'Raymar Nuts, Marex Dış Tic. Ltd. Şti. çatısı altında ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyada B2B kuruyemiş ticareti yürütür.',
+      'Raymar Nuts, Marex Dış Tic. Ltd. Şti. çatısı altında ceviz içi, makadamya, pikan cevizi, Antep fıstığı ve çekirdek ürünlerinde B2B kuruyemiş ticareti yürütür.',
     // Identity manual, p.145: the slogan is always set in quotation marks,
     // italic, gold. See docs/ASSET_AUDIT.md.
     tagline: '“Tane Tane Lezzetler”',
     corporate: {
-      heading: 'Kurumsal',
+      heading: 'Hakkımızda',
       links: [
         { href: '#ust', label: 'Ana Sayfa' },
-        { href: '#kurumsal', label: 'Kurumsal' },
+        { href: '#hakkimizda', label: 'Hakkımızda' },
         { href: '#ticaret', label: 'Uluslararası Ticaret' },
         { href: '#teklif', label: 'İletişim' },
       ],
     },
     products: {
       heading: 'Ürünler',
+      // Same order as the homepage: Ürünlerimiz's own priority, then Ceviz İçi.
       links: [
-        { href: '#urunlerimiz', label: 'Fındık' },
-        { href: '#ceviz', label: 'Ceviz İçi' },
-        { href: '#urunlerimiz', label: 'Antep Fıstığı' },
+        { href: '#urunlerimiz', label: 'Makadamya' },
+        { href: '#urunlerimiz', label: 'Pikan Cevizi' },
         { href: '#urunlerimiz', label: 'Kabak Çekirdeği İçi' },
-        { href: '#urunlerimiz', label: 'Ayçekirdeği' },
-        { href: '#urunlerimiz', label: 'Makademya' },
+        { href: '#urunlerimiz', label: 'Ay Çekirdeği' },
+        { href: '#urunlerimiz', label: 'Antep Fıstığı' },
+        { href: '#ceviz', label: 'Ceviz İçi' },
       ],
     },
     contactHeading: 'İletişim',
@@ -336,8 +539,8 @@ export const tr: Dictionary = {
       'İstanbul Ticaret Sarayı 34235 Giyimkent',
       'Esenler / İstanbul',
     ],
-    phoneValue: '[Telefon bilgisi eklenecek]',
-    emailValue: '[E-posta bilgisi eklenecek]',
+    phoneValue: '+90 (541) 923 64 03',
+    emailValue: 'info@raymarnuts.com',
     copyright: '© 2026 Raymar Nuts. Tüm hakları saklıdır.',
     // Real pages now exist under src/app/[locale]/(legal)/ — see
     // src/lib/legal.ts for the slugs. These used to point at `#teklif` (the
@@ -356,20 +559,32 @@ export const tr: Dictionary = {
    * office and address transcribed in docs/ASSET_AUDIT.md §5 from the
    * corporate identity manual; the exact fields the quote form collects
    * (src/components/forms/quote-form.tsx); the security headers actually set
-   * in next.config.ts; and the confirmed absence of cookies, localStorage or
+   * in public/.htaccess; and the confirmed absence of cookies, localStorage or
    * any third-party analytics anywhere in this codebase.
    *
-   * Two things this text does NOT claim, because they are not yet true:
-   *   - A connected form backend. `submitQuoteRequest` (src/lib/quote-submission.ts)
-   *     is still a documented mock; nothing is transmitted anywhere yet. The
-   *     KVKK metni describes the processing model a connected form will
-   *     follow, in category terms (internal personnel, no named vendor),
-   *     rather than naming a specific e-mail or CRM provider that does not
-   *     exist yet.
-   *   - A company e-mail or KEP address for KVKK applications — none has been
-   *     supplied (see quote.phoneValue / footer.emailValue). The postal
-   *     address and the quote form itself remain valid application channels
-   *     until one is announced.
+   * Delivery, and why section 5 names a processor. `submitQuoteRequest`
+   * (src/lib/quote-submission.ts) posts to public/teklif-gonder.php, which
+   * hands the submission to Brevo's HTTPS API for delivery to
+   * info@raymarnuts.com. That is not a design preference: the hosting plan
+   * disables `mail()`, `sendmail` and every function that could reach them,
+   * and drops outbound SMTP, so an external service is the only way a message
+   * leaves the server at all — measured, see the header of teklif-gonder.php.
+   *
+   * Brevo is Sendinblue SAS, based in France, which makes every submission a
+   * cross-border transfer under KVKK m. 9. Two things follow, and both are
+   * done: section 5 names the processor and the transfer rather than saying
+   * data stays in Türkiye, and `quote.consentText` says "yurt dışına
+   * aktarılmasına" out loud — m. 9 wants explicit consent, and consent to
+   * something the tick box does not mention is not explicit.
+   *
+   * One thing this text still does NOT claim: a KEP (Kayıtlı Elektronik Posta)
+   * address, because none exists. info@raymarnuts.com is now listed as an
+   * application channel alongside the postal address and the form — with the
+   * Tebliğ's own qualifier, that it is valid from an e-mail address already
+   * registered with the company, since a plain mailbox proves no identity by
+   * itself. (The phone number is real, but a phone call is not a valid formal
+   * başvuru channel — no identity verification, no written record — so it is
+   * deliberately absent from the Art. 11 channels list below, not an oversight.)
    *
    * This is a drafted legal text grounded in KVKK's actual statutory
    * structure (Art. 10 disclosure order, Art. 11 rights, TTK Art. 82 retention
@@ -385,7 +600,7 @@ export const tr: Dictionary = {
       eyebrow: 'Yasal',
       lastUpdatedLabel: 'Son güncelleme',
       heading: 'KVKK Aydınlatma Metni',
-      lastUpdated: '2026-08-21',
+      lastUpdated: '2026-08-31',
       intro: [
         'İşbu Aydınlatma Metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") m. 10 ile Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ uyarınca, bu internet sitesi ("Site") üzerindeki teklif formu aracılığıyla işlenen kişisel verileriniz hakkında sizi bilgilendirmek amacıyla hazırlanmıştır.',
       ],
@@ -431,10 +646,11 @@ export const tr: Dictionary = {
           ],
         },
         {
-          heading: '5. Kişisel Verilerin Aktarılması',
+          heading: '5. Kişisel Verilerin Aktarılması ve Yurt Dışına Aktarım',
           paragraphs: [
-            'Talep formuyla ilettiğiniz kişisel veriler, yalnızca talebinizin değerlendirilmesi ve yanıtlanması amacıyla Şirket bünyesinde bu konuda yetkili personel tarafından görülür. Bu veriler, açık rızanız veya kanunda öngörülen istisnai haller dışında üçüncü kişi veya kurumlarla paylaşılmaz, yurt dışına aktarılmaz.',
-            "Şirketin talep süreçlerini yürütmek üzere ileride bir e-posta gönderim hizmeti veya müşteri ilişkileri yönetimi (CRM) sistemi gibi bir hizmet sağlayıcıdan destek alması halinde, bu durum işbu metne yansıtılacak ve söz konusu aktarım KVKK'nın öngördüğü şartlara uygun şekilde yürütülecektir.",
+            'Talep formuyla ilettiğiniz kişisel veriler, yalnızca talebinizin değerlendirilmesi ve yanıtlanması amacıyla Şirket bünyesinde bu konuda yetkili personel tarafından görülür. Bu veriler pazarlama amacıyla kullanılmaz, satılmaz ve aşağıda belirtilen hizmet sağlayıcı dışında hiçbir üçüncü kişi veya kurumla paylaşılmaz.',
+            'Formun Şirkete ulaşabilmesi için tek bir veri işleyenden hizmet alınmaktadır: e-posta iletim altyapısı, merkezi Fransa’da bulunan Brevo (Sendinblue SAS) tarafından sağlanmaktadır. Doldurduğunuz form, Şirketin kurumsal e-posta adresine iletilirken bu altyapı üzerinden geçer; dolayısıyla kişisel verileriniz KVKK m. 9 kapsamında yurt dışına aktarılmış olur. Aktarım, formu göndermeden önce işaretlediğiniz onay kutusuyla verdiğiniz açık rızaya dayanır. Fransa, Avrupa Birliği üyesi olarak Genel Veri Koruma Tüzüğü (GDPR) rejimine tabidir.',
+            'Bunun dışında Şirket, talep süreçlerini yürütmek üzere ileride başka bir hizmet sağlayıcıdan (örneğin bir müşteri ilişkileri yönetimi sistemi) destek alırsa, bu durum işbu metne yansıtılacak ve söz konusu aktarım KVKK’nın öngördüğü şartlara uygun şekilde yürütülecektir.',
           ],
         },
         {
@@ -461,7 +677,7 @@ export const tr: Dictionary = {
         {
           heading: '8. Başvuru Yöntemi',
           paragraphs: [
-            'Yukarıda sayılan haklarınıza ilişkin taleplerinizi, kimliğinizi tevsik edici belgelerle birlikte yazılı olarak Şirketin "Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul" adresine iletebilir veya Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz. Şirketçe açıklanacak bir e-posta veya KEP (Kayıtlı Elektronik Posta) adresi üzerinden başvuru imkânı, bu bilgiler yayımlandığında burada duyurulacaktır.',
+            'Yukarıda sayılan haklarınıza ilişkin taleplerinizi, kimliğinizi tevsik edici belgelerle birlikte yazılı olarak Şirketin "Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul" adresine iletebilir, daha önce Şirkete bildirdiğiniz ve sistemimizde kayıtlı bulunan elektronik posta adresinizi kullanarak info@raymarnuts.com adresine gönderebilir veya Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz. Şirketin KEP (Kayıtlı Elektronik Posta) adresi üzerinden başvuru imkânı, bu bilgi yayımlandığında burada duyurulacaktır.',
             "Başvurunuz, talebin niteliğine göre en kısa sürede ve her hâlükârda KVKK'da öngörülen otuz (30) gün içinde sonuçlandırılır.",
           ],
         },
@@ -474,7 +690,7 @@ export const tr: Dictionary = {
       eyebrow: 'Yasal',
       lastUpdatedLabel: 'Son güncelleme',
       heading: 'Gizlilik Politikası',
-      lastUpdated: '2026-08-21',
+      lastUpdated: '2026-08-31',
       intro: [
         'Bu Gizlilik Politikası, Marex Dış Tic. Ltd. Şti. ("Şirket", "Raymar Nuts") tarafından işletilen bu internet sitesini ("Site") ziyaret ettiğinizde kişisel verilerinizin nasıl ele alındığını açıklar. Teklif formu aracılığıyla işlenen verilerin KVKK kapsamındaki işlenme amaçları, hukuki sebepleri ve haklarınız için KVKK Aydınlatma Metni\'ni inceleyebilirsiniz; bu Politika onu tamamlayan, daha genel bir çerçeve sunar.',
       ],
@@ -488,13 +704,14 @@ export const tr: Dictionary = {
         {
           heading: 'Çerezler',
           paragraphs: [
-            "Site herhangi bir çerez (cookie) kullanmamaktadır. Ayrıntılı bilgi için Çerez Politikası'nı inceleyebilirsiniz.",
+            "Site'nin kendi kodu hiçbir çerez (cookie) yerleştirmez. Tek istisna, İletişim bölümündeki gömülü Google Haritalar haritasıdır — bu harita sayfa yüklendiğinde otomatik olarak yüklenir ve Google kendi çerezlerini yerleştirebilir. Ayrıntılı bilgi için Çerez Politikası'nı inceleyebilirsiniz.",
           ],
         },
         {
           heading: 'Üçüncü Taraf Hizmetleri ve Analitik',
           paragraphs: [
-            'Bu Site şu anda herhangi bir üçüncü taraf analitik, reklam veya izleme hizmeti (örn. Google Analytics, reklam pikseli) kullanmamaktadır. Sitede kullanılan yazı tipleri (fontlar) sunucu üzerinden servis edilir; bu nedenle sayfayı görüntülemeniz herhangi bir üçüncü taraf yazı tipi sağlayıcısına istek gönderilmesine yol açmaz.',
+            'Bu Site herhangi bir üçüncü taraf analitik, reklam veya izleme hizmeti (örn. Google Analytics, reklam pikseli) kullanmamaktadır. Sitede kullanılan yazı tipleri (fontlar) sunucu üzerinden servis edilir; bu nedenle sayfayı görüntülemeniz herhangi bir üçüncü taraf yazı tipi sağlayıcısına istek gönderilmesine yol açmaz.',
+            "Yalnızca iki üçüncü taraf hizmeti kullanılmaktadır. Birincisi, İletişim bölümündeki gömülü Google Haritalar haritasıdır; bu harita Google'ın kendi sunucularından yüklenir ve Google'ın kendi gizlilik uygulamalarına tabidir. İkincisi, yalnızca teklif formunu gönderdiğinizde devreye giren e-posta iletim altyapısıdır (Brevo — Sendinblue SAS, Fransa); formu göndermediğiniz sürece bu hizmete hiçbir veri ulaşmaz. Ayrıntı için KVKK Aydınlatma Metni'nin 5. maddesine bakabilirsiniz.",
           ],
         },
         {
@@ -526,7 +743,7 @@ export const tr: Dictionary = {
     cerez: {
       metaTitle: 'Çerez Politikası',
       metaDescription:
-        'Raymar Nuts internet sitesinin çerez (cookie) kullanmadığını açıklayan çerez politikası.',
+        'Raymar Nuts internet sitesinde kullanılan çerezleri ve gömülü Google Haritalar üzerinden gelebilecek üçüncü taraf çerezlerini açıklayan çerez politikası.',
       eyebrow: 'Yasal',
       lastUpdatedLabel: 'Son güncelleme',
       heading: 'Çerez Politikası',
@@ -536,28 +753,34 @@ export const tr: Dictionary = {
       ],
       sections: [
         {
-          heading: 'Çerez Kullanılmamaktadır',
+          heading: 'Sitenin Kendi Çerezleri',
           paragraphs: [
-            'Bu Site, ziyaretiniz sırasında hiçbir çerez (cookie) yerleştirmez. Sitede; oturum çerezi, tercih çerezi, performans/analitik çerez, reklam veya hedefleme çerezi ile herhangi bir üçüncü taraf çerezi bulunmamaktadır.',
-            "Bu nedenle Site'yi ziyaret etmeniz için herhangi bir çerez onayı vermeniz gerekmez ve Site'de bir çerez onay bandı gösterilmez.",
+            "Site'nin kendi kodu hiçbir çerez (cookie) yerleştirmez. Kimlik doğrulama, oturum takibi, analitik veya reklam amacıyla Site tarafından yerleştirilen herhangi bir birinci taraf çerez bulunmamaktadır.",
+          ],
+        },
+        {
+          heading: 'Google Haritalar — Üçüncü Taraf Çerezi',
+          paragraphs: [
+            "İletişim bölümünde adresimizi gösteren harita, Google Haritalar üzerinden gömülü (embed) olarak sunulur ve sayfa yüklendiği anda otomatik olarak yüklenir. Bu harita Google'ın kendi sunucularından servis edildiği için Google, kendi çerezlerini tarayıcınıza yerleştirebilir. Bu çerezler Site tarafından değil, Google tarafından belirlenir ve yönetilir; ayrıntılı bilgi için Google'ın kendi gizlilik ve çerez uygulamalarına (policies.google.com/privacy) başvurabilirsiniz.",
+            "Bu tek istisna dışında, Site'de hiçbir üçüncü taraf çerezi (analitik, reklam veya hedefleme amaçlı) bulunmamaktadır.",
           ],
         },
         {
           heading: 'Benzer Teknolojiler',
           paragraphs: [
-            'Site, tarayıcınızın yerel depolama alanlarını (localStorage, sessionStorage) da kullanmamaktadır. Teklif formuna girdiğiniz bilgiler yalnızca formu doldurduğunuz sırada tarayıcı belleğinde tutulur; sayfayı yenilediğinizde veya kapattığınızda bu bilgiler saklanmaz.',
+            'Site, tarayıcınızın yerel depolama alanlarını (localStorage, sessionStorage) kullanmamaktadır. Teklif formuna girdiğiniz bilgiler yalnızca formu doldurduğunuz sırada tarayıcı belleğinde tutulur; sayfayı yenilediğinizde veya kapattığınızda bu bilgiler saklanmaz.',
           ],
         },
         {
-          heading: 'İleride Çerez Kullanılması Hâlinde',
+          heading: 'İleride Ek Çerez Kullanılması Hâlinde',
           paragraphs: [
-            "Şirket, ileride site trafiğini ölçmek veya kullanıcı deneyimini iyileştirmek amacıyla çerez veya benzeri teknolojiler kullanmaya karar verirse, bu Politika güncellenecek; zorunlu olmayan çerezler için 6698 sayılı Kanun ve ilgili mevzuat uyarınca açık rızanızın alınacağı bir çerez onay mekanizması Site'ye eklenecektir.",
+            "Şirket, ileride site trafiğini ölçmek veya kullanıcı deneyimini iyileştirmek amacıyla ek çerez veya benzeri teknolojiler kullanmaya karar verirse, bu Politika güncellenecek; zorunlu olmayan çerezler için 6698 sayılı Kanun ve ilgili mevzuat uyarınca açık rızanızın alınacağı bir çerez onay mekanizması Site'ye eklenecektir.",
           ],
         },
         {
           heading: 'İletişim',
           paragraphs: [
-            'Bu Politika hakkındaki sorularınız için Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz.',
+            'Bu Politika hakkındaki sorularınız için info@raymarnuts.com adresine yazabilir veya Site üzerindeki teklif formunu kullanarak bizimle iletişime geçebilirsiniz.',
           ],
         },
       ],
@@ -569,7 +792,7 @@ export const tr: Dictionary = {
     title: 'Raymar Nuts | B2B Kuruyemiş Ticareti ve Tedariki',
     titleTemplate: '%s | Raymar Nuts',
     description:
-      'Raymar Nuts; ceviz içi, fındık, Antep fıstığı, çekirdek ürünleri ve makademyada kurumsal alıcılara yönelik B2B ticaret ve tedarik hizmeti sunar.',
+      'Raymar Nuts; ceviz içi, makadamya, pikan cevizi, Antep fıstığı, kabak çekirdeği içi ve ay çekirdeği içinde toptan B2B ticaret ve tedarik hizmeti sunan kuruluştur.',
     skipToContent: 'İçeriğe geç',
   },
 }

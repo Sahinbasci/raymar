@@ -1,19 +1,8 @@
-import type {
-  RangeProductId,
-  PortfolioCardId,
-  WalnutGroupId,
-  WalnutProductId,
-} from '@/data/products'
+import type { CountryId } from '@/data/countries'
+import type { RangeProductId, WalnutGroupId, WalnutProductId } from '@/data/products'
 
 export type SectionId =
-  | 'ust'
-  | 'giris'
-  | 'kurumsal'
-  | 'urunler'
-  | 'ceviz'
-  | 'urunlerimiz'
-  | 'ticaret'
-  | 'teklif'
+  'ust' | 'giris' | 'hakkimizda' | 'ceviz' | 'urunlerimiz' | 'ticaret' | 'teklif'
 
 export interface NavItem {
   readonly id: SectionId
@@ -68,23 +57,10 @@ export interface ExperienceItem {
 export interface CorporateIntroContent {
   readonly eyebrow: string
   readonly headingLines: readonly string[]
-  readonly body: string
+  /** One `<p>` per paragraph — the client's own "Hakkımızda" copy runs several. */
+  readonly body: readonly string[]
   readonly link: string
   readonly imageAlt: string
-}
-
-export interface PortfolioCardCopy {
-  readonly badge: string
-  readonly title: string
-  readonly subtitle?: string
-  readonly imageAlt: string
-}
-
-export interface PortfolioContent {
-  readonly eyebrow: string
-  readonly heading: string
-  readonly intro: string
-  readonly cards: Readonly<Record<PortfolioCardId, PortfolioCardCopy>>
 }
 
 export interface ProductCopy {
@@ -101,7 +77,13 @@ export interface ProductCopy {
 export interface WalnutContent {
   readonly eyebrow: string
   readonly heading: string
-  readonly intro: string
+  /*
+   * No `intro` and no `footnote`.
+   *
+   * The intro paragraph named the same seven grades the cards below are, and
+   * the footnote was the "temsili görsel" disclaimer. Both removed at the
+   * client's request. `RangeContent` lost its `intro` in the same pass.
+   */
   readonly categoryLabel: string
   readonly detailsCta: string
   readonly quoteCta: string
@@ -112,7 +94,6 @@ export interface WalnutContent {
    * server/client boundary. `{product}` is substituted by `formatTemplate`.
    */
   readonly quoteCtaAriaTemplate: string
-  readonly footnote: string
   /** Shown on a grade whose photograph does not exist yet. */
   readonly imagePending: string
   /** Heading per category group, keyed by `WalnutGroupId`. */
@@ -123,7 +104,13 @@ export interface WalnutContent {
 export interface RangeContent {
   readonly eyebrow: string
   readonly heading: string
-  readonly intro: string
+  /*
+   * No `intro` here, unlike `WalnutContent` and `TradeStoryContent`.
+   *
+   * This section had a paragraph beside its heading listing the same products
+   * the grid below already shows, card by card. It was removed at the client's
+   * request as duplication — the cards are the list.
+   */
   readonly categoryLabel: string
   readonly quoteCta: string
   /** See `WalnutContent.quoteCtaAriaTemplate` — same mechanism, same reason. */
@@ -169,6 +156,25 @@ export interface QuoteContent {
   readonly productPlaceholder: string
   readonly productOptions: readonly string[]
   readonly otherProductOption: string
+  readonly countryPlaceholder: string
+  /** Turkish display name per country, keyed by the ISO id in `data/countries.ts`. */
+  readonly countryOptions: Readonly<Record<CountryId, string>>
+  /** Label above the embedded map, styled like `addressLabel`. */
+  readonly mapLabel: string
+  /** Accessible title on the map `<iframe>`. */
+  readonly mapTitle: string
+  /**
+   * What the map is asked to find — the postal address ONLY, never the company
+   * name.
+   *
+   * Kept separate from `addressLines` rather than derived from it. Feeding the
+   * joined address lines to Google put the legal name at the front of the
+   * query, and Maps resolved it against a business listing for a similarly
+   * named but unrelated company nearby — so the contact section pinned the
+   * wrong building. Geocoding the street address alone lands on the actual
+   * premises.
+   */
+  readonly mapQuery: string
   readonly consentText: string
   /** Links to the legal pages the consent statement refers to, e.g. KVKK and privacy. */
   readonly consentLinks: readonly LinkItem[]
@@ -258,7 +264,6 @@ export interface Dictionary {
   readonly statement: StatementContent
   readonly experience: readonly ExperienceItem[]
   readonly corporateIntro: CorporateIntroContent
-  readonly portfolio: PortfolioContent
   readonly walnut: WalnutContent
   readonly range: RangeContent
   readonly tradeStory: TradeStoryContent

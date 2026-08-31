@@ -24,21 +24,18 @@ export function RangeSection({ content }: { content: RangeContent }) {
   return (
     <section id="urunlerimiz" className="border-t border-raymar-green/8 bg-raymar-ivory">
       <div className="shell">
-        <div className="flex flex-wrap items-end justify-between gap-7.5 pt-19 pb-11 md:pt-25 md:pb-13 lg:pt-39.5 lg:pb-17">
-          <div>
-            <Reveal className="mb-9">
-              <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
-            </Reveal>
-            <Reveal delay={80}>
-              <h2 className="text-[clamp(32px,3.9vw,62px)] leading-[1.05] tracking-[-0.012em] text-raymar-green">
-                {content.heading}
-              </h2>
-            </Reveal>
-          </div>
-          <Reveal delay={160}>
-            <p className="max-w-[340px] text-[15px] leading-[1.7] font-light text-raymar-ink/76">
-              {content.intro}
-            </p>
+        {/* Heading only. The paragraph that used to sit opposite it listed the
+            same products the grid below shows card by card, so it was removed
+            at the client's request — `justify-between` has nothing to push
+            against now, which is why the heading simply reads left-aligned. */}
+        <div className="pt-19 pb-11 md:pt-25 md:pb-13 lg:pt-39.5 lg:pb-17">
+          <Reveal className="mb-9">
+            <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
+          </Reveal>
+          <Reveal delay={80}>
+            <h2 className="text-[clamp(32px,3.9vw,62px)] leading-[1.05] tracking-[-0.012em] text-raymar-green">
+              {content.heading}
+            </h2>
           </Reveal>
         </div>
 

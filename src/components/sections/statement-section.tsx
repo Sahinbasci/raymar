@@ -20,21 +20,10 @@ export function StatementSection({ content }: { content: StatementContent }) {
       />
 
       {/* Negative space to the right of the 900px headline measure. Desktop
-          only — the copy fills the column on narrower screens. */}
-      <FloatingMotif
-        className="top-[16%] right-[7%] hidden lg:block"
-        width={138}
-        drift={34}
-        opacity={0.08}
-        rotate={-8}
-      />
-      <FloatingMotif
-        className="right-[22%] bottom-[14%] hidden lg:block"
-        width={64}
-        drift={20}
-        opacity={0.06}
-        rotate={14}
-      />
+          only — the copy fills the column on narrower screens. One mark, at the
+          shared size and position; see `floatingMotif` in motion/tokens.ts for
+          why the second, smaller one here was removed. */}
+      <FloatingMotif />
       <div className="shell">
         <div className="flex flex-col items-start pt-20 pb-21 md:pt-26 md:pb-27.5 lg:pt-43 lg:pb-44.5">
           <Reveal className="mb-10">
@@ -59,7 +48,7 @@ export function StatementSection({ content }: { content: StatementContent }) {
 
           <Reveal delay={300}>
             <div className="mt-11.5 flex flex-wrap gap-3.5">
-              <ButtonLink href="#urunler" variant="gold" withIcon>
+              <ButtonLink href="#urunlerimiz" variant="gold" withIcon>
                 {content.primaryCta}
               </ButtonLink>
               <ButtonLink href="#teklif" variant="outline">

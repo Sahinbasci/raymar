@@ -15,7 +15,7 @@ import type { CorporateIntroContent } from '@/types/content'
  */
 export function CorporateIntro({ content }: { content: CorporateIntroContent }) {
   return (
-    <section id="kurumsal" className="overflow-hidden bg-raymar-cream">
+    <section id="hakkimizda" className="overflow-hidden bg-raymar-cream">
       <div className="shell">
         <div className="grid grid-cols-1 items-center gap-[54px] py-19 md:gap-16 md:py-25 lg:grid-cols-2 lg:gap-24 lg:pt-42 lg:pb-43.5">
           <div>
@@ -34,9 +34,11 @@ export function CorporateIntro({ content }: { content: CorporateIntroContent }) 
             </Reveal>
 
             <Reveal delay={160}>
-              <p className="mt-9 max-w-[498px] text-[17px] leading-[1.78] font-light text-raymar-ink/84">
-                {content.body}
-              </p>
+              <div className="mt-9 flex max-w-[498px] flex-col gap-4.5 text-[17px] leading-[1.78] font-light text-raymar-ink/84">
+                {content.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
             </Reveal>
 
             <Reveal delay={240}>

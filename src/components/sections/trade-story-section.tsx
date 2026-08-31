@@ -29,13 +29,7 @@ export function TradeStorySection({ content }: { content: TradeStoryContent }) {
       />
 
       {/* Clear of the 840px heading measure and of the stat block below. */}
-      <FloatingMotif
-        className="top-[22%] right-[9%] hidden lg:block"
-        width={112}
-        drift={30}
-        opacity={0.07}
-        rotate={10}
-      />
+      <FloatingMotif />
 
       <div className="relative shell">
         <div className="max-w-[840px] pt-19 md:pt-25 lg:pt-44.5">
@@ -56,40 +50,33 @@ export function TradeStorySection({ content }: { content: TradeStoryContent }) {
 
         <div className="mt-14 pb-19 md:mt-18 md:pb-25 lg:mt-24 lg:pb-33">
           {/*
-            Each step is a marked point on one continuous rule rather than five
-            separate cells. The rule runs edge to edge behind the row; every
-            step opens it with a filled dot sitting ON the line, and the numeral
-            hangs beneath. That reads as a sequence — which is what five
-            ordered principles are — where the earlier bare number over a
-            detached border read as five unrelated labels.
+            One rail, five numbered nodes on it — the same idea at both sizes,
+            turned through ninety degrees rather than redrawn.
+
+            An `<ol>`, not a grid of divs: these are five ordered principles and
+            the order is the point, so a screen reader should hear "list, 5
+            items" and the position of each. The drawn numeral is therefore
+            `aria-hidden` — the list already carries what it says, and reading
+            "zero one" before every title is noise.
+
+            The rail passes BEHIND the nodes and each node is filled with the
+            section's own green, which is what masks it; the rail is also inset
+            to the first and last node centres so it never dangles past the
+            row. Geometry lives in `.trade-steps` (globals.css), because the
+            inset depends on the node size and the two have to stay in step.
           */}
-          <div className="relative">
-            <span
-              aria-hidden="true"
-              className="absolute inset-x-0 top-0 hidden h-px bg-[linear-gradient(to_right,rgb(240_176_56/0.15),rgb(240_176_56/0.55)_18%,rgb(240_176_56/0.55)_82%,rgb(240_176_56/0.15))] lg:block"
-            />
-            <div className="grid grid-cols-1 gap-y-11 md:grid-cols-2 md:gap-x-7 md:gap-y-14 lg:grid-cols-5 lg:gap-x-6">
-              {content.pillars.map((pillar, index) => (
-                <Reveal key={pillar} delay={index * 90}>
-                  <div className="group relative border-t border-raymar-gold/40 pt-7 lg:border-t-0 lg:pt-9">
-                    <span
-                      aria-hidden="true"
-                      className="absolute -top-[3.5px] left-0 hidden h-[7px] w-[7px] rounded-full bg-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:scale-150 lg:block"
-                    />
-                    <span
-                      aria-hidden="true"
-                      className="block font-[family-name:var(--font-display)] text-[34px] leading-none font-light tracking-[0.02em] text-raymar-gold/85"
-                    >
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <p className="mt-4.5 max-w-[210px] font-[family-name:var(--font-display)] text-[24px] leading-[1.22] font-normal text-raymar-white">
-                      {pillar}
-                    </p>
-                  </div>
+          <ol className="trade-steps">
+            {content.pillars.map((pillar, index) => (
+              <li key={pillar} className="trade-step">
+                <Reveal delay={index * 90} className="trade-step-inner">
+                  <span aria-hidden="true" className="trade-step-node">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <p className="trade-step-label">{pillar}</p>
                 </Reveal>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ol>
 
           <Reveal delay={120}>
             <div className="mt-15 flex flex-wrap items-center justify-between gap-8 border-t border-raymar-gold/24 pt-11 lg:mt-22">

@@ -83,9 +83,24 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Sticky header height + breathing room, so in-page anchors are not
-       hidden underneath the fixed header. */
-    scroll-padding-top: 96px;
+    /*
+     * Deliberately SMALLER than the sticky header, not larger.
+     *
+     * At 96px — header height plus "breathing room" — an anchored jump left a
+     * ~7-23px band of the *previous* section wedged between the header and the
+     * target, so every section arrived looking like a fragment of the one
+     * before it. It also pushed the target's first real line 233px down the
+     * viewport on desktop, because each section already carries 76-168px of its
+     * own top padding; the reserved space was being added on top of padding
+     * that was already doing the job.
+     *
+     * 40px lands the section's top edge just under the header instead. The
+     * header overlaps only the section's own empty padding — never its content,
+     * which still clears by ~100px on phones and ~180px on desktop — and the
+     * previous section is fully scrolled away. Measured across both, at 390px
+     * and 1440px.
+     */
+    scroll-padding-top: 40px;
     -webkit-text-size-adjust: 100%;
     /* Kill the grey/black flash WebKit paints on every tap; the custom
        :focus-visible ring already carries all focus affordance. */
@@ -221,26 +236,34 @@
      That guard is a height media query rather than `min(…, 100svh)` inside the
      clamp: if `svh` ever resolves to 0 — as it does in some embedded viewports
      — a `min()` floor would collapse the whole hero to zero height. */
+  /*
+   * Full viewport height, on purpose and at every width.
+   *
+   * This was `clamp(…, 86-94svh, 1120px)`, which left a band of the section
+   * below showing under the hero — the client asked for the hero to fill the
+   * screen. `svh` (small viewport height) rather than `vh` is what keeps that
+   * true on phones: `100vh` is measured against the *retracted* browser chrome,
+   * so on iOS the hero would be taller than the visible area and the scroll cue
+   * would sit under the toolbar until the user scrolled.
+   *
+   * The 1120px ceiling is gone with it. It existed to limit how far the poster
+   * had to be scaled up on tall displays, and dropping it does mean more
+   * upscaling there — but the binding constraint on sharpness is the source
+   * material, not this rule: the poster is 1600x900 and the clip is 1280x720,
+   * so both are already being enlarged on any full-width desktop. Raising the
+   * ceiling changes that by a few per cent; new source files are what would
+   * actually change it.
+   *
+   * No `min-height`. The previous rule clamped to a 520/560px floor, and a
+   * floor is actively wrong once the height is exactly `100svh`: on a window
+   * shorter than the floor it makes the hero TALLER than the viewport, which
+   * pushes the scroll cue — anchored to the hero's bottom edge — below the
+   * fold. `responsive.spec.ts` caught that at 420px tall on all three engines.
+   * The old rule needed the floor because it clamped a percentage; this one
+   * does not, because `100svh` is the viewport by definition.
+   */
   .hero-frame {
-    height: clamp(520px, 86svh, 1120px);
-  }
-
-  @media (width >= 720px) {
-    .hero-frame {
-      height: clamp(560px, 94svh, 1120px);
-    }
-  }
-
-  @media (width < 720px) and (height < 520px) {
-    .hero-frame {
-      height: 100svh;
-    }
-  }
-
-  @media (width >= 720px) and (height < 560px) {
-    .hero-frame {
-      height: 100svh;
-    }
+    height: 100svh;
   }
 
   .hero-cue {
@@ -328,9 +351,178 @@
     }
   }
 
+  /* -- Trade story: numbered rail ---------------------------------------
+     Five ordered principles drawn as nodes on one continuous rail.
+
+     The same construction serves both layouts, rotated: a vertical rail down
+     the left on phones and tablets, a horizontal rail across the row from
+     1240px. That is deliberate — the previous version drew a horizontal line
+     on desktop only and fell back to five stacked cards with top borders,
+     which read as five unrelated labels exactly where the sequence matters
+     most, on the narrow screens most of this site's traffic uses.
+
+     `--node` is the single source of truth for the circle's size. Both the
+     rail's inset (so it starts and ends at the first and last node CENTRE
+     rather than dangling past the row) and the label's indent are derived from
+     it, so changing the circle cannot desynchronise the drawing. */
+  .trade-steps {
+    --node: 52px;
+    --rail: rgb(240 176 56 / 0.34);
+
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Vertical rail, inset to the first and last node centres. */
+  .trade-steps::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--node) / 2);
+    bottom: calc(var(--node) / 2);
+    left: calc(var(--node) / 2);
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      rgb(240 176 56 / 0),
+      var(--rail) 12%,
+      var(--rail) 88%,
+      rgb(240 176 56 / 0)
+    );
+  }
+
+  .trade-step-inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /*
+   * Sits ON the rail and hides it. The background is the section's own green
+   * rather than `transparent`, which is the whole reason the rail can run
+   * behind the row as one unbroken line instead of being cut into four
+   * separate segments.
+   */
+  .trade-step-node {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--node);
+    height: var(--node);
+    border: 1px solid rgb(240 176 56 / 0.45);
+    border-radius: 999px;
+    background: var(--color-raymar-green);
+    font-family: var(--font-display), serif;
+    font-size: 19px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: rgb(240 176 56 / 0.92);
+    transition:
+      border-color 500ms var(--ease-raymar),
+      color 500ms var(--ease-raymar),
+      transform 500ms var(--ease-raymar);
+  }
+
+  .trade-step-label {
+    margin: 0;
+    max-width: 260px;
+    font-family: var(--font-display), serif;
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.24;
+    color: var(--color-raymar-white);
+  }
+
+  /* Touch devices never resolve `:hover` predictably — a tap leaves it stuck. */
+  @media (hover: hover) and (pointer: fine) {
+    .trade-step:hover .trade-step-node {
+      border-color: rgb(240 176 56 / 0.9);
+      color: rgb(240 176 56);
+      transform: scale(1.06);
+    }
+  }
+
+  @media (width >= 720px) {
+    .trade-steps {
+      gap: 34px;
+    }
+
+    .trade-step-label {
+      font-size: 23px;
+      max-width: 420px;
+    }
+  }
+
+  /* Rail turns horizontal once five nodes fit across the shell. */
+  @media (width >= 1240px) {
+    .trade-steps {
+      --node: 56px;
+      --gap: 26px;
+
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--gap);
+    }
+
+    /*
+     * Ends at the first and last node CENTRE, not at the row's edges.
+     *
+     * Nodes sit at the left of their column, so the left inset is just half a
+     * node. The right one has to account for the four columns and four gaps
+     * that precede the last node: with `repeat(5, 1fr)` a column is
+     * (100% − 4·gap)/5, so the last node's centre lands at
+     * 0.8·100% + 0.8·gap + node/2 — which makes the inset from the right
+     * 20% − 0.8·gap − node/2. `--gap` is declared alongside the grid's own
+     * `gap` so the two cannot drift apart.
+     */
+    .trade-steps::before {
+      top: calc(var(--node) / 2);
+      right: calc(20% - 0.8 * var(--gap) - var(--node) / 2);
+      bottom: auto;
+      left: calc(var(--node) / 2);
+      width: auto;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        rgb(240 176 56 / 0),
+        var(--rail) 10%,
+        var(--rail) 90%,
+        rgb(240 176 56 / 0)
+      );
+    }
+
+    .trade-step-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 26px;
+    }
+
+    .trade-step-label {
+      max-width: 210px;
+      font-size: 22px;
+    }
+  }
+
   /* -- Walnut product grid ---------------------------------------------
-     The lead card spans two columns and carries a taller image well; the
-     final row is shortened so the block resolves flush. */
+     Four grades, four equal cards. No lead card spans two columns any more:
+     with seven products the first one had to, or the last row was stranded;
+     with four the row resolves flush on its own, and the whole job of this
+     section is letting a buyer read the grades AGAINST each other — a card
+     at double the size of its neighbours makes that comparison harder, not
+     easier.
+
+     The approved design's alternating 38px drop was tried here — it was
+     written for exactly this "four identical cards in a single row" case —
+     and rejected on sight: staggered baselines read as a misalignment on a
+     row whose whole purpose is comparing four grades against each other. The
+     row is held flush, and the movement lives in the hover instead (see the
+     Dock-style block below). */
   .walnut-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -344,17 +536,10 @@
   @media (width >= 720px) {
     .walnut-grid {
       grid-template-columns: repeat(2, 1fr);
-    }
-
-    .walnut-grid > *:first-child {
-      grid-column: span 2;
+      gap: 40px 22px;
     }
 
     .walnut-media {
-      height: 256px;
-    }
-
-    .walnut-grid > *:first-child .walnut-media {
       height: 300px;
     }
   }
@@ -362,14 +547,42 @@
   @media (width >= 1240px) {
     .walnut-grid {
       grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
     }
 
     .walnut-media {
-      height: 284px;
+      height: 340px;
+    }
+  }
+
+  /* -- Walnut cards: hover lift -----------------------------------------
+     The card under the cursor magnifies and lifts. Nothing else moves.
+
+     A fuller Dock imitation was built first and rejected on sight: the two
+     neighbours grew slightly and the far cards receded, and with only four
+     wide cards — rather than the Dock's row of small icons — the whole row
+     visibly breathing at once read as unstable rather than responsive. The
+     magnification alone gives the same "picked up" feel without disturbing
+     the side-by-side comparison this section exists for.
+
+     The transform targets the `<article>`, never the grid child: the children
+     are `Reveal` wrappers and Motion writes `transform: none` onto them inline
+     once the reveal settles, which silently erases anything declared there.
+
+     Gated on `hover: hover` and `pointer: fine` so a touch device never gets a
+     stuck magnified card — a tap sets `:hover` on mobile Safari and it persists
+     until the next tap elsewhere. */
+  @media (hover: hover) and (pointer: fine) and (width >= 1240px) {
+    .walnut-grid > * article {
+      transition:
+        transform 340ms var(--ease-raymar),
+        box-shadow 340ms var(--ease-raymar);
     }
 
-    .walnut-grid > *:nth-child(n + 4) .walnut-media {
-      height: 250px;
+    .walnut-grid > *:hover article {
+      transform: scale(1.045) translateY(-8px);
+      box-shadow: 0 22px 48px -18px rgb(0 42 31 / 0.28);
+      z-index: 2;
     }
   }
 

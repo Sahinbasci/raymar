@@ -38,21 +38,17 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
   return (
     <section id="ceviz" className="bg-raymar-cream">
       <div className="shell">
-        <div className="flex flex-wrap items-end justify-between gap-8 pt-19 pb-11 md:pt-25 md:pb-13 lg:pt-39.5 lg:pb-15.5">
-          <div>
-            <Reveal className="mb-9">
-              <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
-            </Reveal>
-            <Reveal delay={80}>
-              <h2 className="max-w-[600px] text-[clamp(32px,3.9vw,62px)] leading-[1.05] tracking-[-0.012em] text-raymar-green">
-                {content.heading}
-              </h2>
-            </Reveal>
-          </div>
-          <Reveal delay={160}>
-            <p className="max-w-[360px] text-[15px] leading-[1.7] font-light text-raymar-ink/76">
-              {content.intro}
-            </p>
+        {/* Heading only — the paragraph opposite it named the same seven grades
+            the cards below are, so it was removed at the client's request.
+            Same change as `range-section`. */}
+        <div className="pt-19 pb-11 md:pt-25 md:pb-13 lg:pt-39.5 lg:pb-15.5">
+          <Reveal className="mb-9">
+            <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
+          </Reveal>
+          <Reveal delay={80}>
+            <h2 className="max-w-[600px] text-[clamp(32px,3.9vw,62px)] leading-[1.05] tracking-[-0.012em] text-raymar-green">
+              {content.heading}
+            </h2>
           </Reveal>
         </div>
 
@@ -80,17 +76,11 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
                           <MediaFrame
                             image={product.image}
                             alt={copy.imageAlt}
-                            /* The lead card spans two columns at every width
-                               that has more than one, so it must declare twice
-                               the share the others do. Sending the 25vw string
-                               for it made the optimizer emit a 384px file for a
-                               slot ~1240 device px wide — a 3x upscale, and the
-                               reason that card looked soft. */
-                            sizes={
-                              product.featured
-                                ? '(min-width: 1240px) 50vw, 100vw'
-                                : '(min-width: 1240px) 25vw, (min-width: 720px) 50vw, 100vw'
-                            }
+                            /* Four equal cards now — no lead card spanning two
+                               columns, so one `sizes` string covers every card:
+                               a quarter of the viewport on the four-up row,
+                               half on the two-up, full width on phones. */
+                            sizes="(min-width: 1240px) 25vw, (min-width: 720px) 50vw, 100vw"
                             hoverZoom
                           />
                         ) : (
@@ -126,9 +116,11 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
           </div>
         ))}
 
-        <p className="m-0 pb-19 text-[12.5px] font-normal tracking-[0.02em] text-raymar-ink/74 md:pb-25 lg:pb-35.5">
-          {content.footnote}
-        </p>
+        {/* The "temsili görsel" footnote that used to close this section was
+            removed at the client's request. Its bottom padding moves onto this
+            spacer so the section's own rhythm is unchanged — without it the
+            last card row would sit flush against the next section. */}
+        <div className="pb-19 md:pb-25 lg:pb-35.5" />
       </div>
     </section>
   )

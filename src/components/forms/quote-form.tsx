@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { CheckMark } from '@/components/ui/icons'
+import { countryDialCodes, type CountryId } from '@/data/countries'
 import { cn, formatTemplate } from '@/lib/cn'
 import {
   HONEYPOT_FIELD,
@@ -54,6 +55,41 @@ function fieldBorder(invalid: boolean): string {
   return invalid ? 'border-raymar-alert-rule' : 'border-raymar-green/60'
 }
 
+/*
+ * Shared by both `<select>`s in this form (product and country).
+ *
+ * `appearance-none` drops the native caret with nothing to replace it. The
+ * replacement is the page's own chevron, not a new shape: same geometry,
+ * viewBox and 1.3 stroke as `ChevronDown` in components/ui/icons.tsx — the
+ * wide, shallow mark under the hero cue — so the form speaks the same
+ * language as the rest of the design rather than introducing a second arrow
+ * style. Painted as a background image rather than an absolutely positioned
+ * child: a `<select>` here sits in a flex column beside a *conditional* error
+ * `<span>`, so a child centred with `top-1/2` would centre against the whole
+ * stack and jump down the moment an error renders. `bg-[length:...]` is not
+ * optional — an inline SVG with no intrinsic width scales to the box when
+ * used as a background, which is exactly what went wrong first time round.
+ */
+const selectChevronClass =
+  "appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2713%27%20height%3D%276%27%20viewBox%3D%270%200%2026%2011%27%3E%3Cpath%20d%3D%27M1%201l12%208.4L25%201%27%20fill%3D%27none%27%20stroke%3D%27%23004c38%27%20stroke-width%3D%271.3%27%20stroke-linecap%3D%27square%27%2F%3E%3C%2Fsvg%3E')] bg-[length:13px_6px] bg-[right_1.1rem_center] bg-no-repeat px-3 pr-10"
+
+/**
+ * Countries sorted for the `<select>`: Türkiye pinned first (the primary
+ * market this form serves), everything else alphabetised by its Turkish name
+ * — not by ISO id, which would read as random to a Turkish-speaking visitor.
+ */
+function sortedCountries(
+  options: QuoteContent['countryOptions'],
+): readonly (readonly [CountryId, string])[] {
+  const entries = Object.entries(options) as (readonly [CountryId, string])[]
+  const [turkey, rest] = [
+    entries.filter(([id]) => id === 'TR'),
+    entries.filter(([id]) => id !== 'TR'),
+  ]
+  rest.sort((a, b) => a[1].localeCompare(b[1], 'tr'))
+  return [...turkey, ...rest]
+}
+
 interface QuoteFormProps {
   content: QuoteContent
 }
@@ -92,6 +128,24 @@ export function QuoteForm({ content }: QuoteFormProps) {
   const successHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const fieldId = (name: string) => `${formId}-${name}`
+
+  const countryEntries = useMemo(
+    () => sortedCountries(content.countryOptions),
+    [content.countryOptions],
+  )
+  /*
+   * `values.country` holds the selected ISO id (e.g. `"DE"`) while the form is
+   * open — that is what the `<select>` needs to stay controlled, and what
+   * drives the dial-code prefix below. The Turkish name that a human should
+   * actually read (in the summary, in the delivered enquiry) is resolved from
+   * it only at the two points that need it — see `countryName` below — so the
+   * id never leaks into anything the visitor or Raymar's staff sees.
+   */
+  const countryName = (id: string): string =>
+    content.countryOptions[id as CountryId] ?? id
+  const dialCode = values.country
+    ? (countryDialCodes[values.country as CountryId] ?? '')
+    : ''
 
   // Submitting replaces the whole form with the success panel, so focus would
   // otherwise fall back to <body> and the visitor would be left at the top of
@@ -196,8 +250,22 @@ export function QuoteForm({ content }: QuoteFormProps) {
       (formRef.current?.elements.namedItem(HONEYPOT_FIELD) as HTMLInputElement | null)
         ?.value ?? ''
 
+    /*
+     * Resolved once, used twice: the country select stores the ISO id and the
+     * phone field stores bare local digits, but neither Raymar's inbox nor the
+     * on-screen summary should ever show "DE" or a number with no country
+     * code on it. Both go out as the reader-facing values instead — the
+     * Turkish country name, and the phone number with its dial code attached.
+     */
+    const resolvedCountry = countryName(values.country)
+    const resolvedPhone = values.phone.trim()
+      ? `${dialCode ? `${dialCode} ` : ''}${values.phone.trim()}`
+      : ''
+
     const result = await submitQuoteRequest({
       ...values,
+      country: resolvedCountry,
+      phone: resolvedPhone,
       consent,
       website: honeypot,
     })
@@ -213,7 +281,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
     // previous enquirer's name, e-mail and phone with the KVKK box still
     // ticked — on a shared or kiosk browser that exposes one visitor's details
     // to the next, and invites a resubmission under someone else's name.
-    setSubmitted(values)
+    setSubmitted({ ...values, country: resolvedCountry, phone: resolvedPhone })
     setValues(emptyValues)
     setConsent(false)
     setLastPrefill('')
@@ -353,18 +421,41 @@ export function QuoteForm({ content }: QuoteFormProps) {
             error={fieldError('company')}
             onChange={(value) => setField('company', value)}
           />
-          <TextField
-            id={fieldId('country')}
-            name="country"
-            label={content.fields.country.label}
-            placeholder={content.fields.country.placeholder}
-            autoComplete="country-name"
-            required
-            value={values.country}
-            invalid={invalid.has('country')}
-            error={fieldError('country')}
-            onChange={(value) => setField('country', value)}
-          />
+          <label className="flex flex-col gap-2.5">
+            <FieldLabel id={`${fieldId('country')}-label`} required>
+              {content.fields.country.label}
+            </FieldLabel>
+            <select
+              id={fieldId('country')}
+              name="country"
+              required
+              value={values.country}
+              autoComplete="country"
+              aria-invalid={invalid.has('country') || undefined}
+              aria-labelledby={`${fieldId('country')}-label`}
+              aria-describedby={
+                fieldError('country') ? `${fieldId('country')}-error` : undefined
+              }
+              onChange={(event) => setField('country', event.target.value)}
+              className={cn(
+                inputClass,
+                fieldBorder(invalid.has('country')),
+                selectChevronClass,
+              )}
+            >
+              <option value="">{content.countryPlaceholder}</option>
+              {countryEntries.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            {fieldError('country') ? (
+              <span id={`${fieldId('country')}-error`} className={fieldErrorClass}>
+                {fieldError('country')}
+              </span>
+            ) : null}
+          </label>
           <TextField
             id={fieldId('email')}
             name="email"
@@ -378,18 +469,56 @@ export function QuoteForm({ content }: QuoteFormProps) {
             error={fieldError('email')}
             onChange={(value) => setField('email', value)}
           />
-          <TextField
-            id={fieldId('phone')}
-            name="phone"
-            type="tel"
-            label={content.fields.phone.label}
-            placeholder={content.fields.phone.placeholder}
-            autoComplete="tel"
-            value={values.phone}
-            invalid={false}
-            error={fieldError('phone')}
-            onChange={(value) => setField('phone', value)}
-          />
+          <label className="flex flex-col gap-2.5">
+            <FieldLabel id={`${fieldId('phone')}-label`}>
+              {content.fields.phone.label}
+            </FieldLabel>
+            {/*
+              A compound control, not a plain `<input>`: the dial code is
+              derived from the selected country and shown as its own
+              non-editable chip rather than typed into the placeholder, which
+              is what "+90" used to be — wrong for anyone whose number is not
+              Turkish, and easy to leave in place by accident since a
+              placeholder never blocks submission.
+
+              `focus-within`, not `focus`, on the wrapper: it is the wrapper
+              that owns the border/background this field is styled with, and
+              only the inner `<input>` can actually receive focus.
+
+              The chip only renders once a country is chosen. Before that the
+              field is a plain, full-width text input — nothing invents a
+              country the visitor has not picked yet.
+            */}
+            <div
+              className={cn(
+                'flex h-12 items-stretch overflow-hidden rounded-none border bg-raymar-ivory transition-[border-color,background-color] duration-300 focus-within:border-raymar-gold focus-within:bg-raymar-white',
+                fieldBorder(false),
+              )}
+            >
+              {dialCode ? (
+                <span
+                  aria-hidden="true"
+                  className="flex flex-none items-center border-r border-raymar-green/30 pr-2.5 pl-3.5 text-[15px] text-raymar-ink/60 tabular-nums"
+                >
+                  {dialCode}
+                </span>
+              ) : null}
+              <input
+                id={fieldId('phone')}
+                name="phone"
+                type="tel"
+                placeholder={content.fields.phone.placeholder}
+                autoComplete="tel-national"
+                value={values.phone}
+                aria-labelledby={`${fieldId('phone')}-label`}
+                onChange={(event) => setField('phone', event.target.value)}
+                className={cn(
+                  'min-w-0 flex-1 border-0 bg-transparent text-[15px] text-raymar-ink outline-none placeholder:text-raymar-ink/45',
+                  dialCode ? 'pr-3.5 pl-2.5' : 'px-3.5',
+                )}
+              />
+            </div>
+          </label>
 
           <label className="flex flex-col gap-2.5">
             <FieldLabel id={`${fieldId('product')}-label`} required>
@@ -409,30 +538,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
               className={cn(
                 inputClass,
                 fieldBorder(invalid.has('product')),
-                /*
-                 * `appearance-none` drops the native caret with nothing to
-                 * replace it, so the control read as plain text with no
-                 * indication it opens a menu.
-                 *
-                 * The replacement is the page's own chevron, not a new shape:
-                 * same geometry, viewBox and 1.3 stroke as `ChevronDown` in
-                 * components/ui/icons.tsx — the wide, shallow mark under the
-                 * hero cue — so the form speaks the same language as the rest
-                 * of the design rather than introducing a second arrow style.
-                 *
-                 * Painted as a background image rather than an absolutely
-                 * positioned child: this `<select>` sits in a flex column
-                 * beside a *conditional* error `<span>`, so a child centred
-                 * with `top-1/2` would centre against the whole stack and jump
-                 * down the moment an error renders.
-                 *
-                 * `bg-[length:...]` is not optional. An inline SVG with no
-                 * intrinsic width scales to the box when used as a background,
-                 * which is exactly what went wrong first time round — the mark
-                 * filled the full 48px field height. Pinning the size keeps it
-                 * at 13x6 regardless.
-                 */
-                "appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2713%27%20height%3D%276%27%20viewBox%3D%270%200%2026%2011%27%3E%3Cpath%20d%3D%27M1%201l12%208.4L25%201%27%20fill%3D%27none%27%20stroke%3D%27%23004c38%27%20stroke-width%3D%271.3%27%20stroke-linecap%3D%27square%27%2F%3E%3C%2Fsvg%3E')] bg-[length:13px_6px] bg-[right_1.1rem_center] bg-no-repeat px-3 pr-10",
+                selectChevronClass,
               )}
             >
               <option value="">{content.productPlaceholder}</option>

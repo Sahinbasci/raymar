@@ -15,15 +15,16 @@ export interface ProductImage {
   readonly objectPosition?: string
 }
 
-export const walnutProductIds = [
-  'bal-rengi',
-  'kizil',
-  'pirinc',
-  'kirik',
-  'super-luks-yarim-beyaz',
-  'luks-naturel',
-  'ceyrek',
-] as const
+/**
+ * Four grades, in display order.
+ *
+ * Reduced from seven at the client's request, and the client's four are all
+ * SIZE grades rather than the colour grades this section used to lead with.
+ * That makes the order self-evident and it is deliberately kept: largest piece
+ * to smallest, halves through quarters and broken down to rice. A buyer
+ * scanning the row reads the grading ladder itself, left to right.
+ */
+export const walnutProductIds = ['yarim', 'ceyrek', 'kirik', 'pirinc'] as const
 
 export type WalnutProductId = (typeof walnutProductIds)[number]
 
@@ -47,32 +48,26 @@ export type WalnutGroupId = (typeof walnutGroupIds)[number]
  * The single-variety range, in display order.
  *
  * Walnut is deliberately absent: it is the one product sold as graded
- * varieties, so it keeps its own section. Everything else is one product, one
- * card, and they live together under "Ürünlerimiz" — the range is not split by
- * origin, because hazelnut and pistachio are Turkish and the old "imported"
- * heading was simply wrong for them.
+ * varieties, so it keeps its own section, immediately below this one. Everything
+ * else is one product, one card, and they live together under "Ürünlerimiz" —
+ * the range is not split by origin, because pistachio is Turkish and the old
+ * "imported" heading was simply wrong for it.
+ *
+ * Ordering is a client decision, not alphabetical or by any other system:
+ * macadamia, pecan, pumpkin seed, sunflower (kernel, then in-shell), then
+ * pistachio at the end. Hazelnut was dropped from the range entirely at the
+ * client's request.
  */
 export const rangeProductIds = [
-  'findik',
-  'antep-fistigi',
+  'makademya',
+  'pikan',
   'kabak-cekirdegi',
   'aycekirdegi-ic',
   'aycekirdegi-cerezlik',
-  'makademya',
+  'antep-fistigi',
 ] as const
 
 export type RangeProductId = (typeof rangeProductIds)[number]
-
-export const portfolioCardIds = [
-  'findik',
-  'ceviz',
-  'antep-fistigi',
-  'kabak-cekirdegi',
-  'makademya',
-  'aycekirdegi',
-] as const
-
-export type PortfolioCardId = (typeof portfolioCardIds)[number]
 
 export interface WalnutProduct {
   readonly id: WalnutProductId
@@ -88,90 +83,43 @@ export interface WalnutProduct {
    * failure until the seven grades are shot together.
    */
   readonly image: ProductImage | null
-  /** The design gives the lead card a wider span and a taller image well. */
-  readonly featured: boolean
   /** Reveal stagger in ms, transcribed from `data-delay` in the design. */
   readonly revealDelay: number
 }
 
 export const walnutProducts: readonly WalnutProduct[] = [
   {
-    id: 'bal-rengi',
+    // Raymar's own photograph of the actual grade, supplied 2026-08-31 —
+    // the first product image on the site that is not stock.
+    id: 'yarim',
     group: 'ceviz-ici',
-    image: { src: '/images/walnut-honey.jpg', width: 1800, height: 1200 },
-    featured: true,
+    image: { src: '/images/walnut-halves.jpg', width: 945, height: 1181 },
     revealDelay: 0,
   },
   {
-    // "Kızıl" is the colour grade, not the rare red-pellicle cultivar: it names
-    // the redder, darker-amber kernels against the pale "beyaz" end of the
-    // range. This warm reddish-amber bed reads distinctly darker than
-    // `walnut-honey` (Bal Rengi) and the pale halves, which is exactly the
-    // distinction the grade claims. A genuinely red-pellicle kernel photo does
-    // not exist under any free licence — four independent stock searches came
-    // back empty — so representing the grade by its colour is the honest option.
-    id: 'kizil',
+    // Raymar's own photograph, supplied 2026-08-31.
+    id: 'ceyrek',
     group: 'ceviz-ici',
-    image: { src: '/images/walnut-red.jpg', width: 2400, height: 1600 },
-    featured: false,
+    image: { src: '/images/walnut-quarter.jpg', width: 648, height: 810 },
     revealDelay: 70,
   },
   {
-    // "Pirinç" is the size grade — the smallest, rice-fine broken pieces. No
-    // clean, free product-bed photo of rice-grade walnut exists (every free
-    // result is a kitchen scene or a poor snapshot; the clean ones are all
-    // paid). This is the one genuinely small-piece free image, centre-cropped
-    // to the pile. It is licensed CC BY-SA 4.0 (Bodhi Peace) — attribution and
-    // share-alike required; see docs/ASSET_AUDIT.md — the only image on the
-    // site that carries an attribution obligation.
-    id: 'pirinc',
-    group: 'ceviz-ici',
-    image: { src: '/images/walnut-rice.jpg', width: 2600, height: 2600 },
-    featured: false,
-    revealDelay: 110,
-  },
-  {
+    // Raymar's own photograph, supplied 2026-08-31. Cropped to the product
+    // itself: the frame as shot showed the carton and its liner across the top
+    // half, which read as a warehouse snapshot rather than a product card.
     id: 'kirik',
     group: 'ceviz-ici',
-    image: { src: '/images/walnut-broken.jpg', width: 1280, height: 853 },
-    featured: false,
-    revealDelay: 150,
+    image: { src: '/images/walnut-broken.jpg', width: 1060, height: 670 },
+    revealDelay: 140,
   },
   {
-    // Judged on how each photograph reads *cropped into the card*, not on how
-    // the full frame looks: `walnut-natural` is the lighter of the two at full
-    // size, but its card crop lands on a dense shadowed patch and renders as
-    // the darkest tile in the grid — the exact opposite of what "yarım beyaz"
-    // claims. The paler-reading crop takes the paler grade.
-    id: 'super-luks-yarim-beyaz',
+    // Raymar's own photograph. Replaces the CC BY-SA stock frame that was
+    // dropped on 2026-08-29 rather than carry a photographer credit on the
+    // storefront — the own-shoot it was waiting for. See docs/ASSET_AUDIT.md.
+    id: 'pirinc',
     group: 'ceviz-ici',
-    image: {
-      src: '/images/walnut-halves-pale.jpg',
-      width: 1280,
-      height: 848,
-      objectPosition: '50% 40%',
-    },
-    featured: false,
-    revealDelay: 190,
-  },
-  {
-    id: 'luks-naturel',
-    group: 'ceviz-ici',
-    image: {
-      src: '/images/walnut-natural.jpg',
-      width: 1800,
-      height: 1201,
-      objectPosition: '50% 30%',
-    },
-    featured: false,
-    revealDelay: 230,
-  },
-  {
-    id: 'ceyrek',
-    group: 'ceviz-ici',
-    image: { src: '/images/walnut-quarter.jpg', width: 1800, height: 1350 },
-    featured: false,
-    revealDelay: 270,
+    image: { src: '/images/walnut-rice.jpg', width: 1280, height: 960 },
+    revealDelay: 210,
   },
 ]
 
@@ -187,30 +135,49 @@ export interface RangeProduct {
 }
 
 /**
- * Six products divide evenly into both the two-up and the three-up grid, so
- * every row fills and no card is ever stranded on a row of its own. That is why
- * none of them is given a wider span: the count already resolves the layout.
+ * Six products fill both grids exactly — three rows of two, or two rows of
+ * three — so no card is ever stranded on a row of its own and none needs a
+ * wider span.
  */
 export const rangeProducts: readonly RangeProduct[] = [
   {
-    id: 'findik',
-    image: { src: '/images/hazelnut-inshell.jpg', width: 1400, height: 933 },
+    id: 'makademya',
+    image: {
+      src: '/images/macadamia-white.jpg',
+      width: 900,
+      height: 600,
+      objectPosition: '46% 50%',
+    },
     revealDelay: 0,
   },
   {
-    id: 'antep-fistigi',
-    image: { src: '/images/pistachio-kernel.jpg', width: 1400, height: 934 },
-    revealDelay: 90,
+    /*
+     * Pexels, photo 39173140 — Pexels License: commercial use permitted, no
+     * attribution required, so no credit line has to appear on the page. That
+     * requirement is what ruled out the Wikimedia candidates: the only
+     * usable ones there are CC BY-SA, which obliges a visible credit, and a
+     * photo-credit line under a product card on a corporate site was rejected.
+     *
+     * Graded to sit with its siblings rather than used as downloaded: the
+     * original is markedly hotter than this palette, so saturation is pulled
+     * to 0.92 and gamma lifted slightly. 3:2 landscape, the same shape as the
+     * macadamia and pistachio cards.
+     *
+     * Still stock, not Raymar's own photography — replace it the moment the
+     * client supplies a real one, exactly as `walnut-quarter` and
+     * `walnut-broken` were replaced.
+     */
+    id: 'pikan',
+    image: { src: '/images/pecan.jpg', width: 1600, height: 1065 },
+    revealDelay: 50,
   },
   {
     id: 'kabak-cekirdegi',
-    image: {
-      src: '/images/pumpkin-kernel.jpg',
-      width: 933,
-      height: 1400,
-      objectPosition: '50% 45%',
-    },
-    revealDelay: 140,
+    // Raymar's own photograph, replacing the stock frame. No `objectPosition`:
+    // the old crop was tuned to the stock image's subject placement, and this
+    // one is an evenly filled field where a centred crop is correct.
+    image: { src: '/images/pumpkin-kernel.jpg', width: 945, height: 1181 },
+    revealDelay: 100,
   },
   {
     id: 'aycekirdegi-ic',
@@ -220,115 +187,37 @@ export const rangeProducts: readonly RangeProduct[] = [
       height: 1400,
       objectPosition: '50% 60%',
     },
-    revealDelay: 190,
+    revealDelay: 150,
   },
   {
     id: 'aycekirdegi-cerezlik',
     image: { src: '/images/sunflower-inshell.jpg', width: 1400, height: 933 },
-    revealDelay: 240,
+    revealDelay: 200,
   },
   {
-    id: 'makademya',
-    image: {
-      src: '/images/macadamia-white.jpg',
-      width: 900,
-      height: 600,
-      objectPosition: '46% 50%',
-    },
-    revealDelay: 290,
-  },
-]
-
-export interface PortfolioCard {
-  readonly id: PortfolioCardId
-  readonly href: string
-  /** `null` until the product has a photograph. See `RangeProduct.image`. */
-  readonly image: ProductImage | null
-  readonly revealDelay: number
-}
-
-/**
- * The hero tile of the portfolio mosaic.
- *
- * Points at the range section, not at `#urunler` — that was the section the
- * tile itself sits in, so the largest card on the page scrolled the reader back
- * to where they already were.
- */
-export const portfolioLead: PortfolioCard = {
-  id: 'findik',
-  href: '#urunlerimiz',
-  image: { src: '/images/hazelnut-inshell.jpg', width: 1400, height: 933 },
-  revealDelay: 0,
-}
-
-/**
- * The tall secondary tile beside the lead.
- *
- * Was `walnut-bulk.jpg` — a dark mixed lot with broken and blackened pieces,
- * which is a poor shop window for the whole walnut category. The pale graded
- * kernel field reads as merchandise instead.
- */
-export const portfolioSecondary: PortfolioCard = {
-  id: 'ceviz',
-  href: '#ceviz',
-  image: { src: '/images/walnut-natural.jpg', width: 1800, height: 1201 },
-  revealDelay: 90,
-}
-
-/** The 2x2 block of compact tiles beneath the secondary tile. */
-export const portfolioTiles: readonly PortfolioCard[] = [
-  {
-    // The in-shell cut here, the kernel cut on the range card, so the two
-    // sections never show the reader the same photograph twice.
     id: 'antep-fistigi',
-    href: '#urunlerimiz',
-    image: { src: '/images/pistachio-inshell.jpg', width: 931, height: 1400 },
-    revealDelay: 140,
-  },
-  {
-    id: 'kabak-cekirdegi',
-    href: '#urunlerimiz',
-    image: {
-      src: '/images/pumpkin-kernel.jpg',
-      width: 933,
-      height: 1400,
-      objectPosition: '50% 45%',
-    },
-    revealDelay: 180,
-  },
-  {
-    id: 'makademya',
-    href: '#urunlerimiz',
-    image: { src: '/images/macadamia-white.jpg', width: 900, height: 600 },
-    revealDelay: 220,
-  },
-  {
-    id: 'aycekirdegi',
-    href: '#urunlerimiz',
-    image: {
-      src: '/images/sunflower-kernel.jpg',
-      width: 933,
-      height: 1400,
-      objectPosition: '50% 60%',
-    },
-    revealDelay: 260,
+    image: { src: '/images/pistachio-kernel.jpg', width: 1400, height: 934 },
+    revealDelay: 250,
   },
 ]
 
 /**
  * Corporate-intro circular portrait.
  *
- * Blanched kernels on a warm putty seamless: the roundness of the nuts and the
- * cream ground both sit well inside the circular mask, and it is the only
- * hazelnut frame in the library that is not already carrying a product card.
- * The flagship section's two images left with the section itself.
+ * Walnut, not hazelnut. This was a hazelnut macro until hazelnut was dropped
+ * from the range entirely — an editorial portrait of a nut the company no
+ * longer lists is a quiet contradiction on the one section that introduces the
+ * company. Walnut is now the lead product, and this frame is free because the
+ * grade reduction released it. A dense full-bleed field of kernels also reads
+ * better inside a circular mask than a subject with an obvious centre, which
+ * the crop would cut.
  */
 export const editorialImages = {
   corporatePortrait: {
-    src: '/images/hazelnut-kernel.jpg',
-    width: 1400,
-    height: 933,
-    objectPosition: '50% 55%',
+    src: '/images/walnut-natural.jpg',
+    width: 1800,
+    height: 1201,
+    objectPosition: '50% 45%',
   },
 } satisfies Record<string, ProductImage>
 

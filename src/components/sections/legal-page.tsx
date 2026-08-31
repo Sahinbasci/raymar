@@ -1,8 +1,11 @@
 import { SiteFooter } from '@/components/layout/footer'
 import { SiteHeader } from '@/components/layout/header'
+import { JsonLd } from '@/components/seo/json-ld'
 import { SectionEyebrow } from '@/components/ui/eyebrow'
 import { getDictionary } from '@/content'
 import type { Locale } from '@/lib/i18n'
+import type { LegalSlugKey } from '@/lib/legal'
+import { breadcrumbGraph } from '@/lib/schema'
 import type { LegalPageContent } from '@/types/content'
 
 /**
@@ -23,9 +26,12 @@ import type { LegalPageContent } from '@/types/content'
 export function LegalPage({
   locale,
   content,
+  slugKey,
 }: {
   locale: Locale
   content: LegalPageContent
+  /** Which of the three documents this is — feeds the breadcrumb's own URL. */
+  slugKey: LegalSlugKey
 }) {
   const dictionary = getDictionary(locale)
 
@@ -39,6 +45,15 @@ export function LegalPage({
 
   return (
     <>
+      <JsonLd
+        graph={breadcrumbGraph({
+          locale,
+          dictionary,
+          slugKey,
+          pageName: content.heading,
+        })}
+      />
+
       {/* No hero behind the header here, so it must open in its ivory state —
           the transparent one paints white on ivory at 1.06:1. */}
       <SiteHeader
@@ -103,7 +118,7 @@ export function LegalPage({
         </article>
       </main>
 
-      <SiteFooter content={dictionary.footer} />
+      <SiteFooter content={dictionary.footer} locale={locale} />
     </>
   )
 }

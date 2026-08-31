@@ -2,10 +2,26 @@ import Link from 'next/link'
 import { BrandLogo } from '@/components/media/brand-logo'
 import { MediaFrame } from '@/components/media/media-frame'
 import { brandAssets, footerBand } from '@/data/products'
-import { localeLabels } from '@/lib/i18n'
+import { localeLabels, type Locale } from '@/lib/i18n'
 import type { FooterColumn, FooterContent } from '@/types/content'
 
-function LinkColumn({ column }: { column: FooterColumn }) {
+/**
+ * Makes an in-page fragment absolute against the current locale.
+ *
+ * The footer is rendered on the legal pages as well as the homepage, and a
+ * bare `#hakkimizda` there resolves against the legal document — which has no
+ * such id, so the link silently does nothing. Every footer link to a homepage
+ * section has to navigate home first, exactly as the header's do. Verified
+ * against the built output: before this, ten footer links were dead on each of
+ * the three legal pages.
+ *
+ * Anything already absolute (the legal documents themselves) is left alone.
+ */
+function localeHref(href: string, locale: Locale): string {
+  return href.startsWith('#') ? `/${locale}${href}` : href
+}
+
+function LinkColumn({ column, locale }: { column: FooterColumn; locale: Locale }) {
   return (
     <div>
       <div className="text-xs font-normal tracking-[0.24em] text-raymar-white/74 uppercase">
@@ -15,7 +31,7 @@ function LinkColumn({ column }: { column: FooterColumn }) {
         {column.links.map((link) => (
           <Link
             key={`${link.href}-${link.label}`}
-            href={link.href}
+            href={localeHref(link.href, locale)}
             className="text-[14.5px] font-light text-raymar-white/90 transition-colors duration-300 hover:text-raymar-gold max-[719px]:py-1"
           >
             {link.label}
@@ -40,7 +56,13 @@ function LinkColumn({ column }: { column: FooterColumn }) {
  *     so it reads as the page resolving rather than as a pasted-on photograph.
  *     Purely decorative, so it is `aria-hidden` and carries an empty alt.
  */
-export function SiteFooter({ content }: { content: FooterContent }) {
+export function SiteFooter({
+  content,
+  locale,
+}: {
+  content: FooterContent
+  locale: Locale
+}) {
   return (
     <footer className="relative overflow-hidden bg-raymar-green">
       <div
@@ -103,8 +125,8 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             </p>
           </div>
 
-          <LinkColumn column={content.corporate} />
-          <LinkColumn column={content.products} />
+          <LinkColumn column={content.corporate} locale={locale} />
+          <LinkColumn column={content.products} locale={locale} />
 
           <div>
             <div className="text-xs font-normal tracking-[0.24em] text-raymar-white/74 uppercase">
@@ -118,7 +140,12 @@ export function SiteFooter({ content }: { content: FooterContent }) {
               ))}
             </address>
             <div className="mt-4.5 flex flex-col gap-2 text-sm font-light text-raymar-white/76">
-              <span>{content.phoneValue}</span>
+              <a
+                href="tel:+905419236403"
+                className="transition-colors duration-300 hover:text-raymar-gold"
+              >
+                {content.phoneValue}
+              </a>
               <span>{content.emailValue}</span>
             </div>
             {/* Static locale indicator, as in the design — the interactive
@@ -155,7 +182,7 @@ export function SiteFooter({ content }: { content: FooterContent }) {
             {content.legalLinks.map((link) => (
               <Link
                 key={link.label}
-                href={link.href}
+                href={localeHref(link.href, locale)}
                 className="text-[12.5px] font-light text-raymar-white transition-colors duration-300 hover:text-raymar-gold max-[719px]:py-1"
               >
                 {link.label}
