@@ -216,10 +216,10 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
    grouped with have since been written (item 11).
 2. All product photography is stock, labelled "temsili görsel".
 3. **The quotation endpoint needs a delivery target before launch.**
-   `src/app/api/quote/route.ts` validates, drops honeypot hits, rate-limits per
-   IP and delivers via Resend or a webhook — but only once one of those is
-   configured (see `.env.example`). With neither set it returns 503 and the form
-   shows its error state. This replaced a mock that resolved `{ ok: true }`
+   `public/teklif-gonder.php` validates, drops honeypot hits, rate-limits per
+   IP and delivers by e-mail or webhook — but only once `QUOTE_TO_EMAIL` (or
+   `QUOTE_WEBHOOK_URL`) is set at the top of that file. With neither set it
+   returns 503 and the form shows its error state. This replaced a mock that resolved `{ ok: true }`
    unconditionally, i.e. thanked every buyer for an enquiry it had discarded.
    Refusing loudly is the intended unconfigured behaviour, not a gap; the gap is
    that nobody has chosen where enquiries should land.

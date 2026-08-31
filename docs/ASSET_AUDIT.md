@@ -68,10 +68,10 @@ more).
 
 Two survive because nothing replaced them:
 
-| File                  | Dimensions | Size   | Used by                                       |
-| --------------------- | ---------- | ------ | --------------------------------------------- |
-| `hero-poster.jpg`     | 1600 × 900 | 268 KB | Hero poster                                   |
-| `macadamia-white.jpg` | 900 × 600  | 61 KB  | Portfolio tile + `range-section` product card |
+| File                  | Dimensions | Size   | Used by                      |
+| --------------------- | ---------- | ------ | ---------------------------- |
+| `hero-poster.jpg`     | 1600 × 900 | 268 KB | Hero poster                  |
+| `macadamia-white.jpg` | 900 × 600  | 61 KB  | `range-section` product card |
 
 Delivery: served through `next/image`, which emits AVIF/WebP at the widths
 declared in `next.config.ts`. The originals are untouched on disk.
@@ -85,53 +85,75 @@ sites are unreliable, and several candidates titled "shelled pistachio" were in
 fact in-shell. All are free for commercial use with no attribution required;
 credits are recorded here for provenance only.
 
-| Shipped as                | Photographer          | Source               | Licence            |
-| ------------------------- | --------------------- | -------------------- | ------------------ |
-| `hazelnut-kernel.jpg`     | Anil Karakaya         | Pexels 14017007      | Pexels License     |
-| `hazelnut-inshell.jpg`    | engin akyurt          | Unsplash             | Unsplash License   |
-| `pistachio-kernel.jpg`    | Joanna Kosinska       | Unsplash             | Unsplash License   |
-| `pistachio-inshell.jpg`   | Kairi Kaljo           | Unsplash             | Unsplash License   |
-| `pumpkin-kernel.jpg`      | Karola G / Kaboompics | Pexels 4871089       | Pexels License     |
-| `sunflower-kernel.jpg`    | Vie Studio            | Pexels 7421201       | Pexels License     |
-| `sunflower-inshell.jpg`   | Ganajp                | Pexels 18328395      | Pexels License     |
-| `walnut-honey.jpg`        | engin akyurt          | Unsplash             | Unsplash License   |
-| `walnut-broken.jpg`       | RGY23                 | Pixabay 5852421      | Pixabay Content    |
-| `walnut-halves-pale.jpg`  | Ajale                 | Pixabay 1049558      | Pixabay Content    |
-| `walnut-natural.jpg`      | Arina Krasnikova      | Pexels 6316688       | Pexels License     |
-| `walnut-quarter.jpg`      | Engin Akyurt          | Pexels 38571528      | Pexels License     |
-| `walnut-red.jpg`          | Tom Hermans           | Unsplash IbL3Zd62Q7Q | Unsplash License   |
-| `walnut-rice.jpg`         | Bodhi Peace           | Wikimedia Commons    | **CC BY-SA 4.0** ⚠ |
-| `pistachio-band-bulk.jpg` | Engin Akyurt          | Pexels 27644256      | Pexels License     |
+| Shipped as                | Photographer          | Source               | Licence          |
+| ------------------------- | --------------------- | -------------------- | ---------------- |
+| `hazelnut-kernel.jpg`     | Anil Karakaya         | Pexels 14017007      | Pexels License   |
+| `hazelnut-inshell.jpg`    | engin akyurt          | Unsplash             | Unsplash License |
+| `pistachio-kernel.jpg`    | Joanna Kosinska       | Unsplash             | Unsplash License |
+| `pistachio-inshell.jpg`   | Kairi Kaljo           | Unsplash             | Unsplash License |
+| `pumpkin-kernel.jpg`      | Karola G / Kaboompics | Pexels 4871089       | Pexels License   |
+| `sunflower-kernel.jpg`    | Vie Studio            | Pexels 7421201       | Pexels License   |
+| `sunflower-inshell.jpg`   | Ganajp                | Pexels 18328395      | Pexels License   |
+| `walnut-honey.jpg`        | engin akyurt          | Unsplash             | Unsplash License |
+| `walnut-broken.jpg`       | RGY23                 | Pixabay 5852421      | Pixabay Content  |
+| `walnut-halves-pale.jpg`  | Ajale                 | Pixabay 1049558      | Pixabay Content  |
+| `walnut-natural.jpg`      | Arina Krasnikova      | Pexels 6316688       | Pexels License   |
+| `walnut-quarter.jpg`      | Engin Akyurt          | Pexels 38571528      | Pexels License   |
+| `walnut-red.jpg`          | Tom Hermans           | Unsplash IbL3Zd62Q7Q | Unsplash License |
+| `pistachio-band-bulk.jpg` | Engin Akyurt          | Pexels 27644256      | Pexels License   |
 
 The first seven rows above were downscaled to a 1400px long edge at quality 62.
-**The remaining six were not** — `walnut-honey.jpg` and `walnut-natural.jpg`
-ship at 1800px, `walnut-quarter.jpg` at 1800px, `walnut-red.jpg` at 2400px,
-`walnut-rice.jpg` at 2600px (2600×2600, square) and `pistachio-band-bulk.jpg`
-at 3200px — measured directly off the shipped files, not carried over from
-this note. The two Pixabay files (`walnut-broken.jpg`, `walnut-halves-pale.jpg`)
-are smaller than the 1400px target and were correctly left at their native
-1280px rather than upscaled. All are served through `next/image`, which emits
-9–60 KB AVIF at the widths the layout actually requests — the oversized
-originals cost extra encode time and disk, not extra bytes on the wire, since
-`next/image` never serves a candidate wider than a slot requests.
+**The remaining five were not** — `walnut-honey.jpg` and `walnut-natural.jpg`
+ship at 1800px, `walnut-quarter.jpg` at 1800px, `walnut-red.jpg` at 2400px and
+`pistachio-band-bulk.jpg` at 3200px — measured directly off the shipped files,
+not carried over from this note. The two Pixabay files (`walnut-broken.jpg`,
+`walnut-halves-pale.jpg`) are smaller than the 1400px target and were correctly
+left at their native 1280px rather than upscaled. All are served through
+`next/image`, which emits 9–60 KB AVIF at the widths the layout actually
+requests — the oversized originals cost extra encode time and disk, not extra
+bytes on the wire, since `next/image` never serves a candidate wider than a
+slot requests.
 
 **Excluded on licence grounds.** Several better-composed pistachio and hazelnut
 candidates are hosted on `plus.unsplash.com` — that is Unsplash+, a paid
 subscription licence, not the free Unsplash License, and none were used.
 
-**⚠ `walnut-rice.jpg` carries an attribution obligation.** It is the ONLY image
-on the site not under a no-attribution licence. CC BY-SA 4.0 requires:
+## 3c. Raymar's own product photography
 
-1. **Attribution** — "Bodhi Peace, CC BY-SA 4.0, via Wikimedia Commons",
-   visible in a reasonable place (a credits line or the walnut-section
-   footnote).
-2. **Share-alike** — the centre-crop is a derivative and must itself be
-   offered under CC BY-SA 4.0. This does NOT relicense the site or its code;
-   it binds only that one image file.
-   Source: https://commons.wikimedia.org/wiki/File:Chopped_walnuts_on_board.jpg
-   It was chosen only because it is the single genuinely rice-grade free photo in
-   existence; its quality is below the rest of the set (harsh flash, warm cast) and
-   it is a candidate for replacement by an own-shoot or a paid licence.
+Supplied 2026-08-31 — the first images on the site that are not stock. Three
+grades shot by the client:
+
+| Shipped as           | Product             | Source                              |
+| -------------------- | ------------------- | ----------------------------------- |
+| `walnut-halves.jpg`  | Yarım Ceviz İçi     | Raymar, 945 × 2048                  |
+| `walnut-rice.jpg`    | Pirinç Ceviz İçi    | Raymar, 1280 × 960                  |
+| `pumpkin-kernel.jpg` | Kabak Çekirdeği İçi | Raymar, 945 × 2048 (replaces stock) |
+
+**Colour graded here, not by a generative model.** The client also supplied
+AI-processed versions of the same three frames. Those were rejected after
+inspection: each carried a signed C2PA manifest declaring `softwareAgent
+gpt-image v2.0`, `digitalSourceType: trainedAlgorithmicMedia` and a
+`c2pa.watermarked.unbound` assertion — an invisible watermark bound to the
+pixels, which survives resizing and re-encoding and cannot be removed by any
+step in this pipeline. They were also _smaller_ than the originals (2048 →
+1672 px tall on two of them), the pumpkin frame lost 2.28% of its area to pure
+black against 0.016% in the original, and the AI pass had erased the real
+turquoise table edge visible in the corners of the rice-grade shot.
+
+The versions that ship were graded from the untouched originals with `sharp`
+— gamma, saturation and a blue-channel reduction for warmth, i.e. arithmetic
+on the existing pixels. Same look, full resolution, a third of the shadow
+loss, and no provenance claim of any kind attached to the files.
+
+**`walnut-rice.jpg` — the earlier stock frame was removed 2026-08-29.** It was the one image
+on the site under CC BY-SA 4.0 rather than a no-attribution licence — sourced
+2026-08-11 as the only genuinely rice-grade free photo in existence, quality
+already below the rest of the set (harsh flash, warm cast, a kitchen
+cutting-board rather than a product bed). Complying with the licence meant a
+visible photographer credit in the walnut-section footnote, which read as a
+credits roll on a corporate storefront. The Pirinç card rendered `PendingMedia` until the client's own photograph
+arrived on 2026-08-31 (see §3c) — which was the correct outcome: an own-shoot,
+not a different stock search.
 
 **Kızıl is a colour grade, not the red-pellicle cultivar.** `walnut-red.jpg`
 is a warm reddish-amber kernel bed, chosen to read distinctly redder than the
@@ -150,16 +172,24 @@ colour-grade kızıl stand-in) with the company's own product in one pass.
 These are marked as pending **in the approved design itself** and are reproduced
 verbatim rather than filled in. Do not treat them as final copy.
 
-| Placeholder                                                                     | Appears in              |
-| ------------------------------------------------------------------------------- | ----------------------- |
-| `[Telefon bilgisi eklenecek]`                                                   | Contact block, footer   |
-| `[E-posta bilgisi eklenecek]`                                                   | Contact block, footer   |
-| "Görseller temsilidir; nihai ürün fotoğrafları firma tarafından sağlanacaktır." | Walnut section footnote |
+This table is now empty — every placeholder the approved design carried has been
+replaced with real, client-supplied content:
 
-`[Politika metni eklenecek]` is gone from this table: the consent line now links
-to the real KVKK aydınlatma metni and gizlilik politikası pages rather than
-promising a document that did not exist. See QA_REPORT.md item 11 for the
-standing caveat on those texts.
+- `[Telefon bilgisi eklenecek]` → `+90 (541) 923 64 03` (2026-08-29), rendered as
+  a `tel:` link.
+- `[E-posta bilgisi eklenecek]` → `info@raymarnuts.com` (2026-08-31). This is
+  also the delivery target of the quotation form (`public/teklif-gonder.php`)
+  and is now published in the JSON-LD `contactPoint` and named as a KVKK
+  application channel in the aydınlatma metni.
+- "Görseller temsilidir; nihai ürün fotoğrafları firma tarafından
+  sağlanacaktır." → removed; the walnut and pumpkin cards now carry Raymar's own
+  photographs.
+- `[Politika metni eklenecek]` → the consent line links to the real KVKK
+  aydınlatma metni and gizlilik politikası pages.
+
+One product still has no photograph — Pikan Cevizi — and renders through
+`PendingMedia` rather than a placeholder string. See QA_REPORT.md item 11 for the
+standing caveat on the legal texts.
 
 Two placeholders that were here at hand-off are gone, not because the client
 supplied real copy but because the sections carrying them changed shape: the

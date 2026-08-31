@@ -56,7 +56,15 @@ src/
   hooks/            use-scroll-threshold · use-body-scroll-lock
   lib/              i18n · fonts · site · cn · schema · quote-submission
   types/            content.ts — the Dictionary contract
-  proxy.ts          / → /tr
+```
+
+Deployment-side configuration (not built by Next, copied verbatim into `out/`):
+
+```
+  public/.htaccess          / → /tr · extensionless URLs · security headers · AVIF negotiation
+  public/teklif-gonder.php  quotation endpoint
+  scripts/optimize-images   build-time AVIF/WebP/JPEG variants
+  image-loader.ts           points next/image at those variants
 ```
 
 `not-found` is deliberately absent from `app/[locale]/`: the only layout
@@ -83,11 +91,10 @@ keyed by the same ids. No duplicated component tree per language. ✅
 | Hero               | `sections/hero-section` + `media/hero-video`  | server + client |
 | Giriş Sözü         | `sections/statement-section`                  | server          |
 | Deneyim Şeridi     | `sections/experience-strip`                   | server          |
-| Kurumsal Giriş     | `sections/corporate-intro`                    | server          |
-| Ürün Portföyü      | `sections/portfolio-section`                  | server          |
-| Ceviz Ürün Ailesi  | `sections/walnut-section`                     | server          |
+| Hakkımızda         | `sections/corporate-intro`                    | server          |
 | Ürünlerimiz        | `sections/range-section`                      | server          |
-| 30 Yıl Hikâyesi    | `sections/trade-story-section`                | server          |
+| Ceviz Ürün Ailesi  | `sections/walnut-section`                     | server          |
+| Ticaret Hikâyesi   | `sections/trade-story-section`                | server          |
 | Teklif ve İletişim | `sections/quote-section` + `forms/quote-form` | server + client |
 | Footer             | `layout/footer`                               | server          |
 
@@ -96,9 +103,10 @@ There is no dedicated "Fındık — Amiral Ürün" section and no separate "Seç
 (`id="urunlerimiz"`) during the build. Splitting them by "flagship vs.
 imported" put hazelnut and pistachio — both Turkish — under an "imported"
 heading, which was simply wrong; `range-section` presents every
-single-variety product (hazelnut, pistachio, pumpkin seed, sunflower,
-macademia) as one group instead, and the portfolio mosaic's hazelnut tile
-links straight into it.
+single-variety product (macadamia, pecan, pumpkin seed, sunflower, hazelnut,
+pistachio) as one group instead. The portfolio mosaic that once duplicated
+this list was removed entirely for the same reason — it read as clutter
+against a single, ordered range grid.
 
 `PortfolioCard` is the only shared card abstraction — six instances at three
 scales. The walnut and range cards are used once each per section and are
@@ -109,7 +117,7 @@ kept inline rather than abstracted.
 | Route                                      | Rendering                          |
 | ------------------------------------------ | ---------------------------------- |
 | `/tr`                                      | Static (SSG)                       |
-| `/`                                        | Redirect to `/tr` via `proxy.ts`   |
+| `/`                                        | Redirect to `/tr` via `.htaccess`  |
 | `/en`                                      | 404 until English copy is approved |
 | `/robots.txt`, `/sitemap.xml`, `/icon.svg` | Static                             |
 
@@ -147,10 +155,20 @@ mobile navigation, drawer focus and scroll lock, form validation and success,
 product→form prefill, no-overflow, hero video playback _and_ its fallback,
 reduced motion, logo integrity, and that form values never reach the console.
 
-Note for anyone running the suite: build with `ALLOW_INSECURE_LAN=1`. The
-HTTPS-forcing headers are resolved into the routes manifest at **build** time,
-and WebKit — unlike Chromium — honours `upgrade-insecure-requests` against the
+Note for anyone running the suite: `pnpm build` first. The tests run against
+`out/` served by `scripts/serve-static.mjs`, which reproduces the `.htaccess`
+rules the host applies — the `/` redirect, extensionless URLs, image format
+negotiation and the security headers — so the suite exercises production
+behaviour rather than a bare file server. It deliberately does NOT send
+`upgrade-insecure-requests` or HSTS: both are correct on the deployed HTTPS
+site and both are in `.htaccess`, but WebKit honours the upgrade against a
 plain-HTTP test server and drops the connection.
+
+The one thing the suite cannot reach is `public/teklif-gonder.php` — there is
+no PHP interpreter behind a static file server. Those tests skip loudly rather
+than pass vacuously; point them at a host that runs PHP to execute them:
+
+    QUOTE_ENDPOINT_ORIGIN=https://raymarnuts.com pnpm test quote-api
 
 ## 9. Known uncertainties
 
@@ -160,9 +178,9 @@ plain-HTTP test server and drops the connection.
    MAREX and `marasintl.com`. Left as the design's placeholders. — ASSET_AUDIT.md
 3. **No production domain.** `NEXT_PUBLIC_SITE_URL` must be set before launch.
 4. **Submission delivery is unconfigured.** The endpoint is built
-   (`src/app/api/quote/route.ts`); it needs either the Resend variables or
-   `QUOTE_WEBHOOK_URL` set in the deployment environment. Until then it returns
-   503 and the form shows its error state — never a false success.
+   (`public/teklif-gonder.php`); it needs `QUOTE_TO_EMAIL` (or
+   `QUOTE_WEBHOOK_URL`) set at the top of that file. Until then it returns 503
+   and the form shows its error state — never a false success.
 5. **All product photography is stock**, labelled "temsili görsel".
 6. **The slogan** is rendered without quotation marks, as in the approved design;
    the manual states it should always carry them.
@@ -189,10 +207,11 @@ plain-HTTP test server and drops the connection.
 - [ ] Client: confirm contact details, domain, font decision
 - [ ] Client: supply final product photography
 - [ ] Client: supply English copy
-- [x] Quotation endpoint — `src/app/api/quote/route.ts`, with server-side
+- [x] Quotation endpoint — `public/teklif-gonder.php`, with server-side
       validation, honeypot accept-and-drop, per-IP rate limiting and delivery
-      via Resend or a webhook. Refuses with 503 when unconfigured rather than
-      reporting a false success
+      by e-mail or webhook. Refuses with 503 when unconfigured rather than
+      reporting a false success. **Not executed locally** — no PHP runtime was
+      available on the build machine; verify it on the host after upload
 - [ ] Client: choose and configure a delivery target (see `.env.example`) — the
       one remaining launch blocker
 - [x] Legal pages — KVKK aydınlatma metni, gizlilik politikası, çerez politikası
