@@ -1,20 +1,29 @@
 /**
  * Quotation submission boundary.
  *
- * This used to be a documented mock that resolved `{ ok: true }` without doing
- * anything, which meant the site thanked every buyer for an enquiry it had just
- * thrown away. It now posts to `src/app/api/quote/route.ts`, which delivers the
- * message and refuses — loudly — when it has nowhere to send it.
+ * Posts to `public/teklif-gonder.php`, which delivers the message and refuses —
+ * loudly — when it has nowhere to send it.
  *
- * TO GO LIVE, set one of these in the deployment environment:
+ * The endpoint is PHP rather than a Next route handler because this site is
+ * deployed as a static export to shared LiteSpeed/Apache hosting: `output:
+ * 'export'` drops API routes entirely, so `/api/quote` would 404 and every
+ * enquiry would fail. PHP is what the host actually runs. The contract is
+ * unchanged from that route — same validation, same honeypot accept-and-drop,
+ * same per-IP rate limit, same `{ ok: boolean }` reply.
  *
- *   RESEND_API_KEY + QUOTE_TO_EMAIL + QUOTE_FROM_EMAIL   (e-mail)
- *   QUOTE_WEBHOOK_URL                                     (CRM / Zapier / n8n)
+ * TO GO LIVE, set `QUOTE_TO_EMAIL` at the top of `public/teklif-gonder.php`
+ * (or `QUOTE_WEBHOOK_URL` for a CRM / Zapier / n8n endpoint).
  *
  * With neither configured the endpoint returns 503 and the form shows its error
  * state. That is the intended behaviour: a visitor who is told the message
  * failed can pick up the phone, whereas one who is told it succeeded cannot.
  */
+
+/**
+ * Same-origin path, so it works identically on the deployed host and in local
+ * verification. Kept in one place because the E2E suite intercepts it by name.
+ */
+export const QUOTE_ENDPOINT = '/teklif-gonder.php'
 
 export interface QuotePayload {
   name: string
@@ -47,7 +56,7 @@ const TIMEOUT_MS = 15_000
 
 export async function submitQuoteRequest(payload: QuotePayload): Promise<QuoteResult> {
   try {
-    const response = await fetch('/api/quote', {
+    const response = await fetch(QUOTE_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

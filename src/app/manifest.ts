@@ -39,3 +39,11 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   }
 }
+
+/*
+ * Required by `output: 'export'`: without it the build fails outright with
+ * "export const dynamic = force-static not configured on route". These files
+ * already compute their output from build-time constants only, so declaring it
+ * changes nothing about the result — it just tells Next that explicitly.
+ */
+export const dynamic = 'force-static'

@@ -1,0 +1,238 @@
+# =============================================================================
+# Raymar Nuts — Apache / LiteSpeed configuration
+#
+# This file carries everything the Next.js server used to do for this site.
+# The site is deployed as a static export (`output: 'export'`), so nothing runs
+# at request time: the security headers that `next.config.ts` used to emit and
+# the redirects that `src/proxy.ts` used to perform have nowhere else to live.
+#
+# Every block is wrapped in <IfModule>. On a host missing one of these modules
+# the site still serves — it just loses that block's behaviour — rather than
+# returning a 500 for every request, which is what an unguarded directive for an
+# absent module does.
+# =============================================================================
+
+# Directory listings off. Without this, `/` and any directory without an
+# index file answer with a browsable listing of the deployment — verified
+# against a plain static server, which served exactly that.
+Options -Indexes
+
+# -----------------------------------------------------------------------------
+# MIME types
+# -----------------------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddType video/mp4 .mp4
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml .svg
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Routing
+# -----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # --- Canonical host: strip www --------------------------------------------
+  # Every canonical tag, hreflang, sitemap entry and Open Graph URL the build
+  # emits is on the bare apex (https://raymarnuts.com/...). Without this rule
+  # the www host serves the identical site, so a crawler that finds a www link
+  # anywhere sees a second copy of every page.
+  #
+  # Deliberately BEFORE the HTTPS rule and it writes `https://` itself, so
+  # http://www.… reaches the canonical host in ONE redirect rather than being
+  # bounced twice. `%1` is the host without `www.`, so this rule is not tied to
+  # any particular domain and keeps working if the site is ever moved.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+  # --- HTTPS ----------------------------------------------------------------
+  # HSTS below is only honoured over TLS, so the upgrade has to happen here
+  # first. `%{HTTPS}` is unreliable behind some shared-hosting proxies, so the
+  # forwarded-proto header is checked too.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # --- Image format negotiation ---------------------------------------------
+  # `image-loader.ts` always names the `.jpg`, because that is the format no
+  # browser can fail to render. Here it is upgraded to AVIF or WebP when the
+  # browser's own Accept header says it can decode one AND the file exists.
+  # If this block never fires — an old browser, or a host without mod_rewrite —
+  # the visitor gets the real, correctly sized JPEG. There is no broken-image
+  # path.
+  RewriteCond %{HTTP_ACCEPT} image/avif
+  RewriteCond %{DOCUMENT_ROOT}/$1.avif -f
+  RewriteRule ^(_img/.+)\.jpg$ /$1.avif [T=image/avif,E=NEGOTIATED:1,L]
+
+  RewriteCond %{HTTP_ACCEPT} image/webp
+  RewriteCond %{DOCUMENT_ROOT}/$1.webp -f
+  RewriteRule ^(_img/.+)\.jpg$ /$1.webp [T=image/webp,E=NEGOTIATED:1,L]
+
+  # --- Locale root ----------------------------------------------------------
+  # Replaces the `/` → `/tr` redirect in the deleted `src/proxy.ts`.
+  #
+  # Deliberately 307, not 301/308. `/` sends everyone to Turkish today only
+  # because Turkish is the one published locale; the moment English ships this
+  # becomes an Accept-Language negotiation. A permanent redirect would already
+  # be cached in every returning visitor's browser, and an export buyer whose
+  # browser learned `/` → `/tr` months earlier would never reach `/en`.
+  RewriteRule ^$ /tr [R=307,L]
+
+  # --- Locale case ----------------------------------------------------------
+  # Also from the deleted proxy. Its original reason — a Next prerender-cache
+  # entry being poisoned by a differently-cased request — cannot happen to
+  # static files, but `/TR` and `/Tr` were valid URLs on the previous host and
+  # a Linux filesystem is case-sensitive, so without this they would start
+  # 404ing. Permanent, unlike the `/` rule above: `/TR` has exactly one correct
+  # destination and always will.
+  #
+  # `/EN` matters more than `/TR` did, not less: an English-speaking buyer is
+  # the one most likely to type or be sent a capitalised locale segment, and
+  # `/EN` is a brand-new URL with no history to fall back on.
+  RewriteCond %{REQUEST_URI} !^/tr(/|$)
+  RewriteRule ^([Tt][Rr])(/.*)?$ /tr$2 [R=308,L]
+
+  RewriteCond %{REQUEST_URI} !^/en(/|$)
+  RewriteRule ^([Ee][Nn])(/.*)?$ /en$2 [R=308,L]
+
+  # --- Extensionless page URLs ----------------------------------------------
+  # The export writes `tr.html`, `tr/kvkk-aydinlatma-metni.html`, … while every
+  # canonical, sitemap entry and internal link points at the extensionless form.
+  # `trailingSlash` is deliberately left off so those URLs stay byte-identical
+  # to the ones already live and indexed; this rewrite is what makes them
+  # resolve. Real files are matched first and served untouched.
+  #
+  # `DirectorySlash Off` is load-bearing, not tidiness. The export produces BOTH
+  # `tr.html` and a `tr/` directory (the legal pages live inside it), and with
+  # the default `DirectorySlash On` Apache sees `/tr` as a directory, 301s to
+  # `/tr/`, finds no index file there and — with `Options -Indexes` above —
+  # answers 403. The homepage was dead on exactly that path until this was
+  # added. Turning it off lets the rewrite below claim `/tr` for `tr.html`.
+  #
+  # For the same reason there is no `!-d` condition: excluding directories is
+  # what kept `/tr` from ever reaching the rewrite. A directory that has no
+  # `.html` sibling simply falls through, which is the correct outcome.
+  DirectorySlash Off
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ /$1.html [L]
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Security headers
+# -----------------------------------------------------------------------------
+# Identical policy to the one `next.config.ts` emitted before the static export.
+# Verified by measurement: a static export without this block returns none of
+# these, leaving the site with no CSP, no HSTS and no clickjacking protection.
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.google.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+
+  # Two years, and only sent over TLS: a browser ignores it on plain HTTP
+  # anyway, and the redirect above means a real visitor is always on HTTPS by
+  # the time this is read.
+  #
+  # `includeSubDomains` and `preload` were REMOVED when the site moved to
+  # shared hosting on its own domain. On this kind of plan the control panel
+  # and webmail live on subdomains of the same name — cpanel.raymarnuts.com,
+  # webmail.raymarnuts.com — and `includeSubDomains` would pin every one of
+  # them to HTTPS for two years after a single visit to the apex. If any of
+  # them is served over plain HTTP, or with a certificate issued for the
+  # server's own hostname rather than this domain, it becomes unreachable in
+  # that browser and there is no way to undo it from the server side.
+  #
+  # The apex — the only host this project actually serves — is fully protected
+  # without them. Put them back once every subdomain of raymarnuts.com is
+  # confirmed to serve valid HTTPS, and only submit to the preload list after
+  # that, because preload entries are slow and painful to reverse.
+  Header always set Strict-Transport-Security "max-age=63072000" "expr=%{HTTPS} == 'on'"
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()"
+  Header always set X-DNS-Prefetch-Control "on"
+
+  # Any cache between here and the visitor must key the image on Accept, or it
+  # will hand an AVIF to a browser that cannot decode it. Set only on responses
+  # the negotiation block above actually rewrote.
+  Header append Vary Accept env=NEGOTIATED
+
+  # PHP announces itself by default; the endpoint does not need to.
+  Header unset X-Powered-By
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Compression
+# -----------------------------------------------------------------------------
+# Images and video are already compressed — re-compressing them burns CPU on a
+# shared plan for no gain, so only text formats are listed.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/manifest+json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Caching
+# -----------------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Content-addressed by the build: safe to cache forever.
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+
+  # Replaced by filename only, exactly as on the previous host.
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/avif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+
+  # HTML must revalidate, or a content fix stays invisible behind a stale cache.
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # `_next/static` filenames carry a build hash, so they can be immutable.
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(jpg|jpeg|png|webp|avif|svg|mp4)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Error document
+# -----------------------------------------------------------------------------
+# The branded 404 the app renders, not the host's default page.
+ErrorDocument 404 /404.html
+
+# -----------------------------------------------------------------------------
+# Protect build metadata
+# -----------------------------------------------------------------------------
+# `public/_img/manifest.json` is the image optimizer's fingerprint cache — a
+# build input that says which source hashed to which variant. Nothing on the
+# site requests it, and it should not be browsable.
+#
+# The React Server Component payloads that live beside it are DELIBERATELY NOT
+# blocked here, though an earlier version of this file blocked them by matching
+# `__next.*\.txt`. That was wrong, and measurably so: the App Router fetches
+# `/tr/__next._tree.txt?_rsc=…` itself on every page load to prefetch routes,
+# so denying it put a 403 in the console of every visitor and dropped client-side
+# navigation back to full page loads. They are build output the site depends on
+# at runtime, not metadata to be hidden.
+<FilesMatch "^manifest\.json$">
+  Require all denied
+</FilesMatch>

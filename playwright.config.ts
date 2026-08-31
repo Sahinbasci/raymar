@@ -75,8 +75,19 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 } },
     },
   ],
+  /*
+   * Serves the static export the way the deployment host does, not the way a
+   * naive file server would.
+   *
+   * `next start` no longer applies: the site builds with `output: 'export'`, so
+   * there is no Next server to run. But serving `out/` with a plain file server
+   * would test a site the visitor never gets — the `/` redirect, the
+   * extensionless-URL rewrite, the image negotiation and every security header
+   * live in `public/.htaccess` on the host. `scripts/serve-static.mjs`
+   * reimplements those rules so this suite exercises production behaviour.
+   */
   webServer: {
-    command: `pnpm start --port ${PORT}`,
+    command: `node scripts/serve-static.mjs out ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

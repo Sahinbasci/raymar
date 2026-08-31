@@ -20,11 +20,6 @@ jobs:
       # that a deploy can never bake localhost into canonical/OG/sitemap URLs.
       # This value is only ever used to satisfy that guard in CI.
       NEXT_PUBLIC_SITE_URL: https://example.com
-      # Keeps `upgrade-insecure-requests` and HSTS out of the routes manifest.
-      # Those headers are resolved at BUILD time, and WebKit — unlike Chromium —
-      # honours the upgrade against Playwright's plain-HTTP server and drops the
-      # connection, so without this the WebKit projects cannot reach the site.
-      ALLOW_INSECURE_LAN: '1'
 
     steps:
       - uses: actions/checkout@v4
@@ -62,9 +57,10 @@ jobs:
         run: pnpm exec playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
-      # The Playwright config's `webServer` runs `pnpm start`, which serves
-      # whatever `.next` already holds — so the build has to happen here, with
-      # the env above, rather than being left to the test run.
+      # The Playwright config's `webServer` serves `out/` via
+      # `scripts/serve-static.mjs`, so the export has to exist before the tests
+      # run. `prebuild` generates the image variants the loader points at; a
+      # test run against a missing `out/` fails immediately by design.
       - run: pnpm build
 
       - run: pnpm test
