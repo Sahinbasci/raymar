@@ -39,6 +39,28 @@ test.describe('legal pages', () => {
         /^index, follow/,
       )
 
+      /*
+       * hreflang, which these pages lost silently.
+       *
+       * A page-level `alternates` in Next REPLACES the layout's rather than
+       * merging with it, so returning only `{ canonical }` — which all three
+       * of these pages did — dropped the languages map and emitted no
+       * hreflang at all. Invisible while Turkish was the only locale; a real
+       * defect once the English documents shipped, because the two are
+       * near-identical texts with nothing declaring them translations.
+       * Measured on the live site before it was fixed.
+       */
+      for (const [lang, expected] of [
+        ['tr', `/tr/${slug}`],
+        ['en', `/en/${slug}`],
+        ['x-default', `/tr/${slug}`],
+      ]) {
+        await expect(
+          page.locator(`link[rel="alternate"][hreflang="${lang}"]`),
+          `/tr/${slug} is missing hreflang=${lang}`,
+        ).toHaveAttribute('href', new RegExp(`${expected}$`))
+      }
+
       // Substantive text, not a stub: every page has multiple clauses.
       expect(await page.locator('main h2').count()).toBeGreaterThan(2)
     })
@@ -93,15 +115,45 @@ test.describe('legal pages', () => {
 
     await page.goto('/tr/kvkk-aydinlatma-metni')
 
-    // Bare `#urunler` fragments would resolve against this document and do
+    // Bare `#urunlerimiz` fragments would resolve against this document and do
     // nothing; the links are locale-absolute so they navigate home and scroll.
     await page
       .getByRole('navigation', { name: 'Ana menü' })
       .getByRole('link', { name: 'Ürünler' })
       .click()
 
-    await expect(page).toHaveURL(/\/tr#urunler$/)
-    await expect(page.locator('#urunler')).toBeInViewport({ ratio: 0.05 })
+    await expect(page).toHaveURL(/\/tr#urunlerimiz$/)
+    await expect(page.locator('#urunlerimiz')).toBeInViewport({ ratio: 0.05 })
+  })
+
+  test('every footer link works from a legal page, not just the header', async ({
+    page,
+  }) => {
+    await page.goto('/tr/gizlilik-politikasi')
+
+    /*
+     * The regression this guards, found in the built output rather than in a
+     * browser: the footer took no `locale`, so it rendered its section links
+     * as bare `#hakkimizda` / `#urunlerimiz` fragments. On the homepage those
+     * work; on a legal document they resolve against a page that has no such
+     * id, so ten footer links did nothing at all on each of the three legal
+     * pages. The header had been fixed for exactly this and the footer was
+     * missed — and the whole suite stayed green, because nothing clicked the
+     * footer from anywhere but the homepage.
+     */
+    const links = page.locator('footer a[href^="#"]')
+    expect(
+      await links.count(),
+      'footer must not emit bare fragments off the homepage',
+    ).toBe(0)
+
+    // And the links that do exist have to reach the homepage section.
+    const products = page.locator('footer').getByRole('link', { name: 'Makadamya' })
+    await expect(products).toHaveAttribute('href', '/tr#urunlerimiz')
+
+    await products.click()
+    await expect(page).toHaveURL(/\/tr#urunlerimiz$/)
+    await expect(page.locator('#urunlerimiz')).toBeInViewport({ ratio: 0.05 })
   })
 
   test('all three appear in the sitemap', async ({ request }) => {

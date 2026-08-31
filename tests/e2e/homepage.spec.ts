@@ -1,13 +1,16 @@
 import { expect, test, type Page } from '@playwright/test'
 
-/** Section anchors in the order the approved design lays them out. */
+/**
+ * Section anchors in the client-revised order — see the note in
+ * `src/app/[locale]/page.tsx` for why this deviates from the approved
+ * design's own order (no portfolio mosaic, Ürünlerimiz before Ceviz İçi).
+ */
 const SECTION_IDS = [
   'ust',
   'giris',
-  'kurumsal',
-  'urunler',
-  'ceviz',
+  'hakkimizda',
   'urunlerimiz',
+  'ceviz',
   'ticaret',
   'teklif',
 ] as const
@@ -76,7 +79,7 @@ test.describe('homepage', () => {
     await page.goto('/tr')
 
     await expect(page.locator('h1')).toHaveCount(1)
-    await expect(page.locator('h1')).toContainText('Kuruyemiş Tedarikinde')
+    await expect(page.locator('h1')).toContainText('Kuruyemiş Tedariğinde')
     expect(await page.locator('h2').count()).toBeGreaterThan(4)
   })
 
@@ -85,7 +88,7 @@ test.describe('homepage', () => {
     await scrollThroughPage(page)
 
     // Guards the reveal system: a stuck observer must never leave copy invisible.
-    await expect(page.locator('#kurumsal h2')).toBeVisible()
+    await expect(page.locator('#hakkimizda h2')).toBeVisible()
     await expect(page.locator('#teklif h2')).toBeVisible()
     await expect(page.getByRole('contentinfo')).toBeAttached()
   })

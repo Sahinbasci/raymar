@@ -12,13 +12,13 @@ test.describe('desktop navigation', () => {
     await expect(nav).toBeVisible()
 
     await nav.getByRole('link', { name: 'Ürünler' }).click()
-    await expect(page).toHaveURL(/#urunler$/)
+    await expect(page).toHaveURL(/#urunlerimiz$/)
 
     // `scroll-behavior: smooth` animates, so poll rather than read once.
     await expect
       .poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 })
       .toBeGreaterThan(0)
-    await expect(page.locator('#urunler')).toBeInViewport({ ratio: 0.05 })
+    await expect(page.locator('#urunlerimiz')).toBeInViewport({ ratio: 0.05 })
   })
 
   test('header inverts once scrolled past the hero', async ({ page }) => {
@@ -128,30 +128,92 @@ test.describe('mobile navigation', () => {
     await page.getByRole('button', { name: 'Menüyü aç' }).click()
     await page.getByRole('dialog').getByRole('link', { name: 'Ürünler' }).click()
     await expect(page.getByRole('dialog')).toBeHidden()
-    await expect(page).toHaveURL(/#urunler$/)
+    await expect(page).toHaveURL(/#urunlerimiz$/)
   })
 })
 
 test.describe('language switch', () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) < 1080, 'desktop layout only')
 
-  test('marks the unpublished locale as disabled rather than linking to it', async ({
-    page,
-  }) => {
+  /*
+   * English was unpublished until 2026-08-31, and this suite asserted the
+   * switch rendered a disabled `<button>` for it. Now that `en` is in
+   * `completeLocales` the same control has to be a real link — the two states
+   * are produced by the same component branch, so a test that only checked
+   * "the switch exists" would have passed through the whole transition without
+   * noticing which one shipped.
+   *
+   * `exact` matters throughout: Playwright matches accessible names as a
+   * case-insensitive substring by default, and product cards carry aria-labels
+   * containing "en", so a loose match resolves to several elements.
+   */
+  test('links to the other locale in both directions', async ({ page }) => {
     await page.goto('/tr')
-    // `exact` matters: Playwright matches accessible names as a
-    // case-insensitive substring by default, and every product card now
-    // carries an aria-label — "Bal Rengi Ceviz İçi için teklif talep et"
-    // contains "en", so a loose match resolves to two elements.
-    const en = page.getByRole('button', { name: 'EN', exact: true })
-    await expect(en).toHaveAttribute('aria-disabled', 'true')
+    const toEnglish = page.getByRole('link', { name: 'EN', exact: true })
+    await expect(toEnglish).toHaveAttribute('href', '/en')
+    await toEnglish.click()
+    await expect(page).toHaveURL(/\/en$/)
+
+    const toTurkish = page.getByRole('link', { name: 'TR', exact: true })
+    await expect(toTurkish).toHaveAttribute('href', '/tr')
+    await toTurkish.click()
+    await expect(page).toHaveURL(/\/tr$/)
+  })
+
+  test('marks the current locale, and marks only that one', async ({ page }) => {
+    /*
+     * Scoped to the header. The footer carries its own TR / EN pair as a
+     * decorative, `aria-hidden` indicator, so an unscoped text match finds
+     * both and resolves to more than one element.
+     */
+    for (const [path, active, other] of [
+      ['/en', 'EN', 'TR'],
+      ['/tr', 'TR', 'EN'],
+    ]) {
+      await page.goto(path)
+      const current = page.locator('header [aria-current="true"]')
+      await expect(current).toHaveCount(1)
+      await expect(current).toHaveText(active)
+      // The other locale must be a link, not a second "current" — a switch
+      // that ignores the active locale would mark both.
+      await expect(
+        page.locator('header').getByRole('link', { name: other, exact: true }),
+      ).toHaveCount(1)
+    }
   })
 })
 
-test.describe('unpublished locale', () => {
-  test('/en is not served', async ({ page }) => {
-    const response = await page.goto('/en')
-    expect(response?.status()).toBe(404)
+test.describe('published locales', () => {
+  test('both locales are served, and each declares its own language', async ({
+    page,
+  }) => {
+    for (const [path, lang] of [
+      ['/tr', 'tr'],
+      ['/en', 'en'],
+    ]) {
+      const response = await page.goto(path)
+      expect(response?.status(), `${path} should be served`).toBe(200)
+      await expect(page.locator('html')).toHaveAttribute('lang', lang)
+    }
+  })
+
+  test('the two locales point at each other with hreflang', async ({ page }) => {
+    // A one-way hreflang is the classic way to publish a translation that
+    // search engines never associate with its original: the pair has to be
+    // declared from BOTH documents, and both have to name the same x-default.
+    for (const path of ['/tr', '/en']) {
+      await page.goto(path)
+      for (const [lang, href] of [
+        ['tr', '/tr'],
+        ['en', '/en'],
+        ['x-default', '/tr'],
+      ]) {
+        await expect(
+          page.locator(`link[rel="alternate"][hreflang="${lang}"]`),
+          `${path} is missing hreflang=${lang}`,
+        ).toHaveAttribute('href', new RegExp(`${href}$`))
+      }
+    }
   })
 })
 

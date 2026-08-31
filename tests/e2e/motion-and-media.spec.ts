@@ -18,7 +18,7 @@ test.describe('reduced motion', () => {
 
     // Nothing may be left transparent or displaced by a suppressed animation.
     await expect(page.locator('h1')).toBeVisible()
-    await expect(page.locator('#kurumsal h2')).toBeVisible()
+    await expect(page.locator('#hakkimizda h2')).toBeVisible()
     await expect(page.locator('#ticaret h2')).toBeVisible()
     await expect(page.locator('#teklif h2')).toBeVisible()
 
@@ -29,7 +29,7 @@ test.describe('reduced motion', () => {
       .poll(
         () =>
           page.evaluate(() => {
-            const targets = ['h1', '#kurumsal h2', '#urunler h2', '#teklif h2']
+            const targets = ['h1', '#hakkimizda h2', '#urunlerimiz h2', '#teklif h2']
             return targets.filter((selector) => {
               const el = document.querySelector(selector)
               if (!el) return true

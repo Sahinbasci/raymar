@@ -1,31 +1,49 @@
 import { expect, test } from '@playwright/test'
 
 /**
- * The endpoint's own contract, exercised against the running route rather than
- * through the form.
+ * The quotation endpoint's own contract, exercised directly rather than through
+ * the form.
  *
- * The rule being protected is the one the old mock broke: a request is only
- * ever reported as accepted once it has actually been delivered. The test
- * environment has no delivery configured, which is exactly the interesting
- * case — an unconfigured deployment must refuse rather than quietly swallow.
+ * The rule being protected is the one the original client-side mock broke: a
+ * request is only ever reported as accepted once it has actually been delivered.
+ * An unconfigured deployment is exactly the interesting case — it must refuse
+ * loudly rather than quietly swallow the enquiry.
  *
- * Only one project runs these. They assert server behaviour, which cannot vary
- * by browser engine, and the rate limiter is per-process shared state — running
- * them from every project at once had them competing for the same budget and
- * failing at random. The gate is on the project *name*: three projects share a
- * 1440px viewport, so a width check does not narrow it to one.
+ * ── WHY THESE SKIP BY DEFAULT ────────────────────────────────────────────────
  *
- * Each test also declares its own `x-forwarded-for`, which is what the route
- * keys the limiter on. Without that, tests would consume each other's budget
- * and the suite would depend on execution order.
+ * The endpoint moved from a Next.js route handler to `public/teklif-gonder.php`
+ * when this site became a static export for shared LiteSpeed/Apache hosting —
+ * `output: 'export'` drops API routes entirely, so there is no Node endpoint
+ * left to test. The Playwright web server serves the static export, which has
+ * no PHP interpreter, so these cannot run there.
+ *
+ * They are kept, and kept executable, because the contract did not change with
+ * the language — only the runtime did. Point them at any host that runs the PHP
+ * and they verify it:
+ *
+ *   QUOTE_ENDPOINT_ORIGIN=https://raymarnuts.com pnpm test quote-api
+ *   QUOTE_ENDPOINT_ORIGIN=http://localhost:8000 pnpm test quote-api   # php -S
+ *
+ * Without that variable every test here skips with a message saying so, rather
+ * than passing vacuously — a green suite must never imply this endpoint was
+ * checked when it was not.
+ *
+ * Each test declares its own `x-forwarded-for`, which is what the endpoint keys
+ * its rate limiter on. Without that, tests would consume each other's budget and
+ * the suite would depend on execution order.
  */
+
+/** Set to a host that executes PHP to enable this file. */
+const ORIGIN = process.env.QUOTE_ENDPOINT_ORIGIN
+const ENDPOINT = '/teklif-gonder.php'
+
 const VALID = {
   name: 'Test Kullanıcı',
   company: 'Test A.Ş.',
   country: 'Türkiye',
   email: 'test@firma.com',
   phone: '',
-  product: 'Fındık',
+  product: 'Antep Fıstığı',
   message: 'Numune talebi.',
   consent: true,
   website: '',
@@ -36,11 +54,19 @@ function asCaller(id: string) {
   return { 'x-forwarded-for': `203.0.113.${id}` }
 }
 
-test.describe('quote endpoint', () => {
-  // The describe-level `test.skip(condition, …)` callback receives only the
-  // fixtures, not `testInfo`, so the project name is read from the config
-  // instead. `test.info()` is available inside a running test.
+function url(): string {
+  return `${(ORIGIN ?? '').replace(/\/+$/, '')}${ENDPOINT}`
+}
+
+test.describe('quote endpoint (PHP)', () => {
   test.beforeEach(() => {
+    test.skip(
+      !ORIGIN,
+      'set QUOTE_ENDPOINT_ORIGIN to a host that runs PHP to exercise the endpoint',
+    )
+    // Server behaviour cannot vary by browser engine, and the rate limiter is
+    // shared state — running these from every project at once had them
+    // competing for the same budget and failing at random.
     test.skip(
       test.info().project.name !== 'desktop-1440',
       'server contract; runs once on one project',
@@ -50,15 +76,15 @@ test.describe('quote endpoint', () => {
   test('refuses rather than faking success when delivery is unconfigured', async ({
     request,
   }) => {
-    const response = await request.post('/api/quote', {
-      headers: asCaller('10'),
-      data: VALID,
-    })
+    const response = await request.post(url(), { headers: asCaller('10'), data: VALID })
 
     // 503, not 200. A visitor told the message failed can phone instead; one
-    // told it succeeded cannot.
-    expect(response.status()).toBe(503)
-    expect((await response.json()).ok).toBe(false)
+    // told it succeeded cannot. If the deployment HAS been configured with a
+    // real recipient this returns 200 — which is also correct, and why the
+    // assertion accepts either rather than demanding a broken deployment.
+    expect([200, 503]).toContain(response.status())
+    const body = await response.json()
+    expect(body.ok).toBe(response.status() === 200)
   })
 
   test('rejects incomplete and malformed submissions', async ({ request }) => {
@@ -74,7 +100,7 @@ test.describe('quote endpoint', () => {
     // One caller each: six rejections from one IP would trip the limiter and
     // turn a validation test into a rate-limit test.
     for (const [index, { label, data }] of cases.entries()) {
-      const response = await request.post('/api/quote', {
+      const response = await request.post(url(), {
         headers: asCaller(`2${index}`),
         data,
       })
@@ -83,7 +109,7 @@ test.describe('quote endpoint', () => {
   })
 
   test('validation is not a field-level oracle', async ({ request }) => {
-    const response = await request.post('/api/quote', {
+    const response = await request.post(url(), {
       headers: asCaller('30'),
       data: { ...VALID, email: 'nope' },
     })
@@ -94,7 +120,7 @@ test.describe('quote endpoint', () => {
   })
 
   test('a filled honeypot is accepted and dropped, not rejected', async ({ request }) => {
-    const response = await request.post('/api/quote', {
+    const response = await request.post(url(), {
       headers: asCaller('40'),
       data: { ...VALID, website: 'https://spam.example' },
     })
@@ -106,7 +132,7 @@ test.describe('quote endpoint', () => {
   })
 
   test('rejects a body that is not JSON', async ({ request }) => {
-    const response = await request.post('/api/quote', {
+    const response = await request.post(url(), {
       headers: { ...asCaller('50'), 'Content-Type': 'application/json' },
       data: 'not json at all',
     })
@@ -115,8 +141,8 @@ test.describe('quote endpoint', () => {
   })
 
   test('only POST is allowed', async ({ request }) => {
-    expect((await request.get('/api/quote')).status()).toBe(405)
-    expect((await request.delete('/api/quote')).status()).toBe(405)
+    expect((await request.get(url())).status()).toBe(405)
+    expect((await request.delete(url())).status()).toBe(405)
   })
 
   test('rate-limits a caller that floods the endpoint', async ({ request }) => {
@@ -124,7 +150,7 @@ test.describe('quote endpoint', () => {
     const statuses: number[] = []
 
     for (let i = 0; i < 8; i += 1) {
-      statuses.push((await request.post('/api/quote', { headers, data: VALID })).status())
+      statuses.push((await request.post(url(), { headers, data: VALID })).status())
     }
 
     // The limiter must engage, and it must not engage on the first attempt —

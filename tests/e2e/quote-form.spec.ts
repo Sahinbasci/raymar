@@ -41,9 +41,9 @@ test.describe('quotation form', () => {
 
     await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
     await page.getByLabel('Firma *').fill('Test A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('not-an-email')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('Numune talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
 
@@ -53,14 +53,35 @@ test.describe('quotation form', () => {
     await expect(page.getByLabel('E-posta *')).toHaveAttribute('aria-invalid', 'true')
   })
 
+  test('country selection sets the phone field dial-code prefix', async ({ page }) => {
+    await gotoForm(page)
+
+    // The chip is a decorative `aria-hidden` sibling of the phone `<input>`,
+    // not part of its value — Raymar is a global company, so no dial code may
+    // be assumed before a country is actually chosen.
+    const dialCodeChip = page
+      .locator('#teklif')
+      .locator('span[aria-hidden="true"]')
+      .filter({ hasText: /^\+\d+$/ })
+    await expect(dialCodeChip).toHaveCount(0)
+
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
+    await expect(dialCodeChip).toHaveText('+90')
+
+    // Changing the country swaps the code rather than stacking a second chip.
+    await page.getByLabel('Ülke *').selectOption({ label: 'Almanya' })
+    await expect(dialCodeChip).toHaveCount(1)
+    await expect(dialCodeChip).toHaveText('+49')
+  })
+
   test('requires the KVKK consent box and says so specifically', async ({ page }) => {
     await gotoForm(page)
 
     await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
     await page.getByLabel('Firma *').fill('Test A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('test@firma.com')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('Numune talebi.')
 
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
@@ -73,7 +94,7 @@ test.describe('quotation form', () => {
     // not depend on delivery credentials being present in the environment.
     // What the real endpoint does with the request is asserted separately, in
     // tests/e2e/quote-api.spec.ts, against the running route.
-    await page.route('**/api/quote', (route) =>
+    await page.route('**/teklif-gonder.php', (route) =>
       route.fulfill({ status: 200, json: { ok: true } }),
     )
 
@@ -81,8 +102,9 @@ test.describe('quotation form', () => {
 
     await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
     await page.getByLabel('Firma *').fill('Test A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('test@firma.com')
+    await page.getByLabel('Telefon').fill('532 111 22 33')
     await page.getByLabel('İlgilenilen Ürün *').selectOption('Ceviz İçi')
     await page.getByLabel('Talep Mesajı *').fill('20 ton ceviz içi talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
@@ -98,6 +120,11 @@ test.describe('quotation form', () => {
     await expect(
       page.locator('#teklif dd').filter({ hasText: /^Ceviz İçi$/ }),
     ).toBeVisible()
+    // The summary must show a callable number, not the bare local digits the
+    // visitor actually typed.
+    await expect(
+      page.locator('#teklif dd').filter({ hasText: /^\+90 532 111 22 33$/ }),
+    ).toBeVisible()
 
     await page.getByRole('button', { name: 'Yeni talep oluştur' }).click()
     await expect(page.getByLabel('Ad Soyad *')).toHaveValue('')
@@ -112,28 +139,28 @@ test.describe('quotation form', () => {
 
     await page
       .locator('#urunlerimiz article')
-      .filter({ hasText: 'Makademya' })
+      .filter({ hasText: 'Makadamya' })
       .getByRole('link', { name: 'Teklif Talep Et' })
       .click()
 
-    await expect(page.getByLabel('İlgilenilen Ürün *')).toHaveValue('Makademya')
-    await expect(page.getByLabel('Talep Mesajı *')).toContainText('Makademya')
+    await expect(page.getByLabel('İlgilenilen Ürün *')).toHaveValue('Makadamya')
+    await expect(page.getByLabel('Talep Mesajı *')).toContainText('Makadamya')
   })
 
   test('does not log submitted values to the console', async ({ page }) => {
     const logs: string[] = []
     page.on('console', (message) => logs.push(message.text()))
 
-    await page.route('**/api/quote', (route) =>
+    await page.route('**/teklif-gonder.php', (route) =>
       route.fulfill({ status: 200, json: { ok: true } }),
     )
 
     await gotoForm(page)
     await page.getByLabel('Ad Soyad *').fill('Gizli Kullanıcı')
     await page.getByLabel('Firma *').fill('Gizli A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('gizli@firma.com')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('Gizli mesaj.')
     await page.locator('#teklif').getByRole('checkbox').check()
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
@@ -157,16 +184,16 @@ test.describe('quotation form', () => {
   test('reports failure instead of a false success when delivery fails', async ({
     page,
   }) => {
-    await page.route('**/api/quote', (route) =>
+    await page.route('**/teklif-gonder.php', (route) =>
       route.fulfill({ status: 503, json: { ok: false } }),
     )
 
     await gotoForm(page)
     await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
     await page.getByLabel('Firma *').fill('Test A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('test@firma.com')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('Numune talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
 
@@ -183,14 +210,14 @@ test.describe('quotation form', () => {
   })
 
   test('survives a network failure without a false success', async ({ page }) => {
-    await page.route('**/api/quote', (route) => route.abort())
+    await page.route('**/teklif-gonder.php', (route) => route.abort())
 
     await gotoForm(page)
     await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
     await page.getByLabel('Firma *').fill('Test A.Ş.')
-    await page.getByLabel('Ülke *').fill('Türkiye')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
     await page.getByLabel('E-posta *').fill('test@firma.com')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('Numune talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
 
@@ -204,7 +231,7 @@ test.describe('quotation form', () => {
   test('sends the typed values to the endpoint', async ({ page }) => {
     let body: Record<string, unknown> | undefined
 
-    await page.route('**/api/quote', async (route) => {
+    await page.route('**/teklif-gonder.php', async (route) => {
       body = route.request().postDataJSON()
       await route.fulfill({ status: 200, json: { ok: true } })
     })
@@ -212,9 +239,10 @@ test.describe('quotation form', () => {
     await gotoForm(page)
     await page.getByLabel('Ad Soyad *').fill('Ayşe Yılmaz')
     await page.getByLabel('Firma *').fill('Örnek Gıda')
-    await page.getByLabel('Ülke *').fill('Almanya')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Almanya' })
     await page.getByLabel('E-posta *').fill('ayse@ornek.de')
-    await page.getByLabel('İlgilenilen Ürün *').selectOption('Fındık')
+    await page.getByLabel('Telefon').fill('151 234 56 78')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
     await page.getByLabel('Talep Mesajı *').fill('20 ton fındık talebi.')
     await page.locator('#teklif').getByRole('checkbox').check()
     await page.getByRole('button', { name: 'Talebi Gönder' }).click()
@@ -228,7 +256,10 @@ test.describe('quotation form', () => {
       company: 'Örnek Gıda',
       country: 'Almanya',
       email: 'ayse@ornek.de',
-      product: 'Fındık',
+      // The country's dial code travels with the number on the wire, not just
+      // as a visual chip — Raymar's staff must receive a callable number.
+      phone: '+49 151 234 56 78',
+      product: 'Antep Fıstığı',
       message: '20 ton fındık talebi.',
       consent: true,
       // The honeypot must go over the wire empty, or the server drops the lead.
