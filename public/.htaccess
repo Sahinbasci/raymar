@@ -73,12 +73,40 @@ Options -Indexes
   # --- Locale root ----------------------------------------------------------
   # Replaces the `/` → `/tr` redirect in the deleted `src/proxy.ts`.
   #
-  # Deliberately 307, not 301/308. `/` sends everyone to Turkish today only
-  # because Turkish is the one published locale; the moment English ships this
-  # becomes an Accept-Language negotiation. A permanent redirect would already
-  # be cached in every returning visitor's browser, and an export buyer whose
-  # browser learned `/` → `/tr` months earlier would never reach `/en`.
-  RewriteRule ^$ /tr [R=307,L]
+  # English has shipped, so `/` is now negotiated rather than always Turkish:
+  # a browser whose first preference is not Turkish but which accepts English
+  # is sent to `/en`, everyone else to `/tr`. That is the behaviour this rule
+  # was always documented as taking on "the moment English ships".
+  #
+  # Deliberately 307, not 301/308, and that matters more now than before: a
+  # permanent redirect would be cached per URL, not per language, so the first
+  # visitor's language would decide where every later visitor on that machine —
+  # or behind that cache — landed. `Vary: Accept-Language` is set below for the
+  # same reason.
+  RewriteCond %{HTTP_ACCEPT_LANGUAGE} !^tr [NC]
+  RewriteCond %{HTTP_ACCEPT_LANGUAGE} en [NC]
+  RewriteRule ^$ /en [R=307,L,E=LOCALE_NEGOTIATED:1]
+
+  RewriteRule ^$ /tr [R=307,L,E=LOCALE_NEGOTIATED:1]
+
+  # --- The hosting provider's placeholder ------------------------------------
+  # Before this site went live the domain was parked on Natro, and the account
+  # shipped with Natro's own landing page as `index.html` in the document root.
+  # It was still there after launch: measured on 2026-09-15, `/index.html`
+  # answered 200 with the title "Sınırsız Web Hosting | Türkiye'nin Hosting
+  # Markası | Natro.com" — a hosting advertisement on this company's domain,
+  # and quite possibly what a crawler recorded for raymarnuts.com during the
+  # parked period.
+  #
+  # Re-checked 2026-09-23: it is STILL there — `GET /index.html` answers 200
+  # with that title. This rule is undeployed, and a zip-extract deploy cannot
+  # remove the file either, because `out/` contains no `index.html` to
+  # overwrite it with. **Delete it by hand in cPanel's File Manager**; this
+  # rule then keeps a re-uploaded template or a crawler holding the old URL
+  # pointed at the real homepage, with a permanent redirect that also carries
+  # across whatever the old URL had accumulated. Permanent, unlike the `/` rule
+  # above, because `/index.html` has exactly one correct destination.
+  RewriteRule ^index\.html?$ /tr [R=301,L]
 
   # --- Locale case ----------------------------------------------------------
   # Also from the deleted proxy. Its original reason — a Next prerender-cache
@@ -160,6 +188,10 @@ Options -Indexes
   # the negotiation block above actually rewrote.
   Header append Vary Accept env=NEGOTIATED
 
+  # Same reasoning for the locale redirect on `/`: without this a shared cache
+  # could hand a Turkish visitor the redirect it stored for an English one.
+  Header append Vary Accept-Language env=LOCALE_NEGOTIATED
+
   # PHP announces itself by default; the endpoint does not need to.
   Header unset X-Powered-By
 </IfModule>
@@ -208,7 +240,11 @@ Options -Indexes
   <FilesMatch "\.(jpg|jpeg|png|webp|avif|svg|mp4)$">
     Header set Cache-Control "public, max-age=31536000"
   </FilesMatch>
-  <FilesMatch "\.html$">
+  # The router's `.txt` payloads name the build's hashed chunks, so a stale
+  # one after a deploy would send an open tab to files that no longer exist.
+  # Without a Cache-Control header they were left to heuristic caching. The
+  # sitemap, robots.txt and llms.txt are read by crawlers and should be fresh.
+  <FilesMatch "\.(html|txt|xml|webmanifest)$">
     Header set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
 </IfModule>
@@ -234,5 +270,18 @@ ErrorDocument 404 /404.html
 # navigation back to full page loads. They are build output the site depends on
 # at runtime, not metadata to be hidden.
 <FilesMatch "^manifest\.json$">
+  Require all denied
+</FilesMatch>
+
+# -----------------------------------------------------------------------------
+# Never serve an enquiry backup
+# -----------------------------------------------------------------------------
+# `teklif-gonder.php` stashes an undeliverable enquiry as JSON lines one level
+# above the document root, which is out of reach over HTTP. This is the belt to
+# that braces: on an addon-domain or subdomain layout the account's document
+# root is a level deeper than this file assumes, and the stash would land
+# inside `public_html` where an exact filename would fetch it. That file is the
+# personal data the KVKK notice says only authorised staff see.
+<FilesMatch "\.(jsonl|log)$">
   Require all denied
 </FilesMatch>

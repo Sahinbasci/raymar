@@ -42,11 +42,26 @@ const AI_AGENTS = [
   'cohere-ai',
 ]
 
+/**
+ * The App Router's own payloads, and the two `.txt` files that are content.
+ *
+ * Next writes a `.txt` next to every page — `/tr.txt`, `/tr/urunler.txt`,
+ * `/tr/__next._tree.txt` — for client-side navigation. They are byte-for-byte
+ * the same content as the HTML, so a crawler that indexes them sees a second
+ * copy of all 56 pages. Blocking them costs nothing: the browser fetches them
+ * regardless, since robots.txt binds crawlers, not pages.
+ *
+ * `llms.txt` and the IndexNow key are the exceptions, and are allowed back by
+ * the longer, more specific rule.
+ */
+const CONTENT_TXT = ['/llms.txt', '/62e9be2df8f1e009ba0be63c77a0cb03.txt']
+
 export default function robots(): MetadataRoute.Robots {
+  const rule = { allow: ['/', ...CONTENT_TXT], disallow: ['/*.txt$'] }
   return {
     rules: [
-      { userAgent: '*', allow: '/' },
-      ...AI_AGENTS.map((userAgent) => ({ userAgent, allow: '/' })),
+      { userAgent: '*', ...rule },
+      ...AI_AGENTS.map((userAgent) => ({ userAgent, ...rule })),
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,

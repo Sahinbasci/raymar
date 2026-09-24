@@ -1,10 +1,11 @@
 import { SiteFooter } from '@/components/layout/footer'
 import { SiteHeader } from '@/components/layout/header'
 import { JsonLd } from '@/components/seo/json-ld'
+import { Breadcrumbs } from '@/components/library/breadcrumbs'
 import { SectionEyebrow } from '@/components/ui/eyebrow'
 import { getDictionary } from '@/content'
 import type { Locale } from '@/lib/i18n'
-import type { LegalSlugKey } from '@/lib/legal'
+import { legalPath, type LegalSlugKey } from '@/lib/legal'
 import { breadcrumbGraph } from '@/lib/schema'
 import type { LegalPageContent } from '@/types/content'
 
@@ -65,7 +66,23 @@ export function LegalPage({
 
       <main className="relative overflow-x-hidden bg-raymar-ivory pt-30 pb-24 md:pt-38 md:pb-32">
         <article className="shell">
-          <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
+          {/*
+            The trail the `BreadcrumbList` markup above describes. Without it
+            these three pages published a breadcrumb a visitor could not see —
+            markup for something the page does not show, which is the one thing
+            the rest of this site refuses to do.
+          */}
+          <Breadcrumbs
+            label={dictionary.library.breadcrumbAriaLabel}
+            items={[
+              { name: dictionary.library.homeLabel, path: `/${locale}` },
+              { name: content.heading, path: legalPath(locale, slugKey) },
+            ]}
+          />
+
+          <div className="mt-8">
+            <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
+          </div>
 
           <h1 className="mt-5 max-w-[18ch] text-[clamp(32px,4.2vw,56px)] leading-[1.06] tracking-[-0.012em] text-raymar-green">
             {content.heading}

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import Link from 'next/link'
-import { BrandLogo } from '@/components/media/brand-logo'
+import { NotFoundContent } from '@/components/sections/not-found-content'
 import { getDictionary } from '@/content'
 import { cormorant, cormorantItalic, jost } from '@/lib/fonts'
 import { defaultLocale, localeTags } from '@/lib/i18n'
@@ -19,11 +18,14 @@ import './globals.css'
  * Next skips normal rendering for this file, so it must return the whole
  * document and pull in its own styles and fonts.
  *
- * Copy is read from the default locale's dictionary: the URL matched no route,
- * so there is no locale to resolve from it.
+ * The document is rendered in the default locale, because the URL matched no
+ * route and there is no locale to resolve from it. It usually still says which
+ * language the visitor was reading, though, so `NotFoundContent` swaps itself
+ * into English after hydration when the path starts with `/en`.
  */
 
 const dictionary = getDictionary(defaultLocale)
+const english = getDictionary('en')
 
 export const metadata: Metadata = {
   title: dictionary.notFound.metaTitle,
@@ -40,8 +42,6 @@ export const viewport: Viewport = {
 }
 
 export default function GlobalNotFound() {
-  const { notFound, header } = dictionary
-
   return (
     <html
       lang={localeTags[defaultLocale]}
@@ -49,21 +49,12 @@ export default function GlobalNotFound() {
     >
       <body>
         <main className="flex min-h-dvh flex-col items-start justify-center bg-raymar-green">
-          <div className="shell">
-            <BrandLogo variant="white-gold" height={52} alt={header.logoAlt} />
-            <p className="mt-12 text-xs font-normal tracking-[0.3em] text-raymar-gold uppercase">
-              {notFound.code}
-            </p>
-            <h1 className="mt-6 max-w-[720px] text-[clamp(34px,4.2vw,64px)] leading-[1.04] tracking-[-0.012em] text-raymar-white">
-              {notFound.heading}
-            </h1>
-            <Link
-              href={`/${defaultLocale}`}
-              className="mt-12 inline-flex items-center gap-3 bg-raymar-gold px-[42px] py-[21px] text-xs font-medium tracking-[0.2em] text-raymar-green-deep uppercase transition-colors duration-300 hover:bg-raymar-gold-hover"
-            >
-              {notFound.cta}
-            </Link>
-          </div>
+          <NotFoundContent
+            locale={defaultLocale}
+            languageTag={localeTags.en}
+            tr={{ ...dictionary.notFound, logoAlt: dictionary.header.logoAlt }}
+            en={{ ...english.notFound, logoAlt: english.header.logoAlt }}
+          />
         </main>
       </body>
     </html>

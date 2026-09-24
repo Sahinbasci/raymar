@@ -40,7 +40,7 @@
  */
 
 import { createHash } from 'node:crypto'
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { basename, extname, join } from 'node:path'
 import sharp from 'sharp'
@@ -174,9 +174,26 @@ async function main() {
     }
   }
 
+  /*
+   * Variants whose source is gone.
+   *
+   * Nothing used to delete these, so a photograph removed from `images/` kept
+   * shipping its 24 rungs for ever: five retired frames accounted for 5.5 MB
+   * of the export, downloaded to the server on every deploy and referenced by
+   * no page. The manifest is the list of sources that still exist, so anything
+   * in the output whose stem is missing from it is stale by definition.
+   */
+  const stale = (await readdir(OUT_DIR)).filter((name) => {
+    if (name === 'manifest.json') return false
+    const stem = basename(name, extname(name)).replace(/-\d+$/, '')
+    return !(stem in manifest)
+  })
+  for (const name of stale) await unlink(join(OUT_DIR, name))
+
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2))
   console.log(
-    `[optimize-images] ${entries.length} sources · ${written} variants written · ${skipped} reused`,
+    `[optimize-images] ${entries.length} sources · ${written} variants written · ${skipped} reused` +
+      (stale.length > 0 ? ` · ${stale.length} stale removed` : ''),
   )
 }
 
