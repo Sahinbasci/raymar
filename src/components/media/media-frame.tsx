@@ -34,8 +34,11 @@ export function MediaFrame({
       alt={alt}
       fill
       sizes={sizes}
-      priority={priority}
-      loading={priority ? undefined : 'lazy'}
+      // `priority` on `next/image` is deprecated in Next 16; its documented
+      // replacement for an above-the-fold image is eager loading at high
+      // fetch priority — the same pair the hero poster uses.
+      loading={priority ? 'eager' : 'lazy'}
+      {...(priority ? { fetchPriority: 'high' as const } : {})}
       className={cn(
         'object-cover',
         hoverZoom &&

@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { BrandLogo } from '@/components/media/brand-logo'
 import { MediaFrame } from '@/components/media/media-frame'
+import { topLevelProductPages } from '@/content/library'
 import { brandAssets, footerBand } from '@/data/products'
 import { localeLabels, type Locale } from '@/lib/i18n'
+import { productPath } from '@/lib/library'
 import type { FooterColumn, FooterContent } from '@/types/content'
 
 /**
@@ -103,7 +105,18 @@ export function SiteFooter({
             container edge and leave a hard diagonal corner at each side, which
             is what a single radial mask produced. */}
         <div className="absolute inset-0 [mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)] [mask-composite:intersect] [-webkit-mask-composite:source-in] [-webkit-mask-image:radial-gradient(78%_108%_at_50%_-6%,transparent_40%,#000_96%),linear-gradient(to_bottom,transparent_0%,#000_20%)]">
-          <MediaFrame image={footerBand} alt="" sizes="100vw" />
+          <MediaFrame
+            image={footerBand}
+            alt=""
+            /*
+             * Capped deliberately. The band is decorative, `aria-hidden`, and
+             * two thirds of it sits behind a gradient mask — yet at `100vw` a
+             * 2× desktop pulled the 2880 rung (205 KB AVIF) on every one of
+             * the 56 pages, making it the heaviest recurring asset on the
+             * site. Stopping at 1280 is invisible through the mask.
+             */
+            sizes="(max-width: 1280px) 100vw, 1280px"
+          />
           {/* The veil is shaped around the copyright row rather than laid evenly
               over the band: light everywhere so the crop shows through, with a
               narrow peak at 58-70% — exactly the strip that row occupies.
@@ -126,7 +139,20 @@ export function SiteFooter({
           </div>
 
           <LinkColumn column={content.corporate} locale={locale} />
-          <LinkColumn column={content.products} locale={locale} />
+          {/* Every product page, under its own name. These used to be six
+              links to the same `#urunlerimiz` anchor; now each one is the
+              page about that product, and because the footer is on every
+              page, every product page is one click from anywhere on the site. */}
+          <LinkColumn
+            column={{
+              heading: content.products.heading,
+              links: topLevelProductPages(locale).map((page) => ({
+                href: productPath(locale, page.id),
+                label: page.name,
+              })),
+            }}
+            locale={locale}
+          />
 
           <div>
             <div className="text-xs font-normal tracking-[0.24em] text-raymar-white/74 uppercase">

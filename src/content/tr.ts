@@ -1,5 +1,6 @@
 import { countries } from '@/data/countries'
 import { legalPath } from '@/lib/legal'
+import { libraryIndexPath } from '@/lib/library'
 import type { Dictionary } from '@/types/content'
 
 /**
@@ -256,13 +257,15 @@ export const tr: Dictionary = {
   hero: {
     cueLabel: 'Ürünleri Keşfet',
     posterAlt: '',
+    videoPause: 'Arka plan videosunu duraklat',
+    videoPlay: 'Arka plan videosunu oynat',
   },
 
   statement: {
     // Set in title case; `.eyebrow` uppercases it in CSS, and the document is
     // lang="tr-TR" so the i/İ mapping is the Turkish one.
     eyebrow: 'B2B Kuruyemiş Ticareti',
-    headingLines: ['Kuruyemiş Tedariğinde', '30 Yılı Aşkın Ticaret Deneyimi'],
+    headingLines: ['Kuruyemiş Tedarikinde', '30 Yılı Aşkın Ticaret Deneyimi'],
     body: 'Ceviz içi başta olmak üzere makadamya ve pikan ürünlerinde, kurumsal müşterilerimize güvenilir ve sürdürülebilir tedarik çözümleri sunuyoruz.',
     primaryCta: 'Ürünleri Keşfet',
     secondaryCta: 'Teklif Talep Et',
@@ -303,7 +306,7 @@ export const tr: Dictionary = {
     body: [
       '30 yılı aşkın süredir kuruyemiş ticaretinin içinde yer alan köklü bir geleneğin temsilcisi olarak faaliyet gösteriyoruz. Sektörün farklı kademelerinde yıllar içinde edindiğimiz bilgi, deneyim ve ticari birikimi bugün Raymar Nuts çatısı altında müşterilerimizle buluşturuyoruz.',
       "Türkiye'nin seçkin kuruyemiş ürünlerini uluslararası pazarlara ihraç ederken, dünyanın farklı bölgelerinden özenle tedarik ettiğimiz ürünleri de Raymar Nuts güvencesiyle Türkiye pazarına sunuyoruz.",
-      'Endüstriyel gıda üreticilerine yönelik hammadde tedariğimizin yanı sıra; paketlenerek doğrudan tüketiciye sunulmaya uygun çerezlik kuruyemiş çeşitlerinin de toptan satışını gerçekleştiriyoruz.',
+      'Endüstriyel gıda üreticilerine yönelik ham madde tedarikimizin yanı sıra; paketlenerek doğrudan tüketiciye sunulmaya uygun çerezlik kuruyemiş çeşitlerinin de toptan satışını gerçekleştiriyoruz.',
       'Kalite, güvenilirlik ve sorumluluk anlayışını işimizin temelinde tutuyor; müşterilerimizle uzun vadeli ve sürdürülebilir iş birlikleri kurmayı hedefliyoruz. Kuruyemiş sektöründe faaliyet gösteren değerli firmalarla iş ortağı olarak birlikte büyümekten memnuniyet duyuyoruz.',
     ],
     // Points at #ticaret, not a "Hakkımızda" section of its own — "Kurumsal
@@ -316,7 +319,7 @@ export const tr: Dictionary = {
     // Also the value the walnut cards send as the requested product group, so
     // it has to stay byte-identical to its entry in `quote.productOptions`.
     eyebrow: 'Ceviz İçi',
-    heading: 'Ceviz İçinde Dört Ayrı Kalite',
+    heading: 'Ceviz İçinde Dört Ayrı Boy',
     categoryLabel: 'Ceviz İçi',
     detailsCta: 'Detayları Gör',
     quoteCta: 'Teklif Talep Et',
@@ -334,7 +337,7 @@ export const tr: Dictionary = {
     products: {
       yarim: {
         name: 'Yarım Ceviz İçi',
-        imageAlt: 'Yarım ceviz içi — bütün yarım kernel, dökme',
+        imageAlt: 'Yarım ceviz içi — bütün yarımlar, dökme',
       },
       ceyrek: {
         name: 'Çeyrek Ceviz İçi',
@@ -342,11 +345,11 @@ export const tr: Dictionary = {
       },
       kirik: {
         name: 'Kırık Ceviz İçi',
-        imageAlt: 'Kırık ceviz içi — ihracat kolisinde dökme',
+        imageAlt: 'Kırık ceviz içi — naylon kaplı koli içinde',
       },
       pirinc: {
         name: 'Pirinç Ceviz İçi',
-        imageAlt: 'Pirinç ceviz içi — en ince boy, dökme',
+        imageAlt: 'Pirinç ceviz içi — en küçük boy, dökme',
       },
     },
   },
@@ -354,6 +357,7 @@ export const tr: Dictionary = {
   range: {
     eyebrow: 'Ürün Grupları',
     heading: 'Ürünlerimiz',
+    detailsCta: 'Detayları Gör',
     categoryLabel: 'Ürün Grubu',
     quoteCta: 'Teklif Talep Et',
     // Wording unchanged from the literal it replaces — see `RangeContent`.
@@ -486,7 +490,12 @@ export const tr: Dictionary = {
     errorConsent: 'Devam etmek için KVKK onayını işaretleyin.',
     errorFieldRequired: 'Bu alan zorunludur.',
     errorFieldEmail: 'Geçerli bir e-posta adresi girin.',
-    errorSubmit: 'Talebiniz şu anda iletilemedi. Lütfen tekrar deneyin.',
+    errorSubmit:
+      'Talebiniz şu anda iletilemedi. Lütfen tekrar deneyin ya da doğrudan bize ulaşın: +90 (541) 923 64 03 · info@raymarnuts.com',
+    errorTooMany:
+      'Bu bağlantıdan kısa sürede çok fazla talep gönderildi. Birkaç dakika bekleyip tekrar deneyebilir ya da bize doğrudan ulaşabilirsiniz: +90 (541) 923 64 03 · info@raymarnuts.com',
+    noscriptNotice:
+      'Tarayıcınızda JavaScript kapalı görünüyor. Form yine çalışır; gönderdiğinizde sonucu ayrı bir sayfada görürsünüz. Dilerseniz +90 (541) 923 64 03 numarasını arayabilir ya da info@raymarnuts.com adresine yazabilirsiniz.',
     submitting: 'Gönderiliyor…',
     successHeading: 'Talebiniz alındı.',
     successBody:
@@ -517,20 +526,13 @@ export const tr: Dictionary = {
         { href: '#ust', label: 'Ana Sayfa' },
         { href: '#hakkimizda', label: 'Hakkımızda' },
         { href: '#ticaret', label: 'Uluslararası Ticaret' },
+        { href: libraryIndexPath('tr', 'guides'), label: 'Kuruyemiş Rehberi' },
         { href: '#teklif', label: 'İletişim' },
       ],
     },
+    // Links are the product pages themselves — see `FooterContent.products`.
     products: {
       heading: 'Ürünler',
-      // Same order as the homepage: Ürünlerimiz's own priority, then Ceviz İçi.
-      links: [
-        { href: '#urunlerimiz', label: 'Makadamya' },
-        { href: '#urunlerimiz', label: 'Pikan Cevizi' },
-        { href: '#urunlerimiz', label: 'Kabak Çekirdeği İçi' },
-        { href: '#urunlerimiz', label: 'Ay Çekirdeği' },
-        { href: '#urunlerimiz', label: 'Antep Fıstığı' },
-        { href: '#ceviz', label: 'Ceviz İçi' },
-      ],
     },
     contactHeading: 'İletişim',
     addressLines: [
@@ -620,11 +622,11 @@ export const tr: Dictionary = {
         {
           heading: '2. İşlenen Kişisel Veriler ve Toplanma Yöntemi',
           paragraphs: [
-            'Teklif formunu doldurmanız halinde, formda yer alan ve tarafınızca girilen aşağıdaki veriler, elektronik ortamda ve doğrudan sizin tarafınızdan sağlanmak suretiyle işlenir:',
+            'Teklif formunu doldurmanız hâlinde, formda yer alan ve tarafınızca girilen aşağıdaki veriler, elektronik ortamda ve doğrudan sizin tarafınızdan sağlanmak suretiyle işlenir:',
           ],
           list: [
             'Kimlik bilgisi: ad ve soyad',
-            'İletişim bilgisi: e-posta adresi, telefon numarası (belirtmeniz halinde), ülke bilgisi',
+            'İletişim bilgisi: e-posta adresi, telefon numarası (belirtmeniz hâlinde), ülke bilgisi',
             'Mesleki / ticari bilgi: firma unvanı, ilgilendiğiniz ürün grubu',
             'Talep içeriği: formda yazdığınız talep mesajı',
           ],
@@ -649,19 +651,21 @@ export const tr: Dictionary = {
           heading: '5. Kişisel Verilerin Aktarılması ve Yurt Dışına Aktarım',
           paragraphs: [
             'Talep formuyla ilettiğiniz kişisel veriler, yalnızca talebinizin değerlendirilmesi ve yanıtlanması amacıyla Şirket bünyesinde bu konuda yetkili personel tarafından görülür. Bu veriler pazarlama amacıyla kullanılmaz, satılmaz ve aşağıda belirtilen hizmet sağlayıcı dışında hiçbir üçüncü kişi veya kurumla paylaşılmaz.',
-            'Formun Şirkete ulaşabilmesi için tek bir veri işleyenden hizmet alınmaktadır: e-posta iletim altyapısı, merkezi Fransa’da bulunan Brevo (Sendinblue SAS) tarafından sağlanmaktadır. Doldurduğunuz form, Şirketin kurumsal e-posta adresine iletilirken bu altyapı üzerinden geçer; dolayısıyla kişisel verileriniz KVKK m. 9 kapsamında yurt dışına aktarılmış olur. Aktarım, formu göndermeden önce işaretlediğiniz onay kutusuyla verdiğiniz açık rızaya dayanır. Fransa, Avrupa Birliği üyesi olarak Genel Veri Koruma Tüzüğü (GDPR) rejimine tabidir.',
+            'Formun Şirkete ulaşabilmesi için iki hizmet sağlayıcıdan yararlanılır: form gönderiminin teknik olarak işlendiği barındırma (hosting) sunucusu ve e-posta iletim altyapısı. E-posta iletimi, merkezi Fransa’da bulunan Brevo (Sendinblue SAS) tarafından sağlanmaktadır. Doldurduğunuz form, Şirketin kurumsal e-posta adresine iletilirken bu altyapı üzerinden geçer; dolayısıyla kişisel verileriniz KVKK m. 9 kapsamında yurt dışına aktarılmış olur. Aktarım, formu göndermeden önce işaretlediğiniz onay kutusuyla verdiğiniz açık rızaya dayanır. Fransa, Avrupa Birliği üyesi olarak Genel Veri Koruma Tüzüğü (GDPR) rejimine tabidir.',
             'Bunun dışında Şirket, talep süreçlerini yürütmek üzere ileride başka bir hizmet sağlayıcıdan (örneğin bir müşteri ilişkileri yönetimi sistemi) destek alırsa, bu durum işbu metne yansıtılacak ve söz konusu aktarım KVKK’nın öngördüğü şartlara uygun şekilde yürütülecektir.',
           ],
         },
         {
           heading: '6. Kişisel Verilerin Saklama Süresi',
           paragraphs: [
-            'Kişisel verileriniz, işlenme amacının gerektirdiği süre boyunca ve her hâlükârda ilgili mevzuatta öngörülen azami süreler — örneğin, ticari yazışmalara ilişkin olarak 6102 sayılı Türk Ticaret Kanunu m. 82 uyarınca öngörülen 10 yıllık saklama yükümlülüğü — ile sınırlı olarak saklanır. Bu sürelerin sonunda kişisel verileriniz silinir, yok edilir veya anonim hale getirilir.',
+            'Kişisel verileriniz, işlenme amacının gerektirdiği süre boyunca ve her hâlükârda ilgili mevzuatta öngörülen azami süreler — örneğin, ticari yazışmalara ilişkin olarak 6102 sayılı Türk Ticaret Kanunu m. 82 uyarınca öngörülen 10 yıllık saklama yükümlülüğü — ile sınırlı olarak saklanır. Bu sürelerin sonunda kişisel verileriniz silinir, yok edilir veya anonim hâle getirilir.',
           ],
         },
         {
           heading: '7. KVKK Madde 11 Kapsamındaki Haklarınız',
-          paragraphs: ['KVKK m. 11 uyarınca Şirkete başvurarak:'],
+          paragraphs: [
+            'KVKK m. 11 uyarınca Şirkete başvurarak aşağıdaki haklarınızı kullanabilirsiniz:',
+          ],
           list: [
             'Kişisel verilerinizin işlenip işlenmediğini öğrenme',
             'İşlenmişse buna ilişkin bilgi talep etme',
@@ -671,7 +675,7 @@ export const tr: Dictionary = {
             "KVKK m. 7'de öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme",
             'Düzeltme, silme ve yok etme taleplerinin, verilerin aktarıldığı üçüncü kişilere de bildirilmesini isteme',
             'İşlenen verilerin münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme',
-            'Kanuna aykırı işlenmesi sebebiyle zarara uğramanız halinde zararın giderilmesini talep etme',
+            'Kanuna aykırı işlenmesi sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme',
           ],
         },
         {
@@ -698,7 +702,7 @@ export const tr: Dictionary = {
         {
           heading: 'Bu Site Kişisel Verilerinizi Nasıl Toplar',
           paragraphs: [
-            'Site, ziyaretçilerinden kimlik doğrulama, üyelik veya benzeri bir işlem talep etmez. Kişisel verileriniz, yalnızca teklif formunu kendi isteğinizle doldurup gönderdiğinizde, formda yer alan alanlarla sınırlı olarak toplanır. Siteyi yalnızca gezinerek (form doldurmadan) ziyaret etmeniz halinde tarafınıza ait herhangi bir kişisel veri toplanmaz.',
+            'Site, ziyaretçilerinden kimlik doğrulama, üyelik veya benzeri bir işlem talep etmez. Kişisel verileriniz, yalnızca teklif formunu kendi isteğinizle doldurup gönderdiğinizde, formda yer alan alanlarla sınırlı olarak toplanır. Siteyi yalnızca gezinerek (form doldurmadan) ziyaret etmeniz hâlinde tarafınıza ait herhangi bir kişisel veri toplanmaz.',
           ],
         },
         {
@@ -787,12 +791,63 @@ export const tr: Dictionary = {
     },
   },
 
+  /*
+   * Chrome for the product pages and guides; the documents themselves live in
+   * `src/content/library/`. The index headings use the phrasing people search
+   * with — "toptan kuruyemiş" and "kuruyemiş rehberi" both lead Google's
+   * autocomplete for their topic.
+   */
+  library: {
+    breadcrumbAriaLabel: 'Sayfa konumu',
+    homeLabel: 'Ana Sayfa',
+    products: {
+      metaTitle: 'Toptan Kuruyemiş Ürünleri',
+      metaDescription:
+        'Toptan ceviz içi, Antep fıstığı, makadamya, pikan cevizi, kabak çekirdeği ve ay çekirdeği ürünleri: Raymar Nuts B2B kuruyemiş tedariki ve teklif talebi.',
+      eyebrow: 'Ürünler',
+      heading: 'Toptan Kuruyemiş Ürünleri',
+      intro:
+        'Raymar Nuts; ceviz içi, makadamya, pikan cevizi, Antep fıstığı, kabak çekirdeği içi, ay çekirdeği içi ve çerezlik ay çekirdeğini kurumsal alıcılara toptan olarak tedarik eder. Her ürün sayfasında ürünün ticarette nasıl sınıflandırıldığını, kullanım alanlarını ve depolama koşullarını bulabilirsiniz.',
+      label: 'Ürünler',
+    },
+    guides: {
+      metaTitle: 'Kuruyemiş Rehberi: Ceviz İçi ve Toptan Alım',
+      metaDescription:
+        'Ceviz içi çeşitleri ve renk sınıfları, saklama koşulları, pikan cevizi ile ceviz farkı, makadamya, toptan kuruyemiş alımı ve ihracat belgeleri üzerine rehberler.',
+      eyebrow: 'Rehber',
+      heading: 'Kuruyemiş Rehberi',
+      intro:
+        'Kuruyemiş ticaretinde sık sorulan soruları yanıtlayan rehberler: ceviz içi boyları ve renk sınıfları, saklama koşulları, ürün karşılaştırmaları, toptan alımda dikkat edilmesi gerekenler ve ihracat belgeleri.',
+      label: 'Rehber',
+    },
+    faqHeading: 'Sık Sorulan Sorular',
+    relatedGuidesHeading: 'İlgili Rehberler',
+    relatedProductsHeading: 'İlgili Ürünler',
+    productCardCta: 'Ürünü İncele',
+    guideCardCta: 'Rehberi Oku',
+    publishedLabel: 'Yayın tarihi',
+    updatedLabel: 'Son güncelleme',
+    readingTimeTemplate: '{minutes} dk. okuma',
+    sourcesHeading: 'Kaynaklar',
+    sourcesNote:
+      'Bu sayfadaki bilgiler aşağıdaki yayınlara dayanır. Mevzuata ilişkin bilgiler, sayfanın hazırlandığı tarihteki durumu yansıtır; işlem öncesinde güncel metin resmî kaynağından kontrol edilmelidir.',
+    sourceLanguages: { tr: 'Türkçe', en: 'İngilizce' },
+    quoteBand: {
+      eyebrow: 'Teklif Talebi',
+      heading: 'Toptan fiyat teklifi alın',
+      body: 'İhtiyaç duyduğunuz ürünü, boyu ve yaklaşık miktarı paylaşın; ekibimiz size uygun seçeneklerle dönüş yapsın.',
+      cta: 'Teklif Talep Et',
+    },
+  },
+
   meta: {
     siteName: 'Raymar Nuts',
-    title: 'Raymar Nuts | B2B Kuruyemiş Ticareti ve Tedariki',
+    // "toptan kuruyemiş" is the head term buyers type, and "toptan kuruyemiş
+    // istanbul" leads its autocomplete; the company is in Esenler, İstanbul.
+    title: 'Raymar Nuts | Toptan Kuruyemiş ve Ceviz İçi Tedariki',
     titleTemplate: '%s | Raymar Nuts',
     description:
-      'Raymar Nuts; ceviz içi, makadamya, pikan cevizi, Antep fıstığı, kabak çekirdeği içi ve ay çekirdeği içinde toptan B2B ticaret ve tedarik hizmeti sunan kuruluştur.',
+      'İstanbul merkezli Raymar Nuts; ceviz içi, Antep fıstığı, makadamya, pikan cevizi, kabak ve ay çekirdeği ürünlerini kurumsal alıcılara toptan tedarik eder.',
     skipToContent: 'İçeriğe geç',
   },
 }

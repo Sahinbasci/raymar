@@ -1,7 +1,16 @@
-import staticImageLoader from '../../image-loader'
+import { guidePages, productPages, topLevelProductPages } from '@/content/library'
+import type { LibraryKind } from '@/content/library/types'
 import { rangeProducts, walnutProducts } from '@/data/products'
 import { localeTags, type Locale } from '@/lib/i18n'
+import { imageVariant } from '@/lib/image-variant'
 import { legalPath, type LegalSlugKey } from '@/lib/legal'
+import {
+  entryPath,
+  libraryIndexPath,
+  productPath,
+  publishedTimestamp,
+  type LibraryEntry,
+} from '@/lib/library'
 import { ogImage, siteUrl } from '@/lib/site'
 import type { Dictionary } from '@/types/content'
 
@@ -28,9 +37,18 @@ interface OrganizationGraphOptions {
   readonly dictionary: Dictionary
 }
 
-/** Stable node ids so other graphs can reference these rather than repeat them. */
+/**
+ * Stable node ids so other graphs can reference these rather than repeat them.
+ *
+ * The organization is one entity whatever the page language, so its id is
+ * locale-independent and its body carries nothing that differs by locale. The
+ * website is not: `/tr` and `/en` have their own url, language and
+ * description, and publishing both under one id gave a consumer that merges by
+ * `@id` a single node asserting two urls and two languages. Hence one id per
+ * locale for the site, one for the company.
+ */
 export const ORGANIZATION_ID = `${siteUrl}/#organization`
-export const WEBSITE_ID = `${siteUrl}/#website`
+export const websiteId = (locale: Locale) => `${siteUrl}/${locale}#website`
 
 export function organizationGraph({ locale, dictionary }: OrganizationGraphOptions) {
   const { meta, quote, footer } = dictionary
@@ -59,7 +77,13 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
   ].filter(Boolean)
 
   const organization = {
-    '@type': 'Corporation',
+    /*
+     * `Organization`, not `Corporation`: the entity is a Turkish limited
+     * company (Ltd. Şti.), and schema.org's `Corporation` carries the
+     * narrower sense of a listed corporation. The broader type says only what
+     * is true.
+     */
+    '@type': 'Organization',
     '@id': ORGANIZATION_ID,
     name: meta.siteName,
     /*
@@ -70,10 +94,21 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
      */
     legalName: footer.addressLines[0],
     alternateName: 'Raymar',
-    url: `${siteUrl}/${locale}`,
+    url: siteUrl,
     logo: `${siteUrl}/brand/raymar-logo-green-gold.svg`,
     image: `${siteUrl}${ogImage.url}`,
-    description: meta.description,
+    /*
+     * The registry identifiers the legal pages already publish. `taxID` is a
+     * property Google documents for `Organization`, and it is the one piece of
+     * machine-readable evidence that ties this site to a registered company
+     * rather than to a brand name.
+     */
+    taxID: '6121008134',
+    identifier: {
+      '@type': 'PropertyValue',
+      name: 'MERSİS',
+      value: '0612100813400001',
+    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: footer.addressLines.slice(1, -1).join(', '),
@@ -82,16 +117,21 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
       postalCode: '34235',
       addressCountry: 'TR',
     },
-    /*
-     * The same query string the contact map uses, so the marked-up pin and the
-     * one a visitor clicks resolve to the identical place. Deliberately the
-     * postal address alone: leading with the company name made Google Maps
-     * match a different business at a different building, which is the bug
-     * `quote.mapQuery` exists to fix. No `geo` block accompanies it — latitude
-     * and longitude were never supplied, and inventing coordinates for a real
-     * address is exactly the kind of unevidenced assertion this graph avoids.
-     */
-    hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(quote.mapQuery)}`,
+    location: {
+      '@type': 'Place',
+      name: meta.siteName,
+      /*
+       * `hasMap` is defined on `Place`, not on `Organization`, which is where
+       * it used to sit. Same query string the contact map uses, so the
+       * marked-up pin and the one a visitor clicks resolve to the identical
+       * place — deliberately the postal address alone, because leading with
+       * the company name made Google Maps match a different business at a
+       * different building. No `geo` block: latitude and longitude were never
+       * supplied, and inventing coordinates for a real address is exactly the
+       * kind of unevidenced assertion this graph avoids.
+       */
+      hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(quote.mapQuery)}`,
+    },
     /*
      * `areaServed` and `knowsAbout` are the two properties an answer engine
      * leans on to decide what a company does and where it does it — the
@@ -111,7 +151,7 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
           contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'sales',
-            areaServed: 'Worldwide',
+            areaServed: { '@type': 'Place', name: 'Worldwide' },
             availableLanguage: ['tr', 'en'],
             ...Object.assign({}, ...contactPoint),
           },
@@ -127,7 +167,7 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
 
   const website = {
     '@type': 'WebSite',
-    '@id': WEBSITE_ID,
+    '@id': websiteId(locale),
     url: `${siteUrl}/${locale}`,
     name: meta.siteName,
     description: meta.description,
@@ -144,63 +184,40 @@ interface ProductCatalogGraphOptions {
 }
 
 /**
- * `ItemList` of every product the homepage names — the range and the seven
- * walnut grades — as `Product` entities, homepage-only (not emitted from
- * `organizationGraph`, which runs on every page including the legal ones,
- * where no product is mentioned).
+ * `ItemList` of the product cards on the homepage — the range and the four
+ * walnut sizes — each entry naming the page its card links to, in the order
+ * the cards appear. Homepage-only: `organizationGraph` runs on every
+ * page, including the legal ones, where no product is mentioned.
  *
- * No `offers`, no `aggregateRating`, no `sku` or `gtin`: the same restraint
- * `organizationGraph` documents above for the same reason — none of these
- * exist, and Google treats a fabricated one as a manual-action risk, not a
- * free rich-result. `Product` validates without `offers`; what this buys is
- * entity clarity for a crawler or an answer engine trying to work out what
- * Raymar actually trades in, not a rich-snippet checkbox.
+ * Entries are `ListItem`s naming a page, not `Product` entities. This list
+ * used to hold ten `Product` nodes (the range and each walnut grade), and
+ * Google's product snippets require one of `offers`, `review` or
+ * `aggregateRating` on every `Product` it finds. None of the three exists for
+ * a B2B range with no public prices, and fabricating one is a manual-action
+ * risk, so each node was an invalid item in Search Console waiting to be
+ * reported. Now that each product has its own page, the list points at those
+ * pages instead — which is also the more useful statement for a crawler: here
+ * is the range, and here is where each product is described.
+ *
+ * Images go through `imageVariant`, never `image.src`: the originals under
+ * `/images/` are not deployed, and marking them up pointed every node at a URL
+ * answering 404, measured against the live site.
  */
 export function productCatalogGraph({ locale, dictionary }: ProductCatalogGraphOptions) {
-  const items = [
-    ...rangeProducts.map((product) => ({
-      copy: dictionary.range.products[product.id],
-      image: product.image,
-    })),
-    ...walnutProducts.map((product) => ({
-      copy: dictionary.walnut.products[product.id],
-      image: product.image,
-    })),
-  ]
-
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    '@id': `${siteUrl}/${locale}#urun-gami`,
-    name: dictionary.meta.siteName,
-    itemListElement: items.map(({ copy, image }, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Product',
-        name: copy.name,
-        ...(copy.description ? { description: copy.description } : {}),
-        /*
-         * Run through the same loader the browser's `<img>` goes through, not
-         * `image.src` directly.
-         *
-         * `image.src` names the original under `/images/`, and the static
-         * export does not deploy that directory — no browser ever requests it,
-         * so it is excluded from the upload. Marking it up anyway pointed all
-         * ten Product nodes at URLs that answer 404, measured against the live
-         * site: an image property a crawler cannot fetch is not markup, it is
-         * a broken promise, and Google drops the node's image entirely.
-         *
-         * 1280 is the widest rung that is comfortably above the 1200px Google
-         * asks for in a rich result while staying a file the CDN already has
-         * warm, because it is a size real visitors are served.
-         */
-        ...(image
-          ? { image: `${siteUrl}${staticImageLoader({ src: image.src, width: 1280 })}` }
-          : {}),
-        brand: { '@id': ORGANIZATION_ID },
-      },
-    })),
+    '@id': `${siteUrl}/${locale}#urunlerimiz`,
+    name: dictionary.range.heading,
+    itemListElement: [...rangeProducts, ...walnutProducts]
+      .flatMap((card) => productPages(locale).filter((page) => page.id === card.page))
+      .map((page, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: page.name,
+        url: `${siteUrl}${productPath(locale, page.id)}`,
+        image: `${siteUrl}${imageVariant(page.image).url}`,
+      })),
   }
 }
 
@@ -225,20 +242,243 @@ export function breadcrumbGraph({
 }: BreadcrumbGraphOptions) {
   return {
     '@context': 'https://schema.org',
+    ...breadcrumbList([
+      // The same name the library trails give the homepage. It used to be the
+      // site name here and "Ana Sayfa" / "Home" there, so one node in one
+      // graph had two names.
+      { name: dictionary.library.homeLabel, path: `/${locale}` },
+      { name: pageName, path: legalPath(locale, slugKey) },
+    ]),
+  }
+}
+
+interface Crumb {
+  readonly name: string
+  readonly path: string
+}
+
+function breadcrumbList(crumbs: readonly Crumb[], id?: string) {
+  return {
     '@type': 'BreadcrumbList',
-    itemListElement: [
+    ...(id ? { '@id': id } : {}),
+    itemListElement: crumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: `${siteUrl}${crumb.path}`,
+    })),
+  }
+}
+
+/**
+ * The trail a library page sits on: home, the index, the parent product for a
+ * walnut size, the page. Shared by the visible breadcrumb and the markup, so
+ * the two can never name different pages.
+ */
+export function libraryCrumbs(
+  locale: Locale,
+  dictionary: Dictionary,
+  kind: LibraryKind,
+  entry?: LibraryEntry,
+): Crumb[] {
+  const crumbs: Crumb[] = [
+    { name: dictionary.library.homeLabel, path: `/${locale}` },
+    { name: dictionary.library[kind].label, path: libraryIndexPath(locale, kind) },
+  ]
+  if (entry?.kind === 'products' && entry.page.parent) {
+    const parent = productPages(locale).find((page) => page.id === entry.page.parent)
+    if (parent) crumbs.push({ name: parent.name, path: productPath(locale, parent.id) })
+  }
+  if (entry) {
+    crumbs.push({
+      // The page's own heading, so the trail, the card that linked here and
+      // the `<h1>` all say the same thing. The meta title is shorter and was
+      // used here for that reason, but a breadcrumb naming the current page
+      // something other than its visible heading reads as the wrong page.
+      name: entry.kind === 'products' ? entry.page.name : entry.page.heading,
+      path: entryPath(locale, entry),
+    })
+  }
+  return crumbs
+}
+
+/** The publisher, stated in full rather than only by `@id`. */
+function organizationReference(locale: Locale, dictionary: Dictionary) {
+  return {
+    '@type': 'Organization',
+    '@id': ORGANIZATION_ID,
+    name: dictionary.meta.siteName,
+    url: `${siteUrl}/${locale}`,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${siteUrl}/brand/raymar-logo-green-gold.svg`,
+    },
+  }
+}
+
+interface LibraryPageGraphOptions {
+  readonly locale: Locale
+  readonly dictionary: Dictionary
+  readonly entry: LibraryEntry
+}
+
+/**
+ * Graph for one product page or guide.
+ *
+ * Every page gets a `WebPage`, its `BreadcrumbList` and a `FAQPage` for the
+ * questions it answers on the page. Guides add an `Article`.
+ *
+ * Product pages deliberately carry no `Product` node. Google's product
+ * snippets require one of `offers`, `review` or `aggregateRating`, and none of
+ * the three exists for a B2B range with no public prices — a `Product` here
+ * would be reported as an invalid item on every product page. The page is
+ * about the product; the markup says so through its name and breadcrumb
+ * rather than through an entity Google would reject.
+ *
+ * FAQ rich results are no longer shown for commercial sites, which is not why
+ * the node is here: the questions and answers are the part of these pages an
+ * answer engine is most likely to lift, and marking them up states their
+ * boundaries exactly. Every question in the markup is visible on the page —
+ * `LibraryDocument` renders from the same array.
+ *
+ * Nodes point at each other by `@id`, and the organization is restated in
+ * full where it is referenced: the site-wide organization graph is a separate
+ * script block, and a consumer that does not merge blocks would otherwise see
+ * an author with no name.
+ */
+export function libraryPageGraph({ locale, dictionary, entry }: LibraryPageGraphOptions) {
+  const { page } = entry
+  const url = `${siteUrl}${entryPath(locale, entry)}`
+  const image = imageVariant(page.image)
+  const imageUrl = `${siteUrl}${image.url}`
+
+  /*
+   * The references listed under the page, as `citation`. The same objects
+   * render the visible list, so the markup cannot cite something the page
+   * does not show. Carried by the page's main entity: the article for a guide,
+   * the page itself for a product.
+   */
+  const citation =
+    page.sources.length > 0
+      ? {
+          citation: page.sources.map((source) => ({
+            '@type': 'CreativeWork',
+            name: source.title,
+            url: source.url,
+            inLanguage: source.lang,
+            publisher: { '@type': 'Organization', name: source.publisher },
+          })),
+        }
+      : {}
+
+  const webPage = {
+    '@type': 'WebPage',
+    '@id': `${url}#webpage`,
+    url,
+    name: page.metaTitle,
+    description: page.metaDescription,
+    inLanguage: localeTags[locale],
+    isPartOf: { '@id': websiteId(locale) },
+    breadcrumb: { '@id': `${url}#breadcrumb` },
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      url: imageUrl,
+      width: image.width,
+      height: image.height,
+    },
+    ...(entry.kind === 'products' ? citation : {}),
+  }
+
+  const faq =
+    page.faq.length > 0
+      ? {
+          '@type': 'FAQPage',
+          '@id': `${url}#faq`,
+          url,
+          inLanguage: localeTags[locale],
+          isPartOf: { '@id': `${url}#webpage` },
+          mainEntity: page.faq.map((entryItem) => ({
+            '@type': 'Question',
+            name: entryItem.question,
+            acceptedAnswer: { '@type': 'Answer', text: entryItem.answer },
+          })),
+        }
+      : null
+
+  const article =
+    entry.kind === 'guides'
+      ? {
+          '@type': 'Article',
+          '@id': `${url}#article`,
+          headline: entry.page.heading,
+          description: entry.page.metaDescription,
+          image: [imageUrl],
+          datePublished: publishedTimestamp(entry.page.published),
+          dateModified: publishedTimestamp(entry.page.updated),
+          inLanguage: localeTags[locale],
+          author: organizationReference(locale, dictionary),
+          publisher: organizationReference(locale, dictionary),
+          mainEntityOfPage: { '@id': `${url}#webpage` },
+          ...citation,
+        }
+      : null
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      webPage,
+      ...(article ? [article] : []),
+      ...(faq ? [faq] : []),
+      breadcrumbList(
+        libraryCrumbs(locale, dictionary, entry.kind, entry),
+        `${url}#breadcrumb`,
+      ),
+    ],
+  }
+}
+
+interface LibraryIndexGraphOptions {
+  readonly locale: Locale
+  readonly dictionary: Dictionary
+  readonly kind: LibraryKind
+}
+
+/** `CollectionPage` listing every page in the index, in display order. */
+export function libraryIndexGraph({
+  locale,
+  dictionary,
+  kind,
+}: LibraryIndexGraphOptions) {
+  const content = dictionary.library[kind]
+  const url = `${siteUrl}${libraryIndexPath(locale, kind)}`
+  const entries: LibraryEntry[] =
+    kind === 'products'
+      ? topLevelProductPages(locale).map((page) => ({ kind, page }))
+      : guidePages(locale).map((page) => ({ kind, page }))
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: dictionary.meta.siteName,
-        item: `${siteUrl}/${locale}`,
+        '@type': 'CollectionPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: content.metaTitle,
+        description: content.metaDescription,
+        inLanguage: localeTags[locale],
+        isPartOf: { '@id': websiteId(locale) },
+        breadcrumb: { '@id': `${url}#breadcrumb` },
+        mainEntity: {
+          '@type': 'ItemList',
+          itemListElement: entries.map((entry, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: entry.kind === 'products' ? entry.page.name : entry.page.heading,
+            url: `${siteUrl}${entryPath(locale, entry)}`,
+          })),
+        },
       },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: pageName,
-        item: `${siteUrl}${legalPath(locale, slugKey)}`,
-      },
+      breadcrumbList(libraryCrumbs(locale, dictionary, kind), `${url}#breadcrumb`),
     ],
   }
 }

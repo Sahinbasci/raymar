@@ -1,5 +1,6 @@
 import { countries } from '@/data/countries'
 import { legalPath } from '@/lib/legal'
+import { libraryIndexPath } from '@/lib/library'
 import type { Dictionary } from '@/types/content'
 
 /**
@@ -289,12 +290,14 @@ export const en: Dictionary = {
   hero: {
     cueLabel: 'Explore Products',
     posterAlt: '',
+    videoPause: 'Pause background video',
+    videoPlay: 'Play background video',
   },
 
   statement: {
     eyebrow: 'B2B Nut Trading',
     headingLines: ['Over 30 Years of Trading', 'Experience in Nut Supply'],
-    body: 'In walnut kernels above all, and in macadamia and pecan, we provide corporate customers with reliable and sustainable supply solutions.',
+    body: 'In walnut kernels above all, and in macadamia and pecan, we supply corporate customers on terms they can rely on season after season.',
     primaryCta: 'Explore Products',
     secondaryCta: 'Request a Quote',
   },
@@ -304,19 +307,19 @@ export const en: Dictionary = {
       mark: 'experience',
       label: 'Experience',
       value: 'Over 30 Years',
-      caption: 'We hold over 30 years of experience in international nut trading.',
+      caption: 'We have over thirty years’ experience in the international nut trade.',
     },
     {
       mark: 'network',
       label: 'Reach',
       value: 'Global Trade Network',
-      caption: 'We conduct sourcing and export on an international scale.',
+      caption: 'We source and export across origins.',
     },
     {
       mark: 'partnership',
       label: 'Model',
       value: 'B2B',
-      caption: 'We provide supply and trading services to corporate partners.',
+      caption: 'We supply and trade with corporate customers.',
     },
   ],
 
@@ -324,10 +327,10 @@ export const en: Dictionary = {
     eyebrow: 'About Us',
     headingLines: ['Over 30 Years of Experience', 'in Nut Trading'],
     body: [
-      'We operate as the representative of a long-established tradition that has been part of the nut trade for more than thirty years. The knowledge, experience and commercial depth gathered over the years at different levels of the sector is what we bring to our customers today under the Raymar Nuts name.',
-      "While we export Türkiye's finest nut products to international markets, we also bring products carefully sourced from around the world to the Turkish market with the assurance of Raymar Nuts.",
-      'Alongside our raw-material supply to industrial food manufacturers, we also carry out wholesale of snack-grade nut varieties suitable for packing and sale directly to the consumer.',
-      'We keep quality, reliability and responsibility at the core of our work, and we aim to build long-term, sustainable partnerships with our customers. We are glad to grow together, as partners, with the companies we work alongside in this sector.',
+      'Raymar Nuts continues a family involvement in the nut trade that goes back more than thirty years. The product knowledge and commercial judgement built up across that time — at origin, in processing and in export — are what we bring to our customers today under the Raymar Nuts name.',
+      'We export select Turkish nut products to international markets, and bring product sourced from other origins into the Turkish market — checked against the same specifications either way.',
+      'Alongside our raw-material supply to industrial food manufacturers, we also wholesale snack-grade nuts for packers selling directly to consumers.',
+      'We keep quality, reliability and responsibility at the core of our work, and we aim to build long-term working relationships with our customers. We would rather grow with the companies we work alongside than trade at arm’s length.',
     ],
     link: 'Our Approach to Trade',
     imageAlt: 'Macro photograph of walnut kernels — illustrative image',
@@ -338,7 +341,7 @@ export const en: Dictionary = {
     // the walnut cards send this string as the requested product group and the
     // form matches it by string equality.
     eyebrow: 'Walnut Kernels',
-    heading: 'Four Distinct Grades of Walnut Kernel',
+    heading: 'Four Walnut Kernel Sizes',
     categoryLabel: 'Walnut Kernels',
     detailsCta: 'View Details',
     quoteCta: 'Request a Quote',
@@ -354,19 +357,19 @@ export const en: Dictionary = {
     products: {
       yarim: {
         name: 'Walnut Halves',
-        imageAlt: 'Walnut halves — whole half kernels, loose',
+        imageAlt: 'Walnut halves — intact half kernels, loose',
       },
       ceyrek: {
         name: 'Walnut Quarters',
         imageAlt: 'Walnut quarters — large pieces, loose',
       },
       kirik: {
-        name: 'Broken Walnut Kernels',
-        imageAlt: 'Broken walnut kernels — loose in an export carton',
+        name: 'Walnut Pieces',
+        imageAlt: 'Walnut pieces in a lined carton',
       },
       pirinc: {
         name: 'Walnut Small Pieces',
-        imageAlt: 'Walnut small pieces — the finest grade, loose',
+        imageAlt: 'Walnut small pieces — the smallest size, loose',
       },
     },
   },
@@ -374,14 +377,18 @@ export const en: Dictionary = {
   range: {
     eyebrow: 'Product Groups',
     heading: 'Our Products',
+    detailsCta: 'View Details',
     categoryLabel: 'Product Group',
     quoteCta: 'Request a Quote',
     quoteCtaAriaTemplate: 'Request a quote for {product}',
     imagePending: 'Product photograph in preparation',
     products: {
-      makademya: { name: 'Macadamia', imageAlt: 'Macadamia' },
+      makademya: {
+        name: 'Macadamia Nuts',
+        imageAlt: 'Macadamia nuts in shell and shelled',
+      },
       pikan: {
-        name: 'Pecan',
+        name: 'Pecans',
         imageAlt: 'Pecans — in-shell and kernel, close up',
       },
       'kabak-cekirdegi': {
@@ -397,7 +404,7 @@ export const en: Dictionary = {
         imageAlt: 'In-shell sunflower seeds',
       },
       'antep-fistigi': {
-        name: 'Antep Pistachios',
+        name: 'Pistachios',
         imageAlt: 'Antep pistachios',
       },
     },
@@ -414,7 +421,7 @@ export const en: Dictionary = {
       'Deep Product Knowledge',
       'International Trade Experience',
       'Reliable Business Partnerships',
-      'A Sustainable Approach to Trade',
+      'Trade Built to Last',
     ],
     closingLead:
       'Share your product and supply requirements with us, and our team will come back to you with suitable options.',
@@ -456,12 +463,12 @@ export const en: Dictionary = {
     // matches the requested group against this list by string equality, and a
     // miss drops the visitor silently into "Other".
     productOptions: [
-      'Macadamia',
-      'Pecan',
+      'Macadamia Nuts',
+      'Pecans',
       'Pumpkin Seed Kernels',
       'Sunflower Seed Kernels',
       'In-Shell Sunflower Seeds',
-      'Antep Pistachios',
+      'Pistachios',
       'Walnut Kernels',
     ],
     otherProductOption: 'Other',
@@ -488,7 +495,12 @@ export const en: Dictionary = {
     errorConsent: 'Please tick the KVKK consent box to continue.',
     errorFieldRequired: 'This field is required.',
     errorFieldEmail: 'Enter a valid e-mail address.',
-    errorSubmit: 'Your request could not be sent right now. Please try again.',
+    errorSubmit:
+      'Your request could not be sent right now. Please try again, or reach us directly: +90 (541) 923 64 03 · info@raymarnuts.com',
+    errorTooMany:
+      'Too many requests have been sent from this connection in a short time. Wait a few minutes and try again, or reach us directly: +90 (541) 923 64 03 · info@raymarnuts.com',
+    noscriptNotice:
+      'JavaScript appears to be turned off in your browser. The form still works — you will see the result on a separate page after you send it. You can also call +90 (541) 923 64 03 or write to info@raymarnuts.com.',
     submitting: 'Sending…',
     successHeading: 'Your request has been received.',
     successBody: 'The Raymar team will contact you using the details you provided.',
@@ -518,19 +530,13 @@ export const en: Dictionary = {
         { href: '#ust', label: 'Home' },
         { href: '#hakkimizda', label: 'About Us' },
         { href: '#ticaret', label: 'International Trade' },
+        { href: libraryIndexPath('en', 'guides'), label: 'Nut Trade Guides' },
         { href: '#teklif', label: 'Contact' },
       ],
     },
+    // Links are the product pages themselves — see `FooterContent.products`.
     products: {
       heading: 'Products',
-      links: [
-        { href: '#urunlerimiz', label: 'Macadamia' },
-        { href: '#urunlerimiz', label: 'Pecan' },
-        { href: '#urunlerimiz', label: 'Pumpkin Seed Kernels' },
-        { href: '#urunlerimiz', label: 'Sunflower Seeds' },
-        { href: '#urunlerimiz', label: 'Antep Pistachios' },
-        { href: '#ceviz', label: 'Walnut Kernels' },
-      ],
     },
     contactHeading: 'Contact',
     addressLines: [
@@ -585,7 +591,7 @@ export const en: Dictionary = {
           ],
           list: [
             'Registered name: Marex Dış Tic. Ltd. Şti.',
-            'Mersis No: 0612100813400001',
+            'MERSIS (central trade registry) number: 0612100813400001',
             'Tax office / number: Atışalanı Tax Office, 612 100 8134',
             'Address: Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul, Türkiye',
           ],
@@ -622,7 +628,7 @@ export const en: Dictionary = {
           heading: '5. Transfer of Personal Data and Transfer Abroad',
           paragraphs: [
             'The personal data you send through the request form is seen only by the personnel authorised for this purpose within the Company, solely for the purpose of assessing and responding to your request. It is not used for marketing, not sold, and not shared with any third party or institution other than the service provider named below.',
-            'One data processor is used, so that the form can reach the Company at all: the e-mail delivery infrastructure is provided by Brevo (Sendinblue SAS), based in France. The form you complete passes through that infrastructure on its way to the Company’s corporate e-mail address, which means your personal data is transferred abroad within the meaning of Article 9 of KVKK. That transfer rests on the explicit consent you give by ticking the consent box before submitting the form. France, as a member of the European Union, is subject to the General Data Protection Regulation (GDPR).',
+            'One data processor is used, so that the form can reach the Company at all: the e-mail delivery infrastructure is provided by Brevo (Sendinblue SAS), based in France. The form you complete passes through that infrastructure on its way to the Company’s corporate e-mail address, which means your personal data is transferred abroad within the meaning of Article 9 of KVKK. That transfer rests on the explicit consent you give by ticking the consent box before submitting the form. As context rather than as a legal basis: the provider is established in France and is itself subject to the EU General Data Protection Regulation (GDPR).',
             'Should the Company in future receive support from any other service provider — such as a customer relationship management (CRM) system — in order to operate its request processes, this will be reflected in this text and any such transfer will be carried out in accordance with the conditions required by KVKK.',
           ],
         },
@@ -637,13 +643,13 @@ export const en: Dictionary = {
           paragraphs: ['By applying to the Company under Article 11 of KVKK, you may:'],
           list: [
             'Learn whether your personal data is being processed',
-            'Request information if it has been processed',
-            'Learn the purpose of processing and whether it is used in accordance with that purpose',
+            'Request information about that processing, where your data has been processed',
+            'Learn the purpose of processing and whether your data is used in accordance with that purpose',
             'Know the third parties, in Türkiye or abroad, to whom it has been transferred',
             'Request its correction if it has been processed incompletely or incorrectly',
             'Request its erasure or destruction within the conditions set out in Article 7 of KVKK',
             'Request that correction, erasure and destruction be notified to the third parties to whom the data has been transferred',
-            'Object to a result to your detriment arising from analysis of the processed data exclusively by automated systems',
+            'Object to a decision that has an adverse effect on you and is based solely on automated analysis of your data',
             'Claim compensation if you suffer loss because the data has been processed unlawfully',
           ],
         },
@@ -651,7 +657,7 @@ export const en: Dictionary = {
           heading: '8. How to Apply',
           paragraphs: [
             'You may submit requests concerning the rights listed above, together with documents evidencing your identity, in writing to the Company at "Oruçreis Mah. Vadi Cad. No:108 K:8 D:491, İstanbul Ticaret Sarayı 34235 Giyimkent, Esenler / İstanbul, Türkiye"; by e-mail to info@raymarnuts.com from the electronic mail address you have previously notified to the Company and which is registered in our systems; or by contacting us through the quotation form on the Site. The option to apply via a KEP (registered electronic mail) address will be announced here once the Company publishes that address.',
-            'Your application will be concluded as soon as possible according to the nature of the request and in any event within the thirty (30) days provided for in KVKK.',
+            'We will answer your application as soon as possible, depending on the nature of the request and in any event within the thirty (30) days provided for in KVKK.',
           ],
         },
       ],
@@ -695,7 +701,7 @@ export const en: Dictionary = {
           ],
         },
         {
-          heading: 'Technical Records Arising from Hosting',
+          heading: 'Server Logs Kept by Our Hosting Provider',
           paragraphs: [
             "As with any website, the server hosting this Site may keep standard technical log records — IP address, browser and operating system information, date and time of access — for security and fault diagnosis. These records arise within the hosting provider's own security practices; they are not used by the Company for marketing or profiling.",
           ],
@@ -734,7 +740,7 @@ export const en: Dictionary = {
           ],
         },
         {
-          heading: 'Google Maps — Third-Party Cookie',
+          heading: 'Google Maps — Third-Party Cookies',
           paragraphs: [
             "The map showing our address in the Contact section is embedded from Google Maps and loads automatically when the page loads. Because that map is served from Google's own servers, Google may set its own cookies in your browser. These cookies are determined and managed by Google, not by the Site; for details you may consult Google's own privacy and cookie practices at policies.google.com/privacy.",
             'Apart from this single exception, there are no third-party cookies on the Site for analytics, advertising or targeting.',
@@ -749,7 +755,7 @@ export const en: Dictionary = {
         {
           heading: 'If Additional Cookies Are Used in Future',
           paragraphs: [
-            'If the Company decides in future to use additional cookies or similar technologies in order to measure site traffic or improve the user experience, this Policy will be updated and a cookie consent mechanism will be added to the Site to obtain your explicit consent for non-essential cookies, as required by Law No. 6698 and the related legislation.',
+            'If the Company decides in future to use additional cookies or similar technologies in order to measure site traffic or improve the user experience, this Policy will be updated and consent for non-essential cookies will be obtained before those cookies are set, as Law No. 6698 and the related legislation require.',
           ],
         },
         {
@@ -762,12 +768,60 @@ export const en: Dictionary = {
     },
   },
 
+  /*
+   * Chrome for the product pages and guides; the documents live in
+   * `src/content/library/`. The index headings carry the terms an importer
+   * searches with: "wholesale nuts", "nuts wholesale turkey".
+   */
+  library: {
+    breadcrumbAriaLabel: 'Breadcrumb',
+    homeLabel: 'Home',
+    products: {
+      metaTitle: 'Wholesale Nuts and Seeds: Turkish B2B Supplier',
+      metaDescription:
+        'Wholesale walnut kernels, Antep pistachios, macadamia nuts, pecans, pumpkin seed kernels and sunflower seeds from Raymar Nuts, a Turkish B2B supplier.',
+      eyebrow: 'Products',
+      heading: 'Wholesale Nuts and Seeds',
+      intro:
+        'Raymar Nuts supplies corporate buyers with wholesale walnut kernels, macadamia nuts, pecans, Antep pistachios, pumpkin seed kernels and sunflower seeds. Each product page explains how the product is traded, who uses it and how to store it.',
+      label: 'Products',
+    },
+    guides: {
+      metaTitle: 'Nut Trade Guides: Walnut Grades and Buying',
+      metaDescription:
+        'Guides to walnut kernel sizes and colour grades, storage, pecans versus walnuts, macadamia, buying nuts wholesale and the documents for nut exports.',
+      eyebrow: 'Guides',
+      heading: 'Nut Trade Guides',
+      intro:
+        'Guides to common questions in the nut trade: walnut kernel sizes and colour grades, storage, product comparisons, what to check when buying wholesale and the documents that travel with a shipment.',
+      label: 'Guides',
+    },
+    faqHeading: 'Frequently Asked Questions',
+    relatedGuidesHeading: 'Related Guides',
+    relatedProductsHeading: 'Related Products',
+    productCardCta: 'View Product',
+    guideCardCta: 'Read the Guide',
+    publishedLabel: 'Published',
+    updatedLabel: 'Last updated',
+    readingTimeTemplate: '{minutes} min read',
+    sourcesHeading: 'Sources',
+    sourcesNote:
+      'The information on this page is based on the publications below. Regulatory information reflects the position when the page was written; check the current text at its official source before acting on it.',
+    sourceLanguages: { tr: 'Turkish', en: 'English' },
+    quoteBand: {
+      eyebrow: 'Quotation',
+      heading: 'Request a Wholesale Quotation',
+      body: 'Tell us the product, size and approximate volume you need, and our team will come back to you with suitable options.',
+      cta: 'Request a Quote',
+    },
+  },
+
   meta: {
     siteName: 'Raymar Nuts',
-    title: 'Raymar Nuts | B2B Nut Trading and Supply',
+    title: 'Raymar Nuts | Wholesale Nuts and Walnut Kernel Supply',
     titleTemplate: '%s | Raymar Nuts',
     description:
-      'Raymar Nuts is a B2B trading and supply company for walnut kernels, macadamia, pecan, Antep pistachios, pumpkin seed kernels and sunflower seed kernels.',
+      'Istanbul-based Raymar Nuts supplies corporate buyers with wholesale walnut kernels, Antep pistachios, macadamia nuts, pecans, pumpkin seed kernels and sunflower seeds.',
     skipToContent: 'Skip to content',
   },
 }

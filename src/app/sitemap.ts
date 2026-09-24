@@ -1,6 +1,10 @@
 import type { MetadataRoute } from 'next'
+import { guidePages, productPages } from '@/content/library'
+import type { LibraryKind } from '@/content/library/types'
 import { completeLocales, defaultLocale, localeTags } from '@/lib/i18n'
+import { imageVariant } from '@/lib/image-variant'
 import { legalSlugs } from '@/lib/legal'
+import { libraryAlternates, publishedTimestamp } from '@/lib/library'
 import { siteUrl } from '@/lib/site'
 
 /**
@@ -8,11 +12,15 @@ import { siteUrl } from '@/lib/site'
  *
  * `lastModified` is stamped at build time rather than hardcoded: the site is
  * fully prerendered, so a build IS the moment its content last changed, and a
- * sitemap with no date gives a crawler no recrawl signal at all.
+ * sitemap with no date gives a crawler no recrawl signal at all. Guides are the
+ * exception — they carry their own revision date, which is the honest signal.
  *
  * The `x-default` alternate mirrors the one in the page metadata. Both have to
  * agree — a sitemap that advertises a different alternate set than the pages do
- * is a common reason Google ignores the hreflang cluster entirely.
+ * is a common reason Google ignores the hreflang cluster entirely. The library
+ * pages take theirs from `libraryAlternates`, the very function their metadata
+ * uses, because their slugs differ per locale and cannot be derived by swapping
+ * a prefix.
  */
 const lastModified = new Date()
 
@@ -28,6 +36,15 @@ function alternatesFor(suffix: string) {
   }
 }
 
+/** `libraryAlternates` returns paths for metadata; a sitemap needs absolute URLs. */
+function absoluteAlternates({ languages }: ReturnType<typeof libraryAlternates>) {
+  return {
+    languages: Object.fromEntries(
+      Object.entries(languages).map(([tag, path]) => [tag, `${siteUrl}${path}`]),
+    ),
+  }
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const home = completeLocales.map((locale) => ({
     url: `${siteUrl}/${locale}`,
@@ -36,6 +53,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 1,
     alternates: alternatesFor(''),
   }))
+
+  const kinds: LibraryKind[] = ['products', 'guides']
+
+  const libraryIndexes = completeLocales.flatMap((locale) =>
+    kinds.map((kind) => {
+      const alternates = libraryAlternates(locale, kind)
+      return {
+        url: `${siteUrl}${alternates.canonical}`,
+        lastModified,
+        changeFrequency: 'monthly' as const,
+        priority: 0.8,
+        alternates: absoluteAlternates(alternates),
+      }
+    }),
+  )
+
+  /*
+   * Each page lists its photograph as well. It is the same published copy the
+   * page's markup and Open Graph tags name, so image search indexes the file
+   * that actually exists rather than discovering it second-hand.
+   */
+  const products = completeLocales.flatMap((locale) =>
+    productPages(locale).map((page) => {
+      const alternates = libraryAlternates(locale, 'products', page.id)
+      return {
+        url: `${siteUrl}${alternates.canonical}`,
+        lastModified,
+        changeFrequency: 'monthly' as const,
+        priority: 0.9,
+        alternates: absoluteAlternates(alternates),
+        images: [`${siteUrl}${imageVariant(page.image).url}`],
+      }
+    }),
+  )
+
+  const guides = completeLocales.flatMap((locale) =>
+    guidePages(locale).map((page) => {
+      const alternates = libraryAlternates(locale, 'guides', page.id)
+      return {
+        url: `${siteUrl}${alternates.canonical}`,
+        lastModified: new Date(publishedTimestamp(page.updated)),
+        changeFrequency: 'yearly' as const,
+        priority: 0.7,
+        alternates: absoluteAlternates(alternates),
+        images: [`${siteUrl}${imageVariant(page.image).url}`],
+      }
+    }),
+  )
 
   /*
    * The legal pages are listed so they can be indexed and found, but at a low
@@ -53,7 +118,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   )
 
-  return [...home, ...legal]
+  return [...home, ...libraryIndexes, ...products, ...guides, ...legal]
 }
 
 /*

@@ -1,13 +1,14 @@
-import {
-  QuoteDetailLink,
-  QuoteRequestButton,
-} from '@/components/forms/quote-request-button'
+import Link from 'next/link'
+import { QuoteRequestButton } from '@/components/forms/quote-request-button'
 import { MediaFrame } from '@/components/media/media-frame'
 import { PendingMedia } from '@/components/media/pending-media'
 import { Reveal } from '@/components/motion/reveal'
 import { CategoryLabel, SectionEyebrow } from '@/components/ui/eyebrow'
+import { ArrowShort } from '@/components/ui/icons'
 import { walnutGroupIds, walnutProducts } from '@/data/products'
 import { formatTemplate } from '@/lib/cn'
+import type { Locale } from '@/lib/i18n'
+import { productPath } from '@/lib/library'
 import type { WalnutContent } from '@/types/content'
 
 /**
@@ -19,7 +20,13 @@ import type { WalnutContent } from '@/types/content'
  * counts and well heights live in `.walnut-grid` (globals.css) because they are
  * keyed to `nth-child` position.
  */
-export function WalnutSection({ content }: { content: WalnutContent }) {
+export function WalnutSection({
+  content,
+  locale,
+}: {
+  content: WalnutContent
+  locale: Locale
+}) {
   const groups = walnutGroupIds
     .map((id) => ({
       id,
@@ -68,6 +75,7 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
             <div className="walnut-grid pb-8.5">
               {group.products.map((product) => {
                 const copy = content.products[product.id]
+                const href = productPath(locale, product.page)
                 return (
                   <Reveal key={product.id} delay={product.revealDelay}>
                     <article className="group relative flex h-full flex-col overflow-hidden border border-raymar-green/10 bg-raymar-white">
@@ -90,12 +98,27 @@ export function WalnutSection({ content }: { content: WalnutContent }) {
                       <div className="flex flex-col gap-3.5 px-6 pt-6.5 pb-6">
                         <CategoryLabel>{content.categoryLabel}</CategoryLabel>
                         <ProductHeading className="font-[family-name:var(--font-display)] text-[26px] leading-[1.12] font-normal text-raymar-green transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]">
-                          {copy.name}
+                          <Link
+                            href={href}
+                            className="transition-colors duration-300 hover:text-raymar-gold-dark"
+                          >
+                            {copy.name}
+                          </Link>
                         </ProductHeading>
                         <div className="mt-0.5 flex flex-wrap items-center gap-x-4.5 gap-y-3">
-                          <QuoteDetailLink group={content.eyebrow} name={copy.name}>
+                          {/* A duplicate of the name link above, for the eye
+                              only — see the same pair in `range-section`. */}
+                          <Link
+                            href={href}
+                            aria-hidden="true"
+                            tabIndex={-1}
+                            className="group/details inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark max-[719px]:py-1.5"
+                          >
                             {content.detailsCta}
-                          </QuoteDetailLink>
+                            <span className="inline-flex text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover/details:translate-x-[7px]">
+                              <ArrowShort />
+                            </span>
+                          </Link>
                           <QuoteRequestButton
                             group={content.eyebrow}
                             name={copy.name}

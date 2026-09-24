@@ -1,3 +1,5 @@
+import type { ProductPageId } from '@/content/library/types'
+
 /**
  * Product and media structure.
  *
@@ -44,6 +46,9 @@ export const walnutGroupIds = ['ceviz-ici'] as const
 
 export type WalnutGroupId = (typeof walnutGroupIds)[number]
 
+/** The page for walnut kernels as a whole; each size also has a page beneath it. */
+export const walnutProductPage: ProductPageId = 'walnut-kernels'
+
 /**
  * The single-variety range, in display order.
  *
@@ -72,6 +77,8 @@ export type RangeProductId = (typeof rangeProductIds)[number]
 export interface WalnutProduct {
   readonly id: WalnutProductId
   readonly group: WalnutGroupId
+  /** The size's own page, which the card links to. */
+  readonly page: ProductPageId
   /**
    * `null` where no photograph depicts this grade.
    *
@@ -93,6 +100,7 @@ export const walnutProducts: readonly WalnutProduct[] = [
     // the first product image on the site that is not stock.
     id: 'yarim',
     group: 'ceviz-ici',
+    page: 'walnut-halves',
     image: { src: '/images/walnut-halves.jpg', width: 945, height: 1181 },
     revealDelay: 0,
   },
@@ -100,6 +108,7 @@ export const walnutProducts: readonly WalnutProduct[] = [
     // Raymar's own photograph, supplied 2026-08-31.
     id: 'ceyrek',
     group: 'ceviz-ici',
+    page: 'walnut-quarters',
     image: { src: '/images/walnut-quarter.jpg', width: 648, height: 810 },
     revealDelay: 70,
   },
@@ -109,6 +118,7 @@ export const walnutProducts: readonly WalnutProduct[] = [
     // half, which read as a warehouse snapshot rather than a product card.
     id: 'kirik',
     group: 'ceviz-ici',
+    page: 'walnut-pieces',
     image: { src: '/images/walnut-broken.jpg', width: 1060, height: 670 },
     revealDelay: 140,
   },
@@ -118,6 +128,7 @@ export const walnutProducts: readonly WalnutProduct[] = [
     // storefront — the own-shoot it was waiting for. See docs/ASSET_AUDIT.md.
     id: 'pirinc',
     group: 'ceviz-ici',
+    page: 'walnut-small-pieces',
     image: { src: '/images/walnut-rice.jpg', width: 1280, height: 960 },
     revealDelay: 210,
   },
@@ -125,6 +136,8 @@ export const walnutProducts: readonly WalnutProduct[] = [
 
 export interface RangeProduct {
   readonly id: RangeProductId
+  /** The product's own page, which the card links to. */
+  readonly page: ProductPageId
   /**
    * `null` while no photograph of the product exists. The card then renders its
    * own tan bed instead of borrowing a picture of a different nut — a wrong
@@ -142,6 +155,7 @@ export interface RangeProduct {
 export const rangeProducts: readonly RangeProduct[] = [
   {
     id: 'makademya',
+    page: 'macadamia',
     image: {
       src: '/images/macadamia-white.jpg',
       width: 900,
@@ -168,11 +182,13 @@ export const rangeProducts: readonly RangeProduct[] = [
      * `walnut-broken` were replaced.
      */
     id: 'pikan',
+    page: 'pecans',
     image: { src: '/images/pecan.jpg', width: 1600, height: 1065 },
     revealDelay: 50,
   },
   {
     id: 'kabak-cekirdegi',
+    page: 'pumpkin-seed-kernels',
     // Raymar's own photograph, replacing the stock frame. No `objectPosition`:
     // the old crop was tuned to the stock image's subject placement, and this
     // one is an evenly filled field where a centred crop is correct.
@@ -181,6 +197,7 @@ export const rangeProducts: readonly RangeProduct[] = [
   },
   {
     id: 'aycekirdegi-ic',
+    page: 'sunflower-kernels',
     image: {
       src: '/images/sunflower-kernel.jpg',
       width: 933,
@@ -191,11 +208,13 @@ export const rangeProducts: readonly RangeProduct[] = [
   },
   {
     id: 'aycekirdegi-cerezlik',
+    page: 'in-shell-sunflower-seeds',
     image: { src: '/images/sunflower-inshell.jpg', width: 1400, height: 933 },
     revealDelay: 200,
   },
   {
     id: 'antep-fistigi',
+    page: 'pistachios',
     image: { src: '/images/pistachio-kernel.jpg', width: 1400, height: 934 },
     revealDelay: 250,
   },
@@ -218,6 +237,16 @@ export const editorialImages = {
     width: 1800,
     height: 1201,
     objectPosition: '50% 45%',
+  },
+  /*
+   * Pale, intact halves — the frame the colour-grades guide needs, because
+   * that page is about how light a kernel is and the generic halves photo
+   * asserts a colour it was not chosen for.
+   */
+  paleWalnutHalves: {
+    src: '/images/walnut-halves-pale.jpg',
+    width: 1280,
+    height: 848,
   },
 } satisfies Record<string, ProductImage>
 

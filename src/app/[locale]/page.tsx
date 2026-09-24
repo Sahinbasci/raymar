@@ -53,10 +53,10 @@ export default async function HomePage({
         <StatementSection content={dictionary.statement} />
         <ExperienceStrip items={dictionary.experience} />
         <CorporateIntro content={dictionary.corporateIntro} />
-        <RangeSection content={dictionary.range} />
-        <WalnutSection content={dictionary.walnut} />
+        <RangeSection content={dictionary.range} locale={locale} />
+        <WalnutSection content={dictionary.walnut} locale={locale} />
         <TradeStorySection content={dictionary.tradeStory} />
-        <QuoteSection content={dictionary.quote} />
+        <QuoteSection content={dictionary.quote} locale={locale} />
       </main>
 
       <SiteFooter content={dictionary.footer} locale={locale} />

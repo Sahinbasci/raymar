@@ -33,6 +33,9 @@ export interface HeaderContent {
 export interface HeroContent {
   readonly cueLabel: string
   readonly posterAlt: string
+  /** Accessible names of the background clip's pause/play control. */
+  readonly videoPause: string
+  readonly videoPlay: string
 }
 
 export interface StatementContent {
@@ -104,6 +107,8 @@ export interface WalnutContent {
 export interface RangeContent {
   readonly eyebrow: string
   readonly heading: string
+  /** Visible link to the product's own page, as on the walnut cards. */
+  readonly detailsCta: string
   /*
    * No `intro` here, unlike `WalnutContent` and `TradeStoryContent`.
    *
@@ -187,6 +192,10 @@ export interface QuoteContent {
   /** Attached to a malformed e-mail field via `aria-describedby`. */
   readonly errorFieldEmail: string
   readonly errorSubmit: string
+  /** Shown for a 429: the per-IP limit, which retrying inside cannot clear. */
+  readonly errorTooMany: string
+  /** Shown only when scripting is off: the form still posts, and how else to reach us. */
+  readonly noscriptNotice: string
   readonly submitting: string
   readonly successHeading: string
   readonly successBody: string
@@ -248,13 +257,61 @@ export interface FooterContent {
   readonly blurb: string
   readonly tagline: string
   readonly corporate: FooterColumn
-  readonly products: FooterColumn
+  /**
+   * Heading only. The links are the product pages themselves, read from the
+   * library in `footer.tsx`, so a label can never name a page that does not
+   * exist or drift from that page's own title.
+   */
+  readonly products: { readonly heading: string }
   readonly contactHeading: string
   readonly addressLines: readonly string[]
   readonly phoneValue: string
   readonly emailValue: string
   readonly copyright: string
   readonly legalLinks: readonly LinkItem[]
+}
+
+/** Copy for one of the two library index pages (products, guides). */
+export interface LibraryIndexContent {
+  readonly metaTitle: string
+  readonly metaDescription: string
+  readonly eyebrow: string
+  /** The index page's one `<h1>`. */
+  readonly heading: string
+  readonly intro: string
+  /** Short name for breadcrumbs, e.g. "Ürünler". */
+  readonly label: string
+}
+
+/**
+ * Interface copy for the product pages and guides. The documents themselves
+ * live in `src/content/library/`; this is only the chrome around them.
+ */
+export interface LibraryContent {
+  readonly breadcrumbAriaLabel: string
+  readonly homeLabel: string
+  readonly products: LibraryIndexContent
+  readonly guides: LibraryIndexContent
+  readonly faqHeading: string
+  readonly relatedGuidesHeading: string
+  readonly relatedProductsHeading: string
+  readonly productCardCta: string
+  readonly guideCardCta: string
+  readonly publishedLabel: string
+  readonly updatedLabel: string
+  /** `{minutes}` is substituted by `formatTemplate`. */
+  readonly readingTimeTemplate: string
+  readonly sourcesHeading: string
+  /** One line under the heading: what the list is, and how current it is. */
+  readonly sourcesNote: string
+  /** Names of the languages a source can be in, in this locale. */
+  readonly sourceLanguages: { readonly tr: string; readonly en: string }
+  readonly quoteBand: {
+    readonly eyebrow: string
+    readonly heading: string
+    readonly body: string
+    readonly cta: string
+  }
 }
 
 export interface Dictionary {
@@ -271,6 +328,7 @@ export interface Dictionary {
   readonly notFound: NotFoundContent
   readonly footer: FooterContent
   readonly legal: LegalContent
+  readonly library: LibraryContent
   readonly meta: {
     readonly siteName: string
     readonly title: string

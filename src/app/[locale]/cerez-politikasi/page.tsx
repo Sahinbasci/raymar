@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { LegalPage } from '@/components/sections/legal-page'
 import { getDictionary } from '@/content'
 import { isLocale } from '@/lib/i18n'
-import { legalAlternates } from '@/lib/legal'
+import { legalMetadata } from '@/lib/metadata'
 
 /** Folder name must equal `legalSlugs.cerez`; asserted in tests/e2e/legal.spec.ts. */
 
@@ -15,13 +15,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const { locale } = await params
   if (!isLocale(locale)) return {}
 
-  const { legal } = getDictionary(locale)
-
-  return {
-    title: legal.cerez.metaTitle,
-    description: legal.cerez.metaDescription,
-    alternates: legalAlternates(locale, 'cerez'),
-  }
+  return legalMetadata(locale, 'cerez')
 }
 
 export default async function CerezPage({ params }: PageParams) {

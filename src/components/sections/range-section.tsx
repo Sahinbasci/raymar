@@ -1,10 +1,14 @@
+import Link from 'next/link'
 import { QuoteRequestButton } from '@/components/forms/quote-request-button'
 import { MediaFrame } from '@/components/media/media-frame'
 import { PendingMedia } from '@/components/media/pending-media'
 import { Reveal } from '@/components/motion/reveal'
 import { CategoryLabel, SectionEyebrow } from '@/components/ui/eyebrow'
+import { ArrowShort } from '@/components/ui/icons'
 import { rangeProducts } from '@/data/products'
 import { formatTemplate } from '@/lib/cn'
+import type { Locale } from '@/lib/i18n'
+import { productPath } from '@/lib/library'
 import type { RangeContent } from '@/types/content'
 
 /**
@@ -20,7 +24,13 @@ import type { RangeContent } from '@/types/content'
  * note there for why the design's alternating baseline drop is not carried
  * over, and why no `nth-child` rule is needed as a result.
  */
-export function RangeSection({ content }: { content: RangeContent }) {
+export function RangeSection({
+  content,
+  locale,
+}: {
+  content: RangeContent
+  locale: Locale
+}) {
   return (
     <section id="urunlerimiz" className="border-t border-raymar-green/8 bg-raymar-ivory">
       <div className="shell">
@@ -42,6 +52,7 @@ export function RangeSection({ content }: { content: RangeContent }) {
         <div className="range-grid pb-19 md:pb-25 lg:pb-31.5">
           {rangeProducts.map((product) => {
             const copy = content.products[product.id]
+            const href = productPath(locale, product.page)
             return (
               <Reveal key={product.id} delay={product.revealDelay}>
                 <article className="group flex flex-col gap-5.5">
@@ -64,7 +75,12 @@ export function RangeSection({ content }: { content: RangeContent }) {
                   <div className="border-t border-raymar-gold/45 pt-5">
                     <CategoryLabel>{content.categoryLabel}</CategoryLabel>
                     <h3 className="mt-3.5 font-[family-name:var(--font-display)] text-[28px] leading-[1.1] font-normal text-raymar-green transition-[letter-spacing] duration-500 group-hover:tracking-[0.012em]">
-                      {copy.name}
+                      <Link
+                        href={href}
+                        className="transition-colors duration-300 hover:text-raymar-gold-dark"
+                      >
+                        {copy.name}
+                      </Link>
                     </h3>
                     {/* Optional: the client supplies these one product at a
                         time, so a card without a description keeps its old
@@ -74,17 +90,33 @@ export function RangeSection({ content }: { content: RangeContent }) {
                         {copy.description}
                       </p>
                     ) : null}
-                    <QuoteRequestButton
-                      group={copy.name}
-                      name={copy.name}
-                      variant="arrow"
-                      className="mt-4.5"
-                      ariaLabel={formatTemplate(content.quoteCtaAriaTemplate, {
-                        product: copy.name,
-                      })}
-                    >
-                      {content.quoteCta}
-                    </QuoteRequestButton>
+                    <div className="mt-4.5 flex flex-wrap items-center gap-x-6 gap-y-3">
+                      {/* Same destination as the product name above, which is
+                          the link assistive technology gets. Hidden from it
+                          and from the tab order here, so a keyboard user does
+                          not stop twice per card for one page. */}
+                      <Link
+                        href={href}
+                        aria-hidden="true"
+                        tabIndex={-1}
+                        className="group/details inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark max-[719px]:py-1.5"
+                      >
+                        {content.detailsCta}
+                        <span className="inline-flex text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover/details:translate-x-[7px]">
+                          <ArrowShort />
+                        </span>
+                      </Link>
+                      <QuoteRequestButton
+                        group={copy.name}
+                        name={copy.name}
+                        variant="underline"
+                        ariaLabel={formatTemplate(content.quoteCtaAriaTemplate, {
+                          product: copy.name,
+                        })}
+                      >
+                        {content.quoteCta}
+                      </QuoteRequestButton>
+                    </div>
                   </div>
                 </article>
               </Reveal>
