@@ -25,6 +25,8 @@ interface SiteHeaderProps {
    * without a hero pass `alwaysSolid`.
    */
   alwaysSolid?: boolean
+  /** The page in each locale, where its path is translated. See `LanguageSwitch`. */
+  alternates?: Readonly<Partial<Record<Locale, string>>> | undefined
 }
 
 /**
@@ -45,6 +47,7 @@ export function SiteHeader({
   nav,
   header,
   alwaysSolid = false,
+  alternates,
 }: SiteHeaderProps) {
   const scrolled = useScrollThreshold(48)
   const solid = alwaysSolid || scrolled
@@ -68,6 +71,19 @@ export function SiteHeader({
     close()
     desktop.addEventListener('change', close)
     return () => desktop.removeEventListener('change', close)
+  }, [menuOpen])
+
+  /*
+   * Close the drawer on Back and Forward, too. On Android the system back
+   * gesture is how a visitor dismisses things; it traverses history, and a
+   * drawer left open over the page it lands on would keep that page pinned
+   * under its scroll lock, where the restored position cannot be applied.
+   */
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = () => setMenuOpen(false)
+    window.addEventListener('popstate', close)
+    return () => window.removeEventListener('popstate', close)
   }, [menuOpen])
 
   return (
@@ -107,6 +123,14 @@ export function SiteHeader({
                 variant="green-gold"
                 height={40}
                 alt=""
+                /*
+                 * The twin the header cross-fades to on scroll. It is in the
+                 * viewport from first paint, so lazy-loading it left the bar
+                 * able to flash blank mid-transition on a slow link: the fade
+                 * starts the moment the visitor scrolls, whether or not the
+                 * file has arrived.
+                 */
+                priority
                 className="absolute top-0 left-0 opacity-0 transition-opacity duration-[400ms] group-data-[solid=true]/header:opacity-100"
               />
             </span>
@@ -138,6 +162,7 @@ export function SiteHeader({
           <LanguageSwitch
             current={locale}
             pendingLabel={header.localePending}
+            alternates={alternates}
             className="hidden lg:flex"
           />
 
@@ -170,6 +195,7 @@ export function SiteHeader({
         locale={locale}
         nav={nav}
         header={header}
+        alternates={alternates}
       />
     </>
   )

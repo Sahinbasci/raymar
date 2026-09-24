@@ -82,8 +82,15 @@
    ========================================================================= */
 @layer base {
   html {
-    scroll-behavior: smooth;
     /*
+     * No `scroll-behavior: smooth` here. It animated every scroll on the page,
+     * not only the ones a reader asks for: the router's landing after a route
+     * change (Next.js only suspends it with `data-scroll-behavior`, and only
+     * for its own scrolls), and the browser's own restoration on Back and
+     * Forward, which on Chromium and Firefox slid a whole page length after
+     * the page appeared. The glide now belongs to in-page links alone — see
+     * `InPageNavigation` — and everything else lands where it lands.
+     *
      * Deliberately SMALLER than the sticky header, not larger.
      *
      * At 96px — header height plus "breathing room" — an anchored jump left a
@@ -177,6 +184,15 @@
     outline: 2px solid var(--color-raymar-gold);
     outline-offset: 2px;
     box-shadow: 0 0 0 6px var(--color-raymar-green-deep);
+  }
+
+  /* A section an in-page link has moved focus to (`InPageNavigation`) is a
+     starting point for the next Tab, not a control: a ring around the whole
+     section would read as a selection. Controls never carry `tabindex="-1"`
+     here, so none of them loses its ring. */
+  [tabindex='-1']:focus {
+    outline: none;
+    box-shadow: none;
   }
 
   /* Headings inherit the display serif; weights are set per component so the
@@ -280,10 +296,22 @@
     height: 40px;
   }
 
+  /* The clip's pause/play control sits on the cue's baseline, inside the
+     shell's gutter, so it lines up with the edge of the content above it. */
+  .hero-video-toggle {
+    right: 20px;
+    bottom: 34px;
+  }
+
   @media (width >= 720px) {
     .hero-cue {
       bottom: 56px;
       gap: 16px;
+    }
+
+    .hero-video-toggle {
+      right: 32px;
+      bottom: 56px;
     }
 
     .hero-cue-label {
@@ -296,11 +324,21 @@
     }
   }
 
+  @media (width >= 1080px) {
+    .hero-video-toggle {
+      right: 40px;
+    }
+  }
+
   /* Short laptop windows: pull the cue in so it clears the fold. */
   @media (width >= 720px) and (height <= 699px) {
     .hero-cue {
       bottom: 38px;
       gap: 12px;
+    }
+
+    .hero-video-toggle {
+      bottom: 38px;
     }
 
     .hero-cue-line {
@@ -634,16 +672,13 @@
 
 /* ============================================================================
    REDUCED MOTION
-   The approved design kills all keyframe animation and smooth scrolling.
+   The approved design kills all keyframe animation and smooth scrolling (the
+   in-page glide checks the same preference in `InPageNavigation`).
    Transitions are shortened rather than removed so that state changes
    (header colour, drawer visibility) still resolve to the correct end state
    instead of being cancelled mid-way.
    ========================================================================= */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {

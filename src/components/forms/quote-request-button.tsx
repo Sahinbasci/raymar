@@ -28,10 +28,10 @@ interface QuoteRequestButtonProps {
  * this used to be the latter, which moved the viewport but never moved focus.
  * A keyboard user who activated it landed on the form visually but stayed
  * tabbing from wherever the button sat, so the next Tab threw them back up the
- * page. Native fragment navigation both scrolls (globals.css already sets
- * `scroll-behavior: smooth` and `scroll-padding-top: 96px`, with a
- * `prefers-reduced-motion` override) and sets the browser's sequential focus
- * navigation starting point, so the next Tab continues inside the form.
+ * page. As a fragment link it is handled by `InPageNavigation`, which glides
+ * to the section (instantly under reduced motion) and moves focus into it, so
+ * the next Tab continues inside the form; without JavaScript it is a plain
+ * fragment jump that does the same. This `onClick` still runs either way.
  */
 export function QuoteRequestButton({
   group,
@@ -74,39 +74,6 @@ export function QuoteRequestButton({
       )}
     >
       {children}
-    </a>
-  )
-}
-
-/**
- * "Detayları Gör" on a product card.
- *
- * Stays an anchor because it moves the reader to the `#teklif` section — the
- * browser performs the navigation; the handler only records which product was
- * being viewed so the form arrives pre-filled. There are no per-product detail
- * pages in the approved design; when they exist, only this `href` changes.
- */
-export function QuoteDetailLink({
-  group,
-  name,
-  children,
-}: {
-  group: string
-  name: string
-  children: string
-}) {
-  const { requestQuote } = useQuoteRequest()
-
-  return (
-    <a
-      href="#teklif"
-      onClick={() => requestQuote(group, name)}
-      className="group inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark max-[719px]:py-1.5"
-    >
-      {children}
-      <span className="inline-flex text-raymar-gold transition-transform duration-500 ease-[var(--ease-raymar)] group-hover:translate-x-[7px]">
-        <ArrowShort />
-      </span>
     </a>
   )
 }

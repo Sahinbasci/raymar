@@ -79,15 +79,92 @@ function safeJoin(root, urlPath) {
   return joined.startsWith(root) ? joined : null
 }
 
-function send(response, status, filePath, extraHeaders = {}) {
+/*
+ * Byte ranges, as the production host serves them.
+ *
+ * Without this the harness answered a `Range: bytes=0-1` probe with `200` and
+ * the whole file, where LiteSpeed answers `206` with two bytes — so every
+ * hero-video test ran against a server the site is never actually served
+ * from. Measured afterwards, it happened not to change the playback timings
+ * that prompted the check (first play and stall counts came out within a few
+ * percent either way), but a harness that exists to reproduce production
+ * should not be wrong about the one request pattern `<video>` depends on.
+ *
+ * Two things this harness still does NOT reproduce, and which matter when
+ * reading a throttled measurement taken against it: responses are neither
+ * compressed nor multiplexed (LiteSpeed serves HTTP/2 with gzip), so every
+ * page-load time here is slower than production. Compare runs against each
+ * other on this harness, never against numbers taken on the live site.
+ *
+ * A single range is all a `<video>` element asks for; multipart ranges are not
+ * implemented and fall back to the full body, which a server is allowed to do.
+ */
+const SINGLE_RANGE = /^bytes=(\d*)-(\d*)$/
+
+/*
+ * Test hook, never sent by a browser on its own: `X-Test-Throttle: <bytes per
+ * second>` streams the response body at that rate. A test adds the header to
+ * the hero clip's request alone (`page.route` → `route.continue({ headers })`),
+ * which reproduces a weak mobile signal for the video without also slowing the
+ * page and its scripts the way a browser-wide throttle does — that would push
+ * hydration, and so the clip's first request, past any reasonable timeout.
+ */
+function stream(response, filePath, request, range = {}) {
+  const rate = Number(request?.headers['x-test-throttle'] ?? 0)
+  if (!(rate > 0)) {
+    createReadStream(filePath, range).pipe(response)
+    return
+  }
+  // Chunks of a tenth of a second's worth, each followed by the pause that
+  // keeps the running total at `rate`.
+  const source = createReadStream(filePath, {
+    ...range,
+    highWaterMark: Math.max(1024, Math.round(rate / 10)),
+  })
+  source.on('data', (chunk) => {
+    source.pause()
+    response.write(chunk)
+    setTimeout(() => source.resume(), (chunk.length / rate) * 1000)
+  })
+  source.on('end', () => response.end())
+  source.on('error', () => response.destroy())
+  response.on('close', () => source.destroy())
+}
+
+function send(response, status, filePath, extraHeaders = {}, request = null) {
+  const size = statSync(filePath).size
   const headers = {
     ...SECURITY_HEADERS,
     ...extraHeaders,
     'Content-Type': CONTENT_TYPES[extname(filePath)] ?? 'application/octet-stream',
-    'Content-Length': statSync(filePath).size,
+    'Accept-Ranges': 'bytes',
   }
-  response.writeHead(status, headers)
-  createReadStream(filePath).pipe(response)
+
+  const range = status === 200 ? SINGLE_RANGE.exec(request?.headers.range ?? '') : null
+  if (range) {
+    const [, rawStart, rawEnd] = range
+    // `bytes=-500` is the last 500 bytes; `bytes=500-` is everything from 500.
+    const start = rawStart === '' ? Math.max(0, size - Number(rawEnd)) : Number(rawStart)
+    const end =
+      rawStart !== '' && rawEnd !== '' ? Math.min(Number(rawEnd), size - 1) : size - 1
+
+    if (Number.isNaN(start) || start >= size || start > end) {
+      response.writeHead(416, { ...headers, 'Content-Range': `bytes */${size}` })
+      response.end()
+      return
+    }
+
+    response.writeHead(206, {
+      ...headers,
+      'Content-Range': `bytes ${start}-${end}/${size}`,
+      'Content-Length': end - start + 1,
+    })
+    stream(response, filePath, request, { start, end })
+    return
+  }
+
+  response.writeHead(status, { ...headers, 'Content-Length': size })
+  stream(response, filePath, request)
 }
 
 const server = createServer((request, response) => {
@@ -112,6 +189,14 @@ const server = createServer((request, response) => {
   // --- Locale root: `.htaccess` RewriteRule ^$ /tr [R=307,L] ---------------
   if (path === '/') {
     response.writeHead(307, { ...SECURITY_HEADERS, Location: '/tr' })
+    response.end()
+    return
+  }
+
+  // --- `.htaccess` RewriteRule ^index\.html?$ /tr [R=301,L] -----------------
+  // The hosting provider's placeholder page that was still live on the domain.
+  if (/^\/index\.html?$/.test(path)) {
+    response.writeHead(301, { ...SECURITY_HEADERS, Location: '/tr' })
     response.end()
     return
   }
@@ -164,7 +249,7 @@ const server = createServer((request, response) => {
       if (accept.includes(type)) {
         const candidate = target.replace(/\.jpg$/, ext)
         if (isFile(candidate)) {
-          send(response, 200, candidate, { Vary: 'Accept' })
+          send(response, 200, candidate, { Vary: 'Accept' }, request)
           return
         }
       }
@@ -173,7 +258,7 @@ const server = createServer((request, response) => {
 
   // --- Real files win ------------------------------------------------------
   if (isFile(target)) {
-    send(response, 200, target)
+    send(response, 200, target, {}, request)
     return
   }
 

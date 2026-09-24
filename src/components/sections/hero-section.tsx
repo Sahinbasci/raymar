@@ -81,7 +81,7 @@ export function HeroSection({ content }: { content: HeroContent }) {
         />
       </picture>
 
-      <HeroVideo />
+      <HeroVideo pauseLabel={content.videoPause} playLabel={content.videoPlay} />
 
       <div
         aria-hidden="true"

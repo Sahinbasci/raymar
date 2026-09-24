@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
+import { InPageNavigation } from '@/components/layout/in-page-navigation'
+import { ScrollMemory } from '@/components/layout/scroll-memory'
 import { MotionProvider } from '@/components/motion/motion-provider'
 import { JsonLd } from '@/components/seo/json-ld'
 import { getDictionary } from '@/content'
@@ -154,6 +156,10 @@ export default async function LocaleLayout({
       </head>
       <body>
         <MotionProvider>{children}</MotionProvider>
+        {/* Where the page lands: in-page links glide, Back and Forward
+            restore, everything else is instant. */}
+        <InPageNavigation />
+        <ScrollMemory />
       </body>
     </html>
   )

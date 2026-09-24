@@ -6,6 +6,7 @@ import { BrandLogo } from '@/components/media/brand-logo'
 import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock'
 import type { Locale } from '@/lib/i18n'
 import type { HeaderContent, NavItem } from '@/types/content'
+import { LanguageSwitch } from './language-switch'
 
 interface MobileDrawerProps {
   open: boolean
@@ -14,6 +15,8 @@ interface MobileDrawerProps {
   locale: Locale
   nav: readonly NavItem[]
   header: HeaderContent
+  /** Passed through to the language switch. */
+  alternates?: Readonly<Partial<Record<Locale, string>>> | undefined
 }
 
 /**
@@ -29,7 +32,14 @@ interface MobileDrawerProps {
  * Where a browser does not support them the drawer simply appears and
  * disappears instantly, which is a graceful degradation, not a broken state.
  */
-export function MobileDrawer({ open, onClose, locale, nav, header }: MobileDrawerProps) {
+export function MobileDrawer({
+  open,
+  onClose,
+  locale,
+  nav,
+  header,
+  alternates,
+}: MobileDrawerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   useBodyScrollLock(open)
@@ -83,6 +93,24 @@ export function MobileDrawer({ open, onClose, locale, nav, header }: MobileDrawe
             </Link>
           ))}
         </nav>
+
+        {/*
+          The only language control below `lg`.
+
+          The header's switch is `hidden lg:flex`, and this drawer had no
+          equivalent, so on a phone there was no way to reach English at all —
+          measured on the live site: zero EN links inside the open dialog, on
+          both iPhone and Pixel profiles. Most of this site's traffic is mobile,
+          so the English locale was effectively unpublished for most visitors.
+        */}
+        <LanguageSwitch
+          current={locale}
+          pendingLabel={header.localePending}
+          variant="drawer"
+          alternates={alternates}
+          onNavigate={onClose}
+          className="mt-8 -ml-3.5"
+        />
 
         <Link
           href={`/${locale}#teklif`}
