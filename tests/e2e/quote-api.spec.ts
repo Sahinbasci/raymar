@@ -28,9 +28,13 @@ import { expect, test } from '@playwright/test'
  * than passing vacuously — a green suite must never imply this endpoint was
  * checked when it was not.
  *
- * Each test declares its own `x-forwarded-for`, which is what the endpoint keys
- * its rate limiter on. Without that, tests would consume each other's budget and
- * the suite would depend on execution order.
+ * Each test declares its own `x-forwarded-for`. That header is only honoured
+ * when `REMOTE_ADDR` is a loopback or private address — which is what `php -S`
+ * on localhost looks like, and what a reverse proxy in front of the host looks
+ * like. It is deliberately ignored otherwise: trusting a caller-supplied
+ * header meant the rate limit could be bypassed by rotating one value. So
+ * against a local PHP server the tests each get their own budget, and against
+ * a public host they share one — run them there one at a time.
  */
 
 /** Set to a host that executes PHP to enable this file. */

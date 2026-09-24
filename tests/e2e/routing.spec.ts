@@ -47,6 +47,23 @@ test.describe('locale routing', () => {
     expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin')
   })
 
+  test("the hosting provider's placeholder page is gone for good", async ({
+    request,
+  }) => {
+    /*
+     * The domain was parked on Natro before launch, and Natro's own landing
+     * page was still being served from `/index.html` afterwards — 200, titled
+     * as a hosting advertisement, on this company's domain. Deleting the file
+     * fixed the symptom; a permanent redirect is what stops a re-uploaded
+     * template, or a crawler holding the old URL, from ever seeing it again.
+     */
+    for (const path of ['/index.html', '/index.htm']) {
+      const response = await request.get(path, { maxRedirects: 0 })
+      expect(response.status(), path).toBe(301)
+      expect(response.headers()['location']).toMatch(/\/tr$/)
+    }
+  })
+
   test('the router can fetch its own prefetch payload', async ({ request }) => {
     /*
      * Regression guard, from a bug measured on the live site rather than here.

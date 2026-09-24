@@ -147,13 +147,45 @@ test.describe('legal pages', () => {
       'footer must not emit bare fragments off the homepage',
     ).toBe(0)
 
-    // And the links that do exist have to reach the homepage section.
-    const products = page.locator('footer').getByRole('link', { name: 'Makadamya' })
-    await expect(products).toHaveAttribute('href', '/tr#urunlerimiz')
+    // And the section links that do exist have to reach the homepage section.
+    const about = page.locator('footer').getByRole('link', { name: 'Hakkımızda' })
+    await expect(about).toHaveAttribute('href', '/tr#hakkimizda')
+    await about.click()
+    await expect(page).toHaveURL(/\/tr#hakkimizda$/)
+    await expect(page.locator('#hakkimizda')).toBeInViewport({ ratio: 0.05 })
+  })
 
-    await products.click()
-    await expect(page).toHaveURL(/\/tr#urunlerimiz$/)
-    await expect(page.locator('#urunlerimiz')).toBeInViewport({ ratio: 0.05 })
+  test('the footer product links open the product pages', async ({ page }) => {
+    // These were six links to the same `#urunlerimiz` anchor until each
+    // product had a page of its own.
+    await page.goto('/tr/gizlilik-politikasi')
+    const macadamia = page.locator('footer').getByRole('link', { name: 'Makadamya' })
+    await expect(macadamia).toHaveAttribute('href', '/tr/urunler/makadamya')
+
+    await macadamia.click()
+    await expect(page).toHaveURL(/\/tr\/urunler\/makadamya$/)
+    await expect(page.locator('h1')).toHaveText('Toptan Makadamya')
+  })
+
+  test('a shared legal page previews as itself, not as the homepage', async ({
+    page,
+  }) => {
+    /*
+     * The pages set no Open Graph block, so they inherited the layout's —
+     * which describes the homepage. Measured in the built output: the KVKK
+     * notice carried the homepage's og:title and og:url.
+     */
+    for (const { slug, heading } of LEGAL) {
+      await page.goto(`/tr/${slug}`)
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+        'content',
+        new RegExp(`/tr/${slug}$`),
+      )
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+        'content',
+        new RegExp(heading),
+      )
+    }
   })
 
   test('all three appear in the sitemap', async ({ request }) => {

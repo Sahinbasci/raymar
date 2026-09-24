@@ -79,7 +79,7 @@ test.describe('homepage', () => {
     await page.goto('/tr')
 
     await expect(page.locator('h1')).toHaveCount(1)
-    await expect(page.locator('h1')).toContainText('Kuruyemiş Tedariğinde')
+    await expect(page.locator('h1')).toContainText('Kuruyemiş Tedarikinde')
     expect(await page.locator('h2').count()).toBeGreaterThan(4)
   })
 

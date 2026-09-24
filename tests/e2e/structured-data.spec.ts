@@ -79,7 +79,7 @@ test.describe('structured data', () => {
     }
 
     // If this drops to nothing the test has stopped testing anything — the
-    // graph names the logo, the OG image and nine product photographs.
+    // graph names the logo, the OG image, and each product's page and photograph.
     expect(urls.size).toBeGreaterThanOrEqual(10)
 
     const broken: string[] = []
@@ -93,7 +93,9 @@ test.describe('structured data', () => {
   test('the organization is one entity, described machine-readably', async ({ page }) => {
     const [graph] = await graphs(page, '/tr')
     const nodes = (graph as { '@graph': Record<string, unknown>[] })['@graph']
-    const organization = nodes.find((node) => node['@type'] === 'Corporation')
+    // `Organization`, not `Corporation`: the entity is a Turkish Ltd. Şti. and
+    // the narrower type would claim more than is true.
+    const organization = nodes.find((node) => node['@type'] === 'Organization')
     expect(organization).toBeDefined()
 
     // Brand and legal entity both stated, so a crawler resolves them to one
@@ -120,35 +122,83 @@ test.describe('structured data', () => {
     // consumer cannot tell it is a placeholder. Matched on the bracketed
     // wording rather than a bare `[`, which every array in the graph contains.
     expect(JSON.stringify(graph)).not.toMatch(/\[[^"\]]*eklenecek[^"\]]*\]/)
+
+    // The registry identifiers the legal pages already publish. They are what
+    // ties this site to a registered company rather than to a brand name.
+    expect(organization?.['taxID']).toBe('6121008134')
+    const identifier = organization?.['identifier'] as Record<string, string>
+    expect(identifier['value']).toBe('0612100813400001')
+
+    // `hasMap` is defined on Place, not on Organization: it belongs to the
+    // location node, and a consumer reading the company node must not find it.
+    expect(organization?.['hasMap']).toBeUndefined()
+    const location = organization?.['location'] as Record<string, string>
+    expect(location['@type']).toBe('Place')
+    expect(location['hasMap']).toContain('google.com/maps')
   })
 
-  test('the catalogue graph names every product the page sells', async ({ page }) => {
+  test('each locale has its own WebSite node', async ({ page }) => {
+    // One `@id` with two bodies is the failure this guards: a consumer that
+    // merges by `@id` used to get a single node asserting two urls and two
+    // languages, because `/tr` and `/en` published different WebSite bodies
+    // under the same id.
+    const websites: Record<string, Record<string, unknown>> = {}
+    for (const locale of ['tr', 'en'] as const) {
+      const [graph] = await graphs(page, `/${locale}`)
+      const nodes = (graph as { '@graph': Record<string, unknown>[] })['@graph']
+      const website = nodes.find((node) => node['@type'] === 'WebSite')
+      expect(website, `${locale} has a WebSite node`).toBeDefined()
+      websites[locale] = website as Record<string, unknown>
+    }
+
+    expect(websites['tr']?.['@id']).not.toBe(websites['en']?.['@id'])
+    expect(String(websites['tr']?.['@id'])).toContain('/tr#website')
+    expect(String(websites['en']?.['@id'])).toContain('/en#website')
+    expect(websites['tr']?.['inLanguage']).not.toBe(websites['en']?.['inLanguage'])
+  })
+
+  test('the catalogue graph points at every product page', async ({ page }) => {
     const parsed = await graphs(page, '/tr')
     const list = parsed.find(
       (graph) => (graph as { '@type'?: string })['@type'] === 'ItemList',
-    ) as { itemListElement: { position: number; item: Record<string, unknown> }[] }
+    ) as { itemListElement: Record<string, unknown>[] }
 
     expect(list).toBeDefined()
-    expect(list.itemListElement.length).toBeGreaterThanOrEqual(10)
 
     // Positions must be 1..n in order, or the list asserts an ordering it does
     // not have.
-    expect(list.itemListElement.map((entry) => entry.position)).toEqual(
+    expect(list.itemListElement.map((entry) => entry['position'])).toEqual(
       list.itemListElement.map((_, index) => index + 1),
     )
 
-    for (const { item } of list.itemListElement) {
-      expect(item['@type']).toBe('Product')
-      expect(String(item['name']).length).toBeGreaterThan(0)
-    }
+    /*
+     * One entry per product card, in the order the cards appear, each naming
+     * the page its card opens: the range, then the four walnut sizes. These
+     * used to be ten `Product` nodes with no `offers`, `review` or
+     * `aggregateRating` — the properties Google requires of every Product it
+     * parses — so each was an invalid item waiting in Search Console. The
+     * resolve test above fetches every `url` here.
+     */
+    expect(list.itemListElement.map((entry) => [entry['name'], entry['url']])).toEqual([
+      ['Makadamya', expect.stringMatching(/\/tr\/urunler\/makadamya$/)],
+      ['Pikan Cevizi', expect.stringMatching(/\/tr\/urunler\/pikan-cevizi$/)],
+      [
+        'Kabak Çekirdeği İçi',
+        expect.stringMatching(/\/tr\/urunler\/kabak-cekirdegi-ici$/),
+      ],
+      ['Ay Çekirdeği İçi', expect.stringMatching(/\/tr\/urunler\/ay-cekirdegi-ici$/)],
+      [
+        'Çerezlik Ay Çekirdeği',
+        expect.stringMatching(/\/tr\/urunler\/cerezlik-ay-cekirdegi$/),
+      ],
+      ['Antep Fıstığı', expect.stringMatching(/\/tr\/urunler\/antep-fistigi$/)],
+      ['Yarım Ceviz İçi', expect.stringMatching(/\/tr\/urunler\/yarim-ceviz-ici$/)],
+      ['Çeyrek Ceviz İçi', expect.stringMatching(/\/tr\/urunler\/ceyrek-ceviz-ici$/)],
+      ['Kırık Ceviz İçi', expect.stringMatching(/\/tr\/urunler\/kirik-ceviz-ici$/)],
+      ['Pirinç Ceviz İçi', expect.stringMatching(/\/tr\/urunler\/pirinc-ceviz-ici$/)],
+    ])
 
-    // Every product card visible on the page should be in the graph. Pikan has
-    // no photograph yet, so image presence is deliberately not asserted per
-    // item — the resolve test above covers the ones that are there.
-    const names = list.itemListElement.map((entry) => String(entry.item['name']))
-    for (const expected of ['Kırık Ceviz İçi', 'Çeyrek Ceviz İçi', 'Pikan Cevizi']) {
-      expect(names).toContain(expected)
-    }
+    expect(JSON.stringify(list)).not.toContain('"Product"')
   })
 
   test('each legal page carries a breadcrumb back to the homepage', async ({ page }) => {

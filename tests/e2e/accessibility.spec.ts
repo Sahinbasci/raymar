@@ -130,6 +130,30 @@ test.describe('accessibility', () => {
    * forgotten in a design pass, so they are scanned explicitly rather than
    * assumed to inherit the homepage's result.
    */
+  /*
+   * The product pages and guides are what search sends people to, so they are
+   * scanned too: one index, one product page (primary button, related links)
+   * and one guide (dates, reading time), in each locale where the chrome
+   * differs.
+   */
+  for (const path of [
+    '/tr/urunler',
+    '/en/guides',
+    '/tr/urunler/ceviz-ici',
+    '/en/guides/pecan-vs-walnut',
+  ]) {
+    test(`${path} has no violations`, async ({ page }) => {
+      await page.goto(path)
+
+      const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze()
+
+      expect(
+        violations,
+        violations.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n'),
+      ).toEqual([])
+    })
+  }
+
   for (const slug of [
     'kvkk-aydinlatma-metni',
     'gizlilik-politikasi',

@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+import { expectSettledAtTop, settle, waitForHydration } from './support/scroll'
 
 const DESKTOP = ['desktop-1440', 'laptop-1280']
 
@@ -14,7 +15,8 @@ test.describe('desktop navigation', () => {
     await nav.getByRole('link', { name: 'Ürünler' }).click()
     await expect(page).toHaveURL(/#urunlerimiz$/)
 
-    // `scroll-behavior: smooth` animates, so poll rather than read once.
+    // The in-page glide animates, so poll rather than read once. The exact
+    // landing is asserted in landing.spec.ts.
     await expect
       .poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 })
       .toBeGreaterThan(0)
@@ -183,6 +185,145 @@ test.describe('language switch', () => {
   })
 })
 
+/*
+ * The switch as a reader actually uses it — on every viewport, not just the
+ * desktop one.
+ *
+ * The describe above skips below 1080px, which is how two production defects
+ * went unnoticed: there was no language control on phones at all, and on
+ * desktop every switch threw the reader back to the top of the page. Both were
+ * reported by the client and then measured on the live site; neither could have
+ * been caught by a suite that never opened the drawer or scrolled before
+ * clicking.
+ */
+test.describe('language switch, as used', () => {
+  /** Clicks the EN or TR control wherever this viewport puts it. */
+  async function switchTo(page: Page, label: 'EN' | 'TR', narrow: boolean) {
+    if (narrow) {
+      await page
+        .getByRole('button', { name: /menü|menu/i })
+        .first()
+        .click()
+      const dialog = page.getByRole('dialog')
+      await expect(dialog).toBeVisible()
+      await dialog.getByRole('link', { name: label, exact: true }).click()
+    } else {
+      await page.locator('header').getByRole('link', { name: label, exact: true }).click()
+    }
+  }
+
+  /** The section a third of the way down the viewport — what the reader is on. */
+  function sectionInView(page: Page) {
+    return page.evaluate(() => {
+      const probe = window.innerHeight * 0.35
+      let current: string | null = null
+      for (const section of document.querySelectorAll<HTMLElement>('main section[id]')) {
+        if (section.getBoundingClientRect().top <= probe) current = section.id
+        else break
+      }
+      return current
+    })
+  }
+
+  test('is reachable on this viewport', async ({ page, viewport }) => {
+    const narrow = (viewport?.width ?? 0) < 1024
+    await page.goto('/tr')
+    if (narrow) {
+      await page
+        .getByRole('button', { name: /menü|menu/i })
+        .first()
+        .click()
+      const link = page.getByRole('dialog').getByRole('link', { name: 'EN', exact: true })
+      await expect(link).toBeVisible()
+      // A thumb target, not a cursor one.
+      const box = await link.boundingBox()
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(44)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44)
+    } else {
+      await expect(
+        page.locator('header').getByRole('link', { name: 'EN', exact: true }),
+      ).toBeVisible()
+    }
+  })
+
+  test('keeps the reader on the section they were reading', async ({
+    page,
+    viewport,
+  }) => {
+    const narrow = (viewport?.width ?? 0) < 1024
+    await page.goto('/tr')
+    await waitForHydration(page)
+    await page.locator('#ceviz').evaluate((el) => el.scrollIntoView({ block: 'start' }))
+    await expect.poll(() => sectionInView(page)).toBe('ceviz')
+
+    await switchTo(page, 'EN', narrow)
+    // No fragment any more: the place is carried across in script, down to
+    // the paragraph (see landing.spec.ts), not approximated by a section id.
+    await expect(page).toHaveURL(/\/en$/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect.poll(() => sectionInView(page)).toBe('ceviz')
+
+    // And back, from a different section, so the direction is not assumed.
+    await page
+      .locator('#urunlerimiz')
+      .evaluate((el) => el.scrollIntoView({ block: 'start' }))
+    await expect.poll(() => sectionInView(page)).toBe('urunlerimiz')
+    await switchTo(page, 'TR', narrow)
+    await expect(page).toHaveURL(/\/tr$/)
+    await expect.poll(() => sectionInView(page)).toBe('urunlerimiz')
+  })
+
+  test('from the top, lands at the top', async ({ page, viewport }) => {
+    // No `#ust` on a switch made from the hero: the fragment is only worth
+    // adding when there is somewhere to return to.
+    await page.goto('/tr')
+    await switchTo(page, 'EN', (viewport?.width ?? 0) < 1024)
+    await expect(page).toHaveURL(/\/en$/)
+
+    // The URL was always right — it was the landing position that was wrong.
+    // The page glided to the footer over about a second after the switch, so
+    // a single read straight after navigation saw 0 and passed. Settling is
+    // part of the assertion.
+    await expectSettledAtTop(page)
+  })
+
+  test('translates the document, not just the locale', async ({ page, viewport }) => {
+    // Previously `href="/en"` on every page, so a reader switching language on
+    // a legal document landed on the English homepage.
+    await page.goto('/tr/kvkk-aydinlatma-metni')
+    await switchTo(page, 'EN', (viewport?.width ?? 0) < 1024)
+    await expect(page).toHaveURL(/\/en\/kvkk-aydinlatma-metni$/)
+    await expect(page.locator('h1')).toHaveText('KVKK Personal Data Notice')
+  })
+
+  test('from deep inside a document, keeps the reader there', async ({
+    page,
+    viewport,
+  }) => {
+    /*
+     * Two defects lived here. In the drawer, 1000px down a Turkish page, the
+     * English page opened 1000px down: switching locale is a client-side
+     * navigation, and the drawer's scroll lock, released after the router had
+     * placed the new page, restored the old page's pixel offset onto it. Once
+     * that was fixed the switch opened every translated document at its top,
+     * which the client reported as being thrown to the start. The place is
+     * now carried across by structure — landing.spec.ts checks it paragraph
+     * by paragraph; this checks the drawer path does not fall back to either.
+     */
+    await page.goto('/tr/kvkk-aydinlatma-metni')
+    await waitForHydration(page)
+    await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }))
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000)
+
+    await switchTo(page, 'EN', (viewport?.width ?? 0) < 1024)
+    await expect(page).toHaveURL(/\/en\/kvkk-aydinlatma-metni$/)
+    const landing = await settle(page)
+    expect(landing.min, 'the switch slid to its landing').toBe(landing.max)
+    expect(landing.y).toBeGreaterThan(900)
+    expect(landing.y).toBeLessThan(1600)
+  })
+})
+
 test.describe('published locales', () => {
   test('both locales are served, and each declares its own language', async ({
     page,
@@ -218,3 +359,46 @@ test.describe('published locales', () => {
 })
 
 export { DESKTOP }
+
+/*
+ * Where a route change leaves the reader.
+ *
+ * Next.js 16 stopped suspending a site's own `scroll-behavior: smooth` during
+ * navigation unless `<html data-scroll-behavior="smooth">` is set. This site
+ * set smooth scrolling in globals.css without the attribute, so the router's
+ * post-navigation scroll ran as an animation and ended at the footer. On the
+ * live site that meant a TR → EN switch left every engine at the very bottom
+ * of the page, and on Chromium a footer link from the homepage opened the KVKK
+ * notice scrolled to its end. Every URL assertion in the suite passed the whole
+ * time. The CSS rule is gone altogether now (landing.spec.ts guards that); these
+ * keep checking the landings themselves.
+ */
+test.describe('landing position after navigation', () => {
+  test('following a footer link to a legal page opens it at the top', async ({
+    page,
+  }) => {
+    await page.goto('/tr')
+    await page.locator('footer a[href="/tr/kvkk-aydinlatma-metni"]').first().click()
+    await expect(page).toHaveURL(/\/tr\/kvkk-aydinlatma-metni$/)
+    await expectSettledAtTop(page)
+    await expect(page.locator('h1')).toBeInViewport()
+  })
+
+  test('moving between legal pages opens each at the top', async ({ page }) => {
+    await page.goto('/tr/kvkk-aydinlatma-metni')
+    await page.locator('footer a[href="/tr/gizlilik-politikasi"]').first().click()
+    await expect(page).toHaveURL(/\/tr\/gizlilik-politikasi$/)
+    await expectSettledAtTop(page)
+  })
+
+  test('a section link from a legal page lands on that section', async ({ page }) => {
+    await page.goto('/tr/kvkk-aydinlatma-metni')
+    await page.locator('footer a[href="/tr#hakkimizda"]').first().click()
+    await expect(page).toHaveURL(/\/tr#hakkimizda$/)
+    await expect(page.locator('#hakkimizda')).toBeInViewport({ ratio: 0.1 })
+    // And stays there — the smooth-scroll defect could carry a correct landing
+    // on past its target.
+    await page.waitForTimeout(1200)
+    await expect(page.locator('#hakkimizda')).toBeInViewport({ ratio: 0.1 })
+  })
+})

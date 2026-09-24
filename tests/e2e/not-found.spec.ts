@@ -14,7 +14,7 @@ import { expect, test } from '@playwright/test'
  * locale, including a plausible-looking one under a published locale.
  */
 test.describe('global 404', () => {
-  for (const path of ['/does-not-exist', '/en/does-not-exist', '/fr']) {
+  for (const path of ['/does-not-exist', '/fr']) {
     test(`${path} renders the branded document`, async ({ page }) => {
       const response = await page.goto(path)
       expect(response?.status()).toBe(404)
@@ -29,4 +29,27 @@ test.describe('global 404', () => {
       await expect(page).toHaveURL(/\/tr$/)
     })
   }
+
+  /*
+   * One document serves both locales — a static export has no request-time
+   * branch to pick a language with. The document ships in Turkish and a short
+   * inline script rewrites it when the path says the visitor was reading
+   * English. Before it, an English buyer who mistyped an `/en/...` URL got a
+   * Turkish error page and a link into the Turkish homepage.
+   */
+  test('an /en URL that matches no route answers in English', async ({ page }) => {
+    const response = await page.goto('/en/does-not-exist')
+    expect(response?.status()).toBe(404)
+
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.locator('h1')).toHaveText(
+      'The page you are looking for could not be found.',
+    )
+    await expect(page).toHaveTitle(/Page not found/i)
+
+    const cta = page.getByRole('link', { name: 'Back to Home' })
+    await expect(cta).toHaveAttribute('href', '/en')
+    await cta.click()
+    await expect(page).toHaveURL(/\/en$/)
+  })
 })

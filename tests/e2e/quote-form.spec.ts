@@ -21,6 +21,72 @@ async function gotoForm(page: Page) {
 const SUBMIT_TIMEOUT = 15_000
 
 test.describe('quotation form', () => {
+  /*
+   * What the browser does when this form's JavaScript has not run.
+   *
+   * With no `method` and no `action` the default is a GET to the current page,
+   * which put the enquirer's name, e-mail, phone and message into the URL —
+   * the access log, the history and every later Referer — and delivered
+   * nothing. These attributes are the whole no-JavaScript path, so they are
+   * asserted rather than assumed.
+   */
+  test('posts to the endpoint even with no JavaScript', async ({ page }) => {
+    await page.goto('/tr')
+    const form = page.locator('#teklif form')
+
+    await expect(form).toHaveAttribute('method', /post/i)
+    await expect(form).toHaveAttribute('action', '/teklif-gonder.php')
+
+    // The endpoint answers a form post with an HTML page, and needs to know
+    // which language to answer in.
+    await expect(form.locator('input[name="locale"]')).toHaveValue('tr')
+    await expect(page.locator('#teklif noscript')).toHaveCount(1)
+
+    const enForm = page.locator('#teklif form')
+    await page.goto('/en')
+    await expect(enForm.locator('input[name="locale"]')).toHaveValue('en')
+  })
+
+  /*
+   * The caps the endpoint enforces, mirrored on the controls.
+   *
+   * Without them a buyer pasting a full specification into the message box got
+   * a bare "try again" from a 400 they could not see the reason for, and
+   * retrying identically failed forever.
+   */
+  test('caps every field at the length the endpoint accepts', async ({ page }) => {
+    await page.goto('/tr')
+    const caps: Record<string, string> = {
+      name: '120',
+      company: '160',
+      email: '200',
+      phone: '40',
+      message: '4000',
+    }
+    for (const [field, cap] of Object.entries(caps)) {
+      await expect(
+        page.locator(`#teklif [name="${field}"]`),
+        `${field} is capped`,
+      ).toHaveAttribute('maxlength', cap)
+    }
+  })
+
+  /*
+   * The honeypot must stay invisible to people and uninteresting to autofill.
+   * It was called `website`, which is exactly the name a password manager
+   * fills by heuristic — and a filled honeypot is treated as a bot, so a real
+   * enquiry was dropped while its sender saw the success panel.
+   */
+  test('the honeypot is not a field autofill recognises', async ({ page }) => {
+    await page.goto('/tr')
+    await expect(page.locator('#teklif [name="website"]')).toHaveCount(0)
+    const honeypot = page.locator('#teklif [name="sube-kodu"]')
+    await expect(honeypot).toHaveCount(1)
+    await expect(honeypot).not.toBeInViewport()
+    await expect(honeypot).toHaveAttribute('tabindex', '-1')
+    await expect(honeypot).toHaveAttribute('autocomplete', 'new-password')
+  })
+
   test('blocks submission and reports missing required fields', async ({ page }) => {
     await gotoForm(page)
 
@@ -209,6 +275,33 @@ test.describe('quotation form', () => {
     await expect(page.getByLabel('Talep Mesajı *')).toHaveValue('Numune talebi.')
   })
 
+  /*
+   * A 429 is the per-IP limit, which is ten minutes wide. "Please try again"
+   * is advice that cannot work inside it, so the form says something else —
+   * and both messages name the phone and the e-mail, which do work.
+   */
+  test('says what a rate-limited submission actually means', async ({ page }) => {
+    await page.route('**/teklif-gonder.php', (route) =>
+      route.fulfill({ status: 429, json: { ok: false } }),
+    )
+
+    await gotoForm(page)
+    await page.getByLabel('Ad Soyad *').fill('Test Kullanıcı')
+    await page.getByLabel('Firma *').fill('Test A.Ş.')
+    await page.getByLabel('Ülke *').selectOption({ label: 'Türkiye' })
+    await page.getByLabel('E-posta *').fill('test@firma.com')
+    await page.getByLabel('İlgilenilen Ürün *').selectOption('Antep Fıstığı')
+    await page.getByLabel('Talep Mesajı *').fill('Numune talebi.')
+    await page.locator('#teklif').getByRole('checkbox').check()
+
+    await page.getByRole('button', { name: 'Talebi Gönder' }).click()
+
+    const alert = page.locator('#teklif').getByRole('alert')
+    await expect(alert).toBeVisible()
+    await expect(alert).toContainText('çok fazla talep')
+    await expect(alert).toContainText('info@raymarnuts.com')
+  })
+
   test('survives a network failure without a false success', async ({ page }) => {
     await page.route('**/teklif-gonder.php', (route) => route.abort())
 
@@ -263,7 +356,7 @@ test.describe('quotation form', () => {
       message: '20 ton fındık talebi.',
       consent: true,
       // The honeypot must go over the wire empty, or the server drops the lead.
-      website: '',
+      'sube-kodu': '',
     })
   })
 })
