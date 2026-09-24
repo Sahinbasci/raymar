@@ -4,15 +4,18 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { CheckMark } from '@/components/ui/icons'
 import { countryDialCodes, type CountryId } from '@/data/countries'
 import { cn, formatTemplate } from '@/lib/cn'
+import type { Locale } from '@/lib/i18n'
 import {
+  FIELD_MAX_LENGTH,
   HONEYPOT_FIELD,
+  QUOTE_ENDPOINT,
   submitQuoteRequest,
   type QuotePayload,
 } from '@/lib/quote-submission'
 import type { QuoteContent } from '@/types/content'
 import { useQuoteRequest } from './quote-request-context'
 
-type FieldName = keyof Omit<QuotePayload, 'consent' | 'website'>
+type FieldName = keyof Omit<QuotePayload, 'consent' | 'sube-kodu'>
 
 const emptyValues: Record<FieldName, string> = {
   name: '',
@@ -92,6 +95,8 @@ function sortedCountries(
 
 interface QuoteFormProps {
   content: QuoteContent
+  /** Posted with the form so a no-JavaScript submission is answered in it. */
+  locale: Locale
 }
 
 /**
@@ -104,7 +109,7 @@ interface QuoteFormProps {
  * Submission goes through `submitQuoteRequest`, which is a documented mock —
  * see `src/lib/quote-submission.ts`. Field values are never logged.
  */
-export function QuoteForm({ content }: QuoteFormProps) {
+export function QuoteForm({ content, locale }: QuoteFormProps) {
   const formId = useId()
   const formRef = useRef<HTMLFormElement>(null)
   const { request, clearRequest } = useQuoteRequest()
@@ -267,12 +272,14 @@ export function QuoteForm({ content }: QuoteFormProps) {
       country: resolvedCountry,
       phone: resolvedPhone,
       consent,
-      website: honeypot,
+      'sube-kodu': honeypot,
     })
 
     if (!result.ok) {
       setStatus('idle')
-      setError(content.errorSubmit)
+      // A 429 means the per-IP limit, which is ten minutes wide: telling the
+      // visitor to try again is advice that cannot work inside it.
+      setError(result.status === 429 ? content.errorTooMany : content.errorSubmit)
       return
     }
 
@@ -390,16 +397,40 @@ export function QuoteForm({ content }: QuoteFormProps) {
   return (
     <>
       {liveRegion}
+      {/*
+       * `method` and `action` are what the browser uses when this component's
+       * JavaScript has not run — disabled, blocked, or simply not hydrated
+       * yet. Without them the browser fell back to its default, a GET to the
+       * current page, which put the enquirer's name, e-mail, phone and
+       * message into the URL (and so into the access log, the history and
+       * every later Referer) and delivered nothing. With them, the same
+       * submission reaches the endpoint and gets an HTML answer back.
+       */}
       <form
         ref={formRef}
+        method="post"
+        action={QUOTE_ENDPOINT}
         noValidate
         onSubmit={handleSubmit}
         className="relative border border-raymar-green/12 bg-raymar-white px-5.5 pt-7.5 pb-7 md:px-11.5 md:pt-11.5 md:pb-10.5"
       >
+        <input type="hidden" name="locale" value={locale} />
+        {/*
+         * Rendered only where scripting is off. Everything else on this page
+         * assumes the client took over after hydration; this is the one line
+         * that tells a visitor without it what to expect, and offers the two
+         * channels that need no form at all.
+         */}
+        <noscript>
+          <p className="mb-6 border border-raymar-gold/45 bg-raymar-ivory p-3.5 text-[13.5px] leading-[1.6] text-raymar-ink">
+            {content.noscriptNotice}
+          </p>
+        </noscript>
         <div className="grid grid-cols-1 gap-x-6 gap-y-6.5 md:grid-cols-2">
           <TextField
             id={fieldId('name')}
             name="name"
+            maxLength={FIELD_MAX_LENGTH.name}
             label={content.fields.name.label}
             placeholder={content.fields.name.placeholder}
             autoComplete="name"
@@ -412,6 +443,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
           <TextField
             id={fieldId('company')}
             name="company"
+            maxLength={FIELD_MAX_LENGTH.company}
             label={content.fields.company.label}
             placeholder={content.fields.company.placeholder}
             autoComplete="organization"
@@ -460,6 +492,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
             id={fieldId('email')}
             name="email"
             type="email"
+            maxLength={FIELD_MAX_LENGTH.email}
             label={content.fields.email.label}
             placeholder={content.fields.email.placeholder}
             autoComplete="email"
@@ -507,6 +540,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
                 id={fieldId('phone')}
                 name="phone"
                 type="tel"
+                maxLength={FIELD_MAX_LENGTH.phone}
                 placeholder={content.fields.phone.placeholder}
                 autoComplete="tel-national"
                 value={values.phone}
@@ -566,6 +600,7 @@ export function QuoteForm({ content }: QuoteFormProps) {
               id={fieldId('message')}
               name="message"
               required
+              maxLength={FIELD_MAX_LENGTH.message}
               rows={4}
               placeholder={content.fields.message.placeholder}
               value={values.message}
@@ -599,7 +634,12 @@ export function QuoteForm({ content }: QuoteFormProps) {
             name={HONEYPOT_FIELD}
             type="text"
             tabIndex={-1}
-            autoComplete="off"
+            /*
+             * `new-password` rather than `off`: browsers and password managers
+             * ignore `off` routinely, and a manager that filled this by name
+             * heuristic would have had a real enquiry treated as a bot.
+             */
+            autoComplete="new-password"
             defaultValue=""
           />
         </div>
@@ -755,6 +795,8 @@ interface TextFieldProps {
   placeholder?: string | undefined
   autoComplete?: string | undefined
   required?: boolean
+  /** Mirrors the server's own cap for this field. */
+  maxLength?: number | undefined
 }
 
 function TextField({
@@ -769,6 +811,7 @@ function TextField({
   placeholder,
   autoComplete,
   required = false,
+  maxLength,
 }: TextFieldProps) {
   return (
     <label className="flex flex-col gap-2.5">
@@ -782,6 +825,7 @@ function TextField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         required={required}
+        maxLength={maxLength}
         value={value}
         aria-invalid={invalid || undefined}
         /*

@@ -88,14 +88,92 @@ const RATE_LIMIT_WINDOW = 600;
 
 // ── Wire format ──────────────────────────────────────────────────────────────
 
-header('Content-Type: application/json; charset=utf-8');
+/*
+ * Two callers, two answers.
+ *
+ * The page's own JavaScript posts JSON and reads `{ ok: boolean }`. But the
+ * form also carries `method="post" action="/teklif-gonder.php"`, so a visitor
+ * whose JavaScript never ran — disabled, blocked, or simply not hydrated yet —
+ * posts `application/x-www-form-urlencoded` straight here. Before that
+ * attribute existed the browser fell back to its default, a **GET to the
+ * current page**, which put the enquirer's name, e-mail, phone and message in
+ * the URL — in the host access log, in browser history and in the Referer of
+ * every later outbound click — and delivered nothing.
+ *
+ * So: a JSON request gets JSON, and a form post gets a small HTML page that
+ * says what happened and how else to reach the company.
+ */
+$wantsJson =
+    stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false ||
+    stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+
 // The form is same-origin; no CORS header is emitted on purpose, so this
 // endpoint cannot be driven from another site.
+if ($wantsJson) {
+    header('Content-Type: application/json; charset=utf-8');
+}
+
+/** The locale to answer a no-JavaScript post in; only ever `tr` or `en`. */
+function post_locale(): string {
+    $raw = $_POST['locale'] ?? '';
+    return $raw === 'en' ? 'en' : 'tr';
+}
+
+/**
+ * The HTML answer for a no-JavaScript post: what happened, and — when it
+ * failed — the two channels that do not depend on this endpoint.
+ */
+function html_response(int $status, bool $ok): string {
+    $locale = post_locale();
+    $home = $locale === 'en' ? '/en#teklif' : '/tr#teklif';
+    $phone = '+90 (541) 923 64 03';
+    $mail = 'info@raymarnuts.com';
+
+    $copy = $locale === 'en'
+        ? [
+            'title' => $ok ? 'Your request has been received' : 'Your request could not be sent',
+            'body' => $ok
+                ? 'The Raymar team will get in touch using the details you shared.'
+                : 'The form could not be delivered just now. Please call us or send an e-mail — your enquiry has not been lost, but we would rather answer it today.',
+            'back' => 'Back to the site',
+        ]
+        : [
+            'title' => $ok ? 'Talebiniz alındı' : 'Talebiniz iletilemedi',
+            'body' => $ok
+                ? 'Raymar ekibi paylaştığınız bilgiler üzerinden sizinle iletişime geçecek.'
+                : 'Form şu anda iletilemedi. Lütfen bizi arayın ya da e-posta gönderin; talebiniz kaybolmadı, ama bugün yanıtlamayı tercih ederiz.',
+            'back' => 'Siteye dön',
+        ];
+
+    $contact = $ok
+        ? ''
+        : '<p class="contact"><a href="tel:+905419236403">' . $phone . '</a>'
+            . ' · <a href="mailto:' . $mail . '">' . $mail . '</a></p>';
+
+    return '<!doctype html><html lang="' . $locale . '"><head><meta charset="utf-8">'
+        . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        . '<meta name="robots" content="noindex, nofollow">'
+        . '<title>' . $copy['title'] . ' — Raymar Nuts</title>'
+        . '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;'
+        . 'justify-content:center;background:#f7f4ee;color:#16241d;'
+        . 'font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px}'
+        . 'main{max-width:34rem;text-align:center}h1{font-size:1.5rem;margin:0 0 .75rem}'
+        . 'p{margin:0 0 1rem}.contact a{color:#004c38}a{color:#004c38}</style></head>'
+        . '<body><main><h1>' . $copy['title'] . '</h1><p>' . $copy['body'] . '</p>'
+        . $contact . '<p><a href="' . $home . '">' . $copy['back'] . '</a></p>'
+        . '</main></body></html>';
+}
 
 /** Mirrors the client's own reporting shape: `{ ok: boolean }`, nothing else. */
 function respond(int $status, bool $ok): void {
+    global $wantsJson;
     http_response_code($status);
-    echo json_encode(['ok' => $ok]);
+    if ($wantsJson) {
+        echo json_encode(['ok' => $ok]);
+    } else {
+        header('Content-Type: text/html; charset=utf-8');
+        echo html_response($status, $ok);
+    }
     exit;
 }
 
@@ -134,23 +212,73 @@ function rate_limited(string $ip): bool {
     return count($recent) > RATE_LIMIT_MAX;
 }
 
+/**
+ * Who to count submissions against.
+ *
+ * `REMOTE_ADDR` first, deliberately. `X-Forwarded-For` is a request header:
+ * anyone can send it, and the earlier version trusted its first value, so the
+ * limit was bypassed by rotating one header — and every distinct spoofed value
+ * created its own counter file that nothing ever deleted. The header is only
+ * consulted when `REMOTE_ADDR` is a loopback or private address, which is what
+ * a genuine reverse proxy in front of this host looks like.
+ */
 function client_ip(): string {
-    $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
-    if ($forwarded !== '') {
-        $first = trim(explode(',', $forwarded)[0]);
-        if ($first !== '') return $first;
+    $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+    $behindProxy =
+        $remote === '' ||
+        filter_var(
+            $remote,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+        ) === false;
+
+    if ($behindProxy) {
+        $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+        foreach (explode(',', $forwarded) as $candidate) {
+            $candidate = trim($candidate);
+            if (filter_var($candidate, FILTER_VALIDATE_IP) !== false) return $candidate;
+        }
     }
-    return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+    return $remote !== '' ? $remote : 'unknown';
 }
 
+/**
+ * Deletes counter files nobody has touched for an hour.
+ *
+ * Run on roughly one request in fifty so it costs nothing in the common case.
+ * Without it the directory grows one file per distinct client for the life of
+ * the host — a slow inode leak driven by unauthenticated requests.
+ */
+function sweep_rate_limit_files(): void {
+    if (random_int(1, 50) !== 1) return;
+    $stale = time() - 3600;
+    foreach (glob(sys_get_temp_dir() . '/raymar-quote-*.txt') ?: [] as $file) {
+        if (@filemtime($file) < $stale) @unlink($file);
+    }
+}
+
+sweep_rate_limit_files();
 if (rate_limited(client_ip())) {
     respond(429, false);
 }
 
 // ── Parsing and validation ───────────────────────────────────────────────────
 
-$raw = file_get_contents('php://input');
-$body = json_decode($raw === false ? '' : $raw, true);
+/*
+ * A JSON body from the page's own script, or a form post from a visitor whose
+ * JavaScript never ran. `$_POST` is already parsed by PHP for the second case;
+ * the first is read from the input stream because PHP does not parse JSON.
+ */
+if ($wantsJson) {
+    $raw = file_get_contents('php://input');
+    $body = json_decode($raw === false ? '' : $raw, true);
+} else {
+    $body = $_POST;
+    // A checkbox arrives as the string "on" (or its value); the JSON caller
+    // sends a real boolean, and the check below wants one.
+    $body['consent'] = isset($_POST['consent']) && $_POST['consent'] !== '';
+}
 
 if (!is_array($body)) {
     respond(400, false);
@@ -182,7 +310,7 @@ $payload = [
     'message' => $read($body, 'message'),
 ];
 $consent = ($body['consent'] ?? false) === true;
-$honeypot = $read($body, 'website');
+$honeypot = $read($body, 'sube-kodu');
 
 /*
  * The failure reason is never echoed back — the client already knows which
@@ -193,8 +321,22 @@ foreach (['name', 'company', 'country', 'email', 'product', 'message'] as $field
 }
 if (!filter_var($payload['email'], FILTER_VALIDATE_EMAIL)) respond(400, false);
 if (!$consent) respond(400, false);
+/*
+ * Over-length is the one validation failure that can happen to a genuine
+ * enquiry — a buyer pasting a full specification into the message box. The
+ * form now carries the same caps as `maxlength`, so this is the path for a
+ * client that ignored them: the enquiry is kept rather than dropped, and the
+ * status says which kind of failure it was.
+ */
 foreach ($max_length as $field => $limit) {
-    if (mb_strlen($payload[$field]) > $limit) respond(400, false);
+    if (mb_strlen($payload[$field]) > $limit) {
+        error_log(
+            stash($payload)
+                ? '[quote] rejected as over-length — enquiry stashed to ~/teklif-yedek.jsonl'
+                : '[quote] rejected as over-length AND could not be stashed'
+        );
+        respond(413, false);
+    }
 }
 
 /*
@@ -204,6 +346,18 @@ foreach ($max_length as $field => $limit) {
  * A bot that gets a 200 learns nothing and moves on.
  */
 if ($honeypot !== '') {
+    /*
+     * Kept, not discarded. The field is hidden off-screen, and a password
+     * manager that fills fields by name heuristic can put something in it for
+     * a real person — who would then be shown the success panel for an
+     * enquiry nobody ever received. Stashing costs one line and makes that
+     * failure recoverable; the bot still learns nothing from the 200.
+     */
+    error_log(
+        stash($payload + ['honeypot' => $honeypot])
+            ? '[quote] honeypot filled — enquiry stashed to ~/teklif-yedek.jsonl'
+            : '[quote] honeypot filled AND could not be stashed'
+    );
     respond(200, true);
 }
 

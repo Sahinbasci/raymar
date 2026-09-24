@@ -2,6 +2,7 @@ import { QuoteForm } from '@/components/forms/quote-form'
 import { ContactMap } from '@/components/media/contact-map'
 import { Reveal } from '@/components/motion/reveal'
 import { SectionEyebrow } from '@/components/ui/eyebrow'
+import type { Locale } from '@/lib/i18n'
 import type { QuoteContent } from '@/types/content'
 
 /**
@@ -13,7 +14,13 @@ import type { QuoteContent } from '@/types/content'
  * different legal entity and domain, so they are not published here.
  * See docs/ASSET_AUDIT.md.
  */
-export function QuoteSection({ content }: { content: QuoteContent }) {
+export function QuoteSection({
+  content,
+  locale,
+}: {
+  content: QuoteContent
+  locale: Locale
+}) {
   /*
    * Built from `mapQuery` — the postal address alone — and NOT from the
    * `addressLines` the visitor reads above it.
@@ -83,9 +90,12 @@ export function QuoteSection({ content }: { content: QuoteContent }) {
                     <div className="text-xs font-normal tracking-[0.24em] text-raymar-ink/78 uppercase">
                       {content.emailLabel}
                     </div>
-                    <div className="mt-2.25 text-[14.5px] font-light text-raymar-ink/76">
+                    <a
+                      href={`mailto:${content.emailValue}`}
+                      className="mt-2.25 block text-[14.5px] font-light text-raymar-ink/76 transition-colors duration-300 hover:text-raymar-green"
+                    >
                       {content.emailValue}
-                    </div>
+                    </a>
                   </div>
                 </div>
                 <ContactMap
@@ -98,7 +108,7 @@ export function QuoteSection({ content }: { content: QuoteContent }) {
           </div>
 
           <Reveal delay={120} className="relative">
-            <QuoteForm content={content} />
+            <QuoteForm content={content} locale={locale} />
           </Reveal>
         </div>
       </div>
