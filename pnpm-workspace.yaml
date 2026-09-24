@@ -4,3 +4,14 @@
 #                   prebuilt binding is not linked and `pnpm lint` fails.
 allowBuilds:
   unrs-resolver: true
+
+# Dependency pins applied to the whole tree.
+#
+# `pnpm audit` flagged two packages that reach the project only through build
+# and lint tooling — nanoid (via next and @tailwindcss/postcss) and js-yaml
+# (via eslint). Neither ships in the static export, but an audit run on the
+# delivered repository should come back clean, so both are pinned forward to
+# their patched releases. Same major version in each case.
+overrides:
+  nanoid: '>=3.3.18'
+  js-yaml: '>=4.3.2'
