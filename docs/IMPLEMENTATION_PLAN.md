@@ -174,13 +174,18 @@ than pass vacuously; point them at a host that runs PHP to execute them:
 
 1. **Cormorant Garamond is not in the brand manual** (DIN-only). Preserved from
    the approved design; needs client ratification. — DESIGN_SYSTEM.md
-2. **Telephone / e-mail / domain.** Real values exist in the manual but under
-   MAREX and `marasintl.com`. Left as the design's placeholders. — ASSET_AUDIT.md
-3. **No production domain.** `NEXT_PUBLIC_SITE_URL` must be set before launch.
-4. **Submission delivery is unconfigured.** The endpoint is built
-   (`public/teklif-gonder.php`); it needs `QUOTE_TO_EMAIL` (or
-   `QUOTE_WEBHOOK_URL`) set at the top of that file. Until then it returns 503
-   and the form shows its error state — never a false success.
+2. ~~**Telephone / e-mail / domain.**~~ Resolved: `+90 (541) 923 64 03`,
+   `info@raymarnuts.com` and `raymarnuts.com` are the published values.
+3. ~~**No production domain.**~~ Resolved: the site is built with
+   `NEXT_PUBLIC_SITE_URL=https://raymarnuts.com`, and the build refuses to run
+   without the variable.
+4. **Submission delivery depends on a file on the server.** The endpoint is
+   built (`public/teklif-gonder.php`) and delivers through Brevo's HTTPS API,
+   keyed from `~/raymar-gizli.php` above the document root — the host blocks
+   `mail()`, `sendmail` and outbound SMTP. Without that file it returns 503,
+   stashes the enquiry to `~/teklif-yedek.jsonl` and the form shows its error
+   state — never a false success. Verify with one real submission after every
+   deploy or host change.
 5. **All product photography is stock**, labelled "temsili görsel".
 6. **The slogan** is rendered without quotation marks, as in the approved design;
    the manual states it should always carry them.

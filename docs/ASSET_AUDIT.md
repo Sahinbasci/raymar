@@ -167,6 +167,25 @@ figure. Representing the grade by its colour is the honest option.
 surface would replace both compromises above (the CC BY-SA rice image and the
 colour-grade kızıl stand-in) with the company's own product in one pass.
 
+## 3b. Photographs kept but not deployed
+
+Four stock photographs are no longer referenced by any page and were moved out
+of `public/images/` — the image optimizer's input folder — into
+`design-source/unused-photography/` on 2026-09-23. They stayed in the
+repository (the licences are recorded above and they may be wanted again), but
+they no longer produce 24 variants each, which was 5.5 MB of the export
+reaching the server on every deploy for nothing:
+
+| File                                          | Why it is unused                                                                                     |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `hazelnut-inshell.jpg`, `hazelnut-kernel.jpg` | Hazelnut was dropped from the range                                                                  |
+| `walnut-honey.jpg`, `walnut-red.jpg`          | Colour-grade frames; the colour guide carries one photograph, and it is now `walnut-halves-pale.jpg` |
+
+`walnut-halves-pale.jpg` stayed in `public/images/` and is now the
+colour-grades guide's photograph — that page is about how light a kernel is,
+and the generic halves frame it used before asserted a colour it had not been
+chosen for.
+
 ## 4. Placeholder content — REQUIRES CLIENT INPUT
 
 These are marked as pending **in the approved design itself** and are reproduced

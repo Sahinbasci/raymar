@@ -1,5 +1,9 @@
 # SEO ve GEO Planı
 
+> **Arşiv.** Bu plan site tek sayfayken yazıldı. Güncel strateji:
+> [`SEO_GEO_STRATEGY.md`](./SEO_GEO_STRATEGY.md) (Eylül 2026). Buradaki fındık
+> ve yedi ceviz kalitesi mimarisi uygulanmadı; gam ve yapı değişti.
+
 Altı araştırma kolunun çıktısı; her kol ayrı bir şüpheci incelemeden geçirildi.
 Kaynaklı ve doğrulanmış bulgular ile çıkarım olanlar ayrı ayrı işaretlidir.
 

@@ -1,7 +1,68 @@
 # QA Report
 
-All checks below were run against the **production build** (`next build` +
-`next start`), not the dev server.
+All checks below were run against the **production build** (`pnpm build`, then
+the static export served by `scripts/serve-static.mjs`), not the dev server.
+
+## Current state — 23 September 2026
+
+|                 |                                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Automated suite | **846 passed, 0 failed** (1085 scenarios; 239 skipped by project gating)                                                        |
+| Projects        | desktop-1440, laptop-1280, tablet-768, mobile-pixel7, webkit-iphone, webkit-desktop-1440, firefox-desktop-1440                   |
+| Engines         | Chromium, WebKit, Gecko                                                                                                          |
+| Published URLs  | 56 — TR 28 + EN 28 (homepage, 2 indexes, 11 product pages, 11 guides, 3 legal per locale)                                        |
+| Static gates    | `pnpm lint`, `pnpm typecheck`, `pnpm format:check` clean; `pnpm audit` clean                                                     |
+| Dependencies    | Next 16.3.5 (two critical advisories in 16.3.0 fixed by the upgrade); nanoid and js-yaml pinned forward in `pnpm-workspace.yaml` |
+
+What the suite covers beyond the August scope recorded below: both locales and
+their hreflang pairing, every library page (title, description, canonical,
+single `h1`, JSON-LD validity, visible sources matching the `citation` nodes),
+the sitemap matching the exported page set exactly, `llms.txt`, in-page
+navigation and scroll restoration (menu links, repeat clicks, language switch
+keeping the reader's place, Back/Forward landing on the exact pixel), the hero
+video across three engines including throttled-network, Low Power Mode, Data
+Saver and reduced-motion paths, and a crawl of every page for console errors,
+failed requests, broken images, horizontal overflow, layout shift and axe
+violations.
+
+The August record below is kept as written: it documents defects that were
+found and fixed, and the reasoning behind decisions that still hold.
+
+## Hand-over audit — 23 September 2026
+
+An independent pass over the built site, the repository and the live host,
+looking for what a client would find. What it turned up, and what was done:
+
+| Finding                                                                                                                                                       | Status                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| The live site is still the 8-page August deploy: the whole content library, `llms.txt`, the 56-URL sitemap and the current `.htaccess` exist only locally     | **Client action** — upload the package                                                                             |
+| `GET /index.html` on the live host still answers 200 with Natro's hosting advertisement; `out/` has no `index.html`, so an extract-deploy cannot overwrite it | **Client action** — delete it in cPanel; the `.htaccess` 301 then keeps it gone                                    |
+| Honeypot returned a success panel and discarded the enquiry, and its field was named `website` — exactly what a password manager fills by heuristic           | Fixed: renamed, `autocomplete="new-password"`, and the endpoint now stashes whatever it catches                    |
+| The form had no `method`/`action`, so a submission without JavaScript did a GET and put the enquirer's name, e-mail, phone and message in the URL             | Fixed: posts to the endpoint, which answers a form post with an HTML page; `<noscript>` names the phone and e-mail |
+| Over-length fields were rejected with a bare 400 and no stash, and nothing on the form said what the limit was                                                | Fixed: `maxlength` mirrors the server caps; an over-length post is stashed and answered 413                        |
+| The rate limiter keyed on `X-Forwarded-For`, which the caller controls, and its counter files were never cleaned up                                           | Fixed: `REMOTE_ADDR` unless it is private, plus a TTL sweep                                                        |
+| `Organization` and `WebSite` shared one `@id` across both locales while their bodies differed                                                                 | Fixed: per-locale `WebSite` id; the company node carries nothing locale-specific                                   |
+| `hasMap` on `Organization` (it is defined on `Place`), `ItemList` pointing at a fragment that does not exist, `Corporation` for a Ltd. Şti.                   | Fixed, with tests                                                                                                  |
+| The 404 document was Turkish only                                                                                                                             | Fixed: it answers in English under `/en`                                                                           |
+| Router `.txt` payloads were crawlable — a second copy of all 56 pages                                                                                         | Fixed in `robots.txt`, with `llms.txt` and the IndexNow key allowed back                                           |
+| 5.5 MB of image variants shipped for photographs no page references                                                                                           | Fixed: the originals moved out of the optimizer's input folder                                                     |
+| The colour-grades guide carried a photograph whose alt asserted a colour it was not chosen for                                                                | Fixed: it now uses the pale-halves frame                                                                           |
+| Legal pages emitted a `BreadcrumbList` nothing on the page showed                                                                                             | Fixed: the trail is rendered                                                                                       |
+| `/` redirected everyone to Turkish although English had shipped                                                                                               | Fixed: `Accept-Language` negotiation in `.htaccess`, with `Vary`                                                   |
+| The enquiry stash could land inside the web root on an addon-domain layout                                                                                    | Fixed: `.htaccess` denies `.jsonl`/`.log`                                                                          |
+| Two critical advisories against Next 16.3.0                                                                                                                   | Fixed: upgraded to 16.3.5; `pnpm audit` clean                                                                      |
+
+Turkish and English copy were reviewed line by line at the same time. The
+substantive corrections: a real contradiction about what "kırık" means between
+the product hub, the pieces page and the small-pieces page; Turkish decimal
+commas in the English aflatoxin limits; "husk fly" mistranslated as the codling
+moth; an absolute claim ("the one heading that can have a lot rejected") that
+the site's own buying guide contradicts; "sustainable" used in English where
+the Turkish means "lasting"; an unevidenced superlative on the homepage; a
+health claim (NIH on alpha-linolenic acid) removed from a trade page; oil
+percentages compared across two different denominators; and institution names
+taking an apostrophe against TDK's rule. Product names now match across the
+homepage card, the quotation dropdown, the breadcrumb and the page heading.
 
 ## Tested viewports
 
@@ -25,11 +86,12 @@ mouse-driven and at 1× DPR.
 **229 passed, 0 failed** across seven projects covering all three engines
 (Chromium, WebKit, Gecko), stable across repeated full runs. 44 skips are
 intentional viewport gates (desktop-only tests on mobile projects and vice
-versa).
+versa). _(August figures. The current run is in § Current state above.)_
 
 Covered: no console errors, no ≥400 responses, section order, `/`→`/tr`
-redirect (307, deliberately not 308), `/tR` case-canonicalisation (308), `/en`
-correctly 404s and renders the branded 404 document, single `h1`, desktop nav,
+redirect (307, deliberately not 308), `/tR` case-canonicalisation (308), the
+branded 404 document (`/en` 404ed at the time; the English locale has since
+been published), single `h1`, desktop nav,
 header inversion, mobile drawer (open, initial focus, Escape, scroll lock and
 position restore, link dismissal), CTA targets, form validation (required /
 e-mail / KVKK), successful submission and summary, product→form prefill, form
@@ -211,18 +273,28 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
 
 ## Known limitations and open items
 
-1. Telephone and e-mail remain the design's placeholders — see ASSET_AUDIT.md §4
-   for why, and what the client must confirm. The legal texts they used to be
-   grouped with have since been written (item 11).
-2. All product photography is stock, labelled "temsili görsel".
-3. **The quotation endpoint needs a delivery target before launch.**
-   `public/teklif-gonder.php` validates, drops honeypot hits, rate-limits per
-   IP and delivers by e-mail or webhook — but only once `QUOTE_TO_EMAIL` (or
-   `QUOTE_WEBHOOK_URL`) is set at the top of that file. With neither set it
-   returns 503 and the form shows its error state. This replaced a mock that resolved `{ ok: true }`
-   unconditionally, i.e. thanked every buyer for an enquiry it had discarded.
-   Refusing loudly is the intended unconfigured behaviour, not a gap; the gap is
-   that nobody has chosen where enquiries should land.
+_Items 1, 3 and 8 were resolved after this list was first written; they are
+kept with their resolution rather than deleted, because each explains a
+decision that still shapes the code._
+
+1. ~~Telephone and e-mail remain the design's placeholders.~~ **Resolved
+   2026-08-31:** `+90 (541) 923 64 03` and `info@raymarnuts.com` are the real
+   values and appear in the contact section, the footer, the legal texts and
+   the `Organization` structured data. No bracketed placeholder string remains
+   anywhere in the content dictionaries.
+2. All product photography is stock, labelled "temsili görsel". Replacing it
+   with the company's own product and production photographs is the single
+   highest-value content upgrade left, for search and for AI answer engines
+   alike.
+3. ~~The quotation endpoint needs a delivery target before launch.~~
+   **Resolved:** `public/teklif-gonder.php` validates server-side, drops
+   honeypot hits, rate-limits per IP and delivers through Brevo's HTTPS API —
+   the host blocks `mail()`, `sendmail` and outbound SMTP, so HTTPS is the only
+   transport available. The key lives in `~/raymar-gizli.php` above the
+   document root. Unconfigured, the endpoint answers 503 and stashes the
+   enquiry in `~/teklif-yedek.jsonl`; it never reports success for a message it
+   did not deliver. **Still to verify on the live host after every deploy or
+   host change: one real test submission.**
 4. `NEXT_PUBLIC_SITE_URL` must be set before launch — the build now refuses to
    run without it rather than silently baking in localhost.
 5. Cormorant Garamond is not in the brand manual (DIN-only) — needs ratification.
@@ -248,20 +320,32 @@ allow-discrete` (Chrome 117+, Safari 17.4+). Where unsupported the drawer
    The lockup's aspect ratio measures 2.693 in all four states, i.e. the
    artwork is never deformed — the manual's other hard rule.
 
-8. No English locale. `/en` 404s until `src/content/en.ts` is filled and `'en'`
-   is added to `completeLocales`. Doing the second without the first now fails
-   the build — `src/content/index.ts` asserts it, because `en.ts` re-exports
-   the Turkish dictionary and publishing it would serve the Turkish site again
-   under `/en` as a declared English translation.
+8. ~~No English locale.~~ **Resolved:** `/en` is published, with per-locale
+   slugs, reciprocal `hreflang` (plus `x-default`) and its own product pages
+   and guides. The build asserts that every library page exists in both
+   locales.
 9. No automated visual-regression baselines; comparison was manual.
 10. No screen-reader pass (VoiceOver/NVDA) — see § Accessibility.
 11. **The legal texts are drafted, not reviewed by counsel.** KVKK aydınlatma
-    metni, gizlilik politikası and çerez politikası are written and published
-    from verified facts only — the legal entity, Mersis and tax numbers from the
-    identity manual, the exact fields the form collects, the security headers
-    actually set, and the confirmed absence of cookies or third-party analytics.
-    They follow KVKK's statutory structure (Art. 10 disclosure order, Art. 11
-    rights, TTK Art. 82 retention). Two things they deliberately do not claim: a
-    connected form backend, and a KVKK application e-mail or KEP address, since
-    neither exists yet. Both need adding to the text the moment they do. A
-    lawyer's pass is still worth having before these become load-bearing.
+    metni, gizlilik politikası and çerez politikası are written from verified
+    facts only — the legal entity, Mersis and tax numbers from the identity
+    manual, the exact fields the form collects, the security headers actually
+    set, and the site's own cookie and analytics behaviour. They follow KVKK's
+    statutory structure (Art. 10 disclosure order, Art. 11 rights, TTK Art. 82
+    retention). They now also disclose the two third parties the site actually
+    involves: Brevo (Sendinblue SAS, France) as the form's only data processor,
+    with the cross-border transfer under Art. 9 resting on the consent
+    checkbox, and the Google Maps embed in the contact section. A KEP address
+    is still named as "to be announced" because none exists. **A lawyer's pass
+    is still worth having**, and one question is worth putting to them
+    explicitly: the Google Maps iframe loads without asking, so Google may set
+    cookies before any consent is given (item 12).
+12. **The contact map loads without consent.** `ContactMap` renders the Google
+    Maps iframe unconditionally (`loading="lazy"`, so the request happens as it
+    nears the viewport). The legal texts disclose this honestly, and the site
+    sets no cookies of its own, but a stricter reading of KVKK and of GDPR for
+    EU buyers would want either a click-to-load gate on the map or a consent
+    banner. Click-to-load is the cheaper of the two and needs: a placeholder
+    with a "Haritayı yükle / Load the map" button, one sentence changed in the
+    cookie and privacy policies, and `tests/e2e/contact-map.spec.ts` inverted.
+    **Client decision.**

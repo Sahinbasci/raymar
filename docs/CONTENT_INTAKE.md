@@ -1,5 +1,11 @@
 # İçerik Doldurma Formu (Content Intake)
 
+> **Durum (23 Eylül 2026):** Bu form tarihsel kayıttır. İçindeki tüm
+> placeholder'lar kapandı — telefon `+90 (541) 923 64 03`, e-posta
+> `info@raymarnuts.com`, alan adı `raymarnuts.com`, yasal metinler yazıldı ve
+> yayımlandı. Ürün fotoğrafları hâlâ stok görsel; "temsili görsel" notu
+> sayfalarda duruyor ve şirketin kendi fotoğrafları geldiğinde değiştirilecek.
+
 Sitedeki tüm placeholder / stok / doğrulanmamış içeriği gerçeğiyle değiştirmek
 için hazırlanmış soru listesi. Cevapları hazırlayıp (AI ile taslak çıkarabilirsin)
 geri ver; ben ilgili dosyalara işlerim.
