@@ -16,16 +16,42 @@ const OBSERVER_GRACE_MS = 300
  * browser evaluates the threshold off the main thread and the hook only
  * re-renders on the two state flips, not on every scroll frame.
  *
+ * The observer is the *trigger*, not the answer. Its callback re-reads
+ * `window.scrollY` instead of trusting `entry.isIntersecting`, and the effect
+ * reads it once on mount before the observer has said anything at all.
+ *
+ * The motive is the failure mode, not a reproduction: every state this hook
+ * can be wrong about is one it never gets a second chance at. The header's
+ * two states differ by more than decoration — transparent means white
+ * navigation, and on the ivory page below the hero that is white on
+ * near-white. If the state is ever settled wrongly while the page is already
+ * scrolled — the reader scrolled during hydration, the browser restored a
+ * position, the URL carried a fragment — no further scroll is coming to
+ * correct it. `entry.isIntersecting` is a snapshot of whenever the browser
+ * last computed the intersection; `window.scrollY` is the position now. The
+ * second costs one property read, cannot be stale, and leaves the observer
+ * doing what it is good at: telling us *when* to look, without a listener on
+ * every scroll frame.
+ *
+ * To be clear about what this is: a rare `data-solid` failure did show up
+ * once in Firefox under a full parallel suite, and it is what sent me here,
+ * but it did not reproduce — not in isolation, not at ten workers, not with
+ * the JavaScript held back so the scroll lands before hydration. This is the
+ * more defensible of two equally cheap readings, not a diagnosed fix.
+ *
  * Fallback path exists because some embedded and virtualised viewports never
  * deliver IntersectionObserver callbacks. Left unhandled, the header would stay
- * locked in its transparent state and its white navigation would be invisible
- * against the ivory page. The passive scroll listener is only attached when the
- * observer has proven silent, so the normal path costs nothing.
+ * locked in its transparent state. The passive scroll listener is only attached
+ * when the observer has proven silent, so the normal path costs nothing.
  */
 export function useScrollThreshold(offset: number): boolean {
   const [passed, setPassed] = useState(false)
 
   useEffect(() => {
+    const read = () => setPassed(window.scrollY > offset)
+
+    read()
+
     const sentinel = document.createElement('div')
     sentinel.setAttribute('aria-hidden', 'true')
     Object.assign(sentinel.style, {
@@ -42,25 +68,23 @@ export function useScrollThreshold(offset: number): boolean {
     let observerReported = false
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
+      () => {
         observerReported = true
-        if (entry) setPassed(!entry.isIntersecting)
+        read()
       },
       { threshold: 0 },
     )
     observer.observe(sentinel)
 
-    const onScroll = () => setPassed(window.scrollY > offset)
-
     const grace = window.setTimeout(() => {
       if (observerReported) return
-      onScroll()
-      window.addEventListener('scroll', onScroll, { passive: true })
+      read()
+      window.addEventListener('scroll', read, { passive: true })
     }, OBSERVER_GRACE_MS)
 
     return () => {
       window.clearTimeout(grace)
-      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('scroll', read)
       observer.disconnect()
       sentinel.remove()
     }

@@ -51,6 +51,30 @@ test.describe('desktop navigation', () => {
   })
 })
 
+test.describe('header state on arrival', () => {
+  /*
+   * Landing already scrolled must invert the header.
+   *
+   * The test above scrolls and waits for the header to react. This one gives
+   * it nothing to react to: the browser puts the reader at the fragment, and
+   * from the page's point of view nothing ever moves. The state has to be
+   * right on arrival or it stays wrong, and wrong here means white navigation
+   * on the near-white page below the hero.
+   *
+   * It passed before `useScrollThreshold` was changed to read the scroll
+   * position rather than the observer's entry, so it is not a regression test
+   * for that change — it covers an arrival path that had no coverage at all.
+   */
+  test('a deep link lands with the header already inverted', async ({ page }) => {
+    await page.goto('/tr#teklif')
+
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 })
+      .toBeGreaterThan(48)
+    await expect(page.locator('header')).toHaveAttribute('data-solid', 'true')
+  })
+})
+
 test.describe('mobile navigation', () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) >= 1080, 'narrow layout only')
 
