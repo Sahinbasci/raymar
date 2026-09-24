@@ -604,6 +604,10 @@ test.describe('site audit — layout stability', () => {
    * and anything measurable is a regression worth knowing about.
    */
   for (const path of [
+    // The homepage first: it is the page most visitors see, and the only one
+    // with the video, the animated sections and the map placeholder on it.
+    '/tr',
+    '/en',
     '/tr/urunler',
     '/tr/urunler/ceviz-ici',
     '/tr/rehber/ceviz-ici-cesitleri',

@@ -7,7 +7,7 @@ the static export served by `scripts/serve-static.mjs`), not the dev server.
 
 |                 |                                                                                                                                  |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Automated suite | **846 passed, 0 failed** (1085 scenarios; 239 skipped by project gating)                                                         |
+| Automated suite | **869 passed, 0 failed** (1120 scenarios; 251 skipped by project gating)                                                         |
 | Projects        | desktop-1440, laptop-1280, tablet-768, mobile-pixel7, webkit-iphone, webkit-desktop-1440, firefox-desktop-1440                   |
 | Engines         | Chromium, WebKit, Gecko                                                                                                          |
 | Published URLs  | 56 — TR 28 + EN 28 (homepage, 2 indexes, 11 product pages, 11 guides, 3 legal per locale)                                        |

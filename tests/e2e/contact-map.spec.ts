@@ -75,6 +75,44 @@ test.describe('contact map', () => {
     expect(decodeURIComponent(src ?? '')).toContain('Vadi Cad. No:108')
   })
 
+  /*
+   * Pressing the button must not move the page.
+   *
+   * The gate swaps one block of content for another, and a swap that resizes
+   * its container drags everything below it — here, the legal links and the
+   * footer — while the reader is looking at the contact details. The frame is
+   * a fixed-ratio box for exactly this reason, so the assertion is on the box,
+   * not on a CLS score: layout-shift entries within half a second of a click
+   * carry `hadRecentInput`, which excludes them from CLS and would let a real
+   * jump through unmeasured.
+   */
+  test('loading the map does not move anything', async ({ page }) => {
+    await page.goto('/tr')
+    const section = page.locator('#teklif')
+    await section.scrollIntoViewIfNeeded()
+
+    // Document coordinates, not viewport ones: clicking scrolls the button
+    // into view, which moves the viewport without moving the layout.
+    const measure = () =>
+      page.evaluate(() => {
+        const el = document.querySelector('#teklif')
+        if (!el) throw new Error('#teklif is missing')
+        const box = el.getBoundingClientRect()
+        return {
+          top: Math.round(box.top + window.scrollY),
+          height: Math.round(box.height),
+          documentHeight: Math.round(document.documentElement.scrollHeight),
+        }
+      })
+
+    const before = await measure()
+    await section.getByRole('button', { name: 'Haritayı Yükle' }).click()
+    await expect(section.locator('iframe')).toBeAttached()
+    const after = await measure()
+
+    expect(after).toEqual(before)
+  })
+
   test('the English page offers the same gate in English', async ({ page }) => {
     await page.goto('/en')
     await expect(page.locator('#teklif iframe')).toHaveCount(0)
