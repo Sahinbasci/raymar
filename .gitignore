@@ -23,3 +23,8 @@ tsconfig.tsbuildinfo
 /blob-report
 /playwright/.cache
 .vercel
+
+# The deploy package. `out/` is zipped to the repo root before a cPanel upload
+# (see README § Deploying); it is the same build artifact in one file.
+/raymar-*.zip
+/raymar-deploy.zip

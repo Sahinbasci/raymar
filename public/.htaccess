@@ -98,7 +98,7 @@ Options -Indexes
   # and quite possibly what a crawler recorded for raymarnuts.com during the
   # parked period.
   #
-  # Re-checked 2026-09-23: it is STILL there — `GET /index.html` answers 200
+  # Re-checked 2026-09-24: it is STILL there — `GET /index.html` answers 200
   # with that title. This rule is undeployed, and a zip-extract deploy cannot
   # remove the file either, because `out/` contains no `index.html` to
   # overwrite it with. **Delete it by hand in cPanel's File Manager**; this
