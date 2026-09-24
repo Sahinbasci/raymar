@@ -168,6 +168,10 @@ export interface QuoteContent {
   readonly mapLabel: string
   /** Accessible title on the map `<iframe>`. */
   readonly mapTitle: string
+  /** Button that fetches the embed; nothing reaches Google before it is pressed. */
+  readonly mapLoadLabel: string
+  /** One line under that button: what pressing it means for the visitor. */
+  readonly mapNotice: string
   /**
    * What the map is asked to find — the postal address ONLY, never the company
    * name.

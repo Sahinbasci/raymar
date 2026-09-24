@@ -476,6 +476,9 @@ export const en: Dictionary = {
     countryOptions: quoteCountryOptions,
     mapLabel: 'Location',
     mapTitle: 'Raymar Nuts location — Google Maps',
+    mapLoadLabel: 'Load the Map',
+    mapNotice:
+      'The map is loaded from Google Maps; once you load it, Google may set its own cookies in your browser.',
     // Identical to the Turkish query, and deliberately so: this is a postal
     // address, and Google Maps resolves the real building from it. Leading
     // with the company name matched a different business nearby.
@@ -684,7 +687,7 @@ export const en: Dictionary = {
         {
           heading: 'Cookies',
           paragraphs: [
-            "The Site's own code sets no cookies. The single exception is the embedded Google Maps map in the Contact section — it loads automatically when the page loads, and Google may set its own cookies. See the Cookie Policy for details.",
+            "The Site's own code sets no cookies. The single exception is the Google Maps map in the Contact section: it loads only when you press the “Load the Map” button, and Google may set its own cookies at that point. Until you press it, no request reaches Google. See the Cookie Policy for details.",
           ],
         },
         {
@@ -742,7 +745,7 @@ export const en: Dictionary = {
         {
           heading: 'Google Maps — Third-Party Cookies',
           paragraphs: [
-            "The map showing our address in the Contact section is embedded from Google Maps and loads automatically when the page loads. Because that map is served from Google's own servers, Google may set its own cookies in your browser. These cookies are determined and managed by Google, not by the Site; for details you may consult Google's own privacy and cookie practices at policies.google.com/privacy.",
+            "The map showing our address in the Contact section is embedded from Google Maps, but it is not loaded when the page opens. It is fetched from Google's servers only when you press the “Load the Map” button, and from that point Google may set its own cookies in your browser. Until you press it, no request is sent to Google. These cookies are determined and managed by Google, not by the Site; for details you may consult Google's own privacy and cookie practices at policies.google.com/privacy.",
             'Apart from this single exception, there are no third-party cookies on the Site for analytics, advertising or targeting.',
           ],
         },

@@ -101,6 +101,8 @@ export function QuoteSection({
                 <ContactMap
                   label={content.mapLabel}
                   title={content.mapTitle}
+                  loadLabel={content.mapLoadLabel}
+                  notice={content.mapNotice}
                   embedSrc={mapEmbedSrc}
                 />
               </div>

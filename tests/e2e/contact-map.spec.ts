@@ -18,30 +18,54 @@ const EXPECTED_EMBED_SRC = `https://www.google.com/maps?q=${encodeURIComponent(
 )}&output=embed`
 
 test.describe('contact map', () => {
-  test('the Google Maps embed is present without any click to reveal it', async ({
-    page,
-  }) => {
-    await page.goto('/tr')
+  /*
+   * Nothing reaches Google until the visitor asks.
+   *
+   * The embed used to render unconditionally, which meant Google could set
+   * cookies in a browser that had done nothing but open the page — the reason
+   * a site either gates the map or carries a consent banner. This asserts the
+   * gate from the network up: no request to Google while the section is on
+   * screen, and no iframe in the DOM to make one.
+   */
+  test('requests nothing from Google before the visitor asks', async ({ page }) => {
+    const requests: string[] = []
+    page.on('request', (request) => {
+      if (/google\.com|gstatic\.com|googleapis\.com/.test(request.url())) {
+        requests.push(request.url())
+      }
+    })
 
-    // Unconditional by explicit decision (see contact-map.tsx's own doc
-    // comment): the iframe must already be in the DOM on first load, not
-    // behind a "load map" button — that is also why the cookie and privacy
-    // policies disclose Google as an active third party rather than a
-    // hypothetical one.
+    await page.goto('/tr')
+    await page.locator('#teklif').scrollIntoViewIfNeeded()
+    await page.waitForTimeout(1500)
+
+    expect(requests, `requested: ${requests.join(', ')}`).toEqual([])
+    await expect(page.locator('#teklif iframe')).toHaveCount(0)
+
+    // And the visitor is told what pressing it does, rather than being asked
+    // to consent to something unnamed.
+    const button = page.locator('#teklif').getByRole('button', { name: 'Haritayı Yükle' })
+    await expect(button).toBeVisible()
+    await expect(page.locator('#teklif')).toContainText('Google Haritalar’dan yüklenir')
+  })
+
+  test('loads the embed once the button is pressed', async ({ page }) => {
+    await page.goto('/tr')
+    const mapRequest = page.waitForRequest(/^https:\/\/www\.google\.com\/maps/)
+
+    await page.locator('#teklif').getByRole('button', { name: 'Haritayı Yükle' }).click()
+
     const map = page.locator(
       '#teklif iframe[title="Raymar Nuts konumu — Google Haritalar"]',
     )
     await expect(map).toBeAttached()
     await expect(map).toHaveAttribute('src', EXPECTED_EMBED_SRC)
-    await expect(map).toHaveAttribute('loading', 'lazy')
-
-    await expect(
-      page.locator('#teklif').getByRole('button', { name: /harita/i }),
-    ).toHaveCount(0)
+    await mapRequest
   })
 
   test('the query geocodes the address, not the company name', async ({ page }) => {
     await page.goto('/tr')
+    await page.locator('#teklif').getByRole('button', { name: 'Haritayı Yükle' }).click()
     const src = await page.locator('#teklif iframe').first().getAttribute('src')
 
     // The regression this guards: with "Marex Dış Tic. Ltd. Şti." leading the
@@ -51,12 +75,12 @@ test.describe('contact map', () => {
     expect(decodeURIComponent(src ?? '')).toContain('Vadi Cad. No:108')
   })
 
-  test('the embed actually requests Google once scrolled into view', async ({ page }) => {
-    const mapRequest = page.waitForRequest(/^https:\/\/www\.google\.com\/maps/)
-
-    await page.goto('/tr')
-    await page.locator('#teklif iframe').scrollIntoViewIfNeeded()
-
-    await mapRequest
+  test('the English page offers the same gate in English', async ({ page }) => {
+    await page.goto('/en')
+    await expect(page.locator('#teklif iframe')).toHaveCount(0)
+    await page.locator('#teklif').getByRole('button', { name: 'Load the Map' }).click()
+    await expect(
+      page.locator('#teklif iframe[title="Raymar Nuts location — Google Maps"]'),
+    ).toBeAttached()
   })
 })

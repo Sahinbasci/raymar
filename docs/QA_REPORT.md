@@ -7,7 +7,7 @@ the static export served by `scripts/serve-static.mjs`), not the dev server.
 
 |                 |                                                                                                                                  |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Automated suite | **846 passed, 0 failed** (1085 scenarios; 239 skipped by project gating)                                                        |
+| Automated suite | **846 passed, 0 failed** (1085 scenarios; 239 skipped by project gating)                                                         |
 | Projects        | desktop-1440, laptop-1280, tablet-768, mobile-pixel7, webkit-iphone, webkit-desktop-1440, firefox-desktop-1440                   |
 | Engines         | Chromium, WebKit, Gecko                                                                                                          |
 | Published URLs  | 56 — TR 28 + EN 28 (homepage, 2 indexes, 11 product pages, 11 guides, 3 legal per locale)                                        |
@@ -335,17 +335,19 @@ decision that still shapes the code._
     retention). They now also disclose the two third parties the site actually
     involves: Brevo (Sendinblue SAS, France) as the form's only data processor,
     with the cross-border transfer under Art. 9 resting on the consent
-    checkbox, and the Google Maps embed in the contact section. A KEP address
-    is still named as "to be announced" because none exists. **A lawyer's pass
-    is still worth having**, and one question is worth putting to them
-    explicitly: the Google Maps iframe loads without asking, so Google may set
-    cookies before any consent is given (item 12).
-12. **The contact map loads without consent.** `ContactMap` renders the Google
-    Maps iframe unconditionally (`loading="lazy"`, so the request happens as it
-    nears the viewport). The legal texts disclose this honestly, and the site
-    sets no cookies of its own, but a stricter reading of KVKK and of GDPR for
-    EU buyers would want either a click-to-load gate on the map or a consent
-    banner. Click-to-load is the cheaper of the two and needs: a placeholder
-    with a "Haritayı yükle / Load the map" button, one sentence changed in the
-    cookie and privacy policies, and `tests/e2e/contact-map.spec.ts` inverted.
-    **Client decision.**
+    checkbox, and the Google Maps embed in the contact section, which now
+    loads only on a press (item 12). A KEP address is still named as "to be
+    announced" because none exists. **A lawyer's pass is still worth having.**
+12. ~~The contact map loads without consent.~~ **Resolved:** `ContactMap` no
+    longer renders the iframe on load. The frame is a placeholder carrying a
+    "Haritayı Yükle / Load the Map" button and one line saying what pressing it
+    does; the embed is created on the press, and nothing reaches Google before
+    that. The cookie and privacy policies were rewritten to describe the gate
+    rather than an automatic load, and `tests/e2e/contact-map.spec.ts` now
+    asserts the new contract from the network up — no request to any Google
+    origin while the contact section sits on screen, the correct `src` after
+    the press, and the same gate in English. 28 scenarios, all 7 projects.
+
+    The gate is also why the site still needs no cookie banner: with the map
+    behind a press, the site sets no cookie and fires no third-party request
+    until a visitor asks it to.

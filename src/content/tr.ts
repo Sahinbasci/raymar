@@ -462,6 +462,9 @@ export const tr: Dictionary = {
     countryOptions: quoteCountryOptions,
     mapLabel: 'Konum',
     mapTitle: 'Raymar Nuts konumu — Google Haritalar',
+    mapLoadLabel: 'Haritayı Yükle',
+    mapNotice:
+      'Harita Google Haritalar’dan yüklenir; yüklediğinizde Google tarayıcınıza kendi çerezlerini yerleştirebilir.',
     // Şirket adı bilerek yok: sorgunun başında olduğunda Google Haritalar
     // yakındaki benzer adlı başka bir firmanın işletme kaydına eşleyip yanlış
     // binayı işaretliyordu. Yalnız posta adresi verilince doğru noktaya
@@ -708,7 +711,7 @@ export const tr: Dictionary = {
         {
           heading: 'Çerezler',
           paragraphs: [
-            "Site'nin kendi kodu hiçbir çerez (cookie) yerleştirmez. Tek istisna, İletişim bölümündeki gömülü Google Haritalar haritasıdır — bu harita sayfa yüklendiğinde otomatik olarak yüklenir ve Google kendi çerezlerini yerleştirebilir. Ayrıntılı bilgi için Çerez Politikası'nı inceleyebilirsiniz.",
+            "Site'nin kendi kodu hiçbir çerez (cookie) yerleştirmez. Tek istisna, İletişim bölümündeki Google Haritalar haritasıdır: harita yalnızca siz “Haritayı Yükle” düğmesine bastığınızda yüklenir ve o anda Google kendi çerezlerini yerleştirebilir. Düğmeye basmadığınız sürece Google'a hiçbir istek gitmez. Ayrıntılı bilgi için Çerez Politikası'nı inceleyebilirsiniz.",
           ],
         },
         {
@@ -765,7 +768,7 @@ export const tr: Dictionary = {
         {
           heading: 'Google Haritalar — Üçüncü Taraf Çerezi',
           paragraphs: [
-            "İletişim bölümünde adresimizi gösteren harita, Google Haritalar üzerinden gömülü (embed) olarak sunulur ve sayfa yüklendiği anda otomatik olarak yüklenir. Bu harita Google'ın kendi sunucularından servis edildiği için Google, kendi çerezlerini tarayıcınıza yerleştirebilir. Bu çerezler Site tarafından değil, Google tarafından belirlenir ve yönetilir; ayrıntılı bilgi için Google'ın kendi gizlilik ve çerez uygulamalarına (policies.google.com/privacy) başvurabilirsiniz.",
+            "İletişim bölümünde adresimizi gösteren harita, Google Haritalar üzerinden gömülü (embed) olarak sunulur; ancak sayfa açıldığında yüklenmez. Harita yalnızca “Haritayı Yükle” düğmesine bastığınızda Google'ın sunucularından getirilir ve Google o andan itibaren kendi çerezlerini tarayıcınıza yerleştirebilir. Düğmeye basmadığınız sürece Google'a hiçbir istek gönderilmez. Bu çerezler Site tarafından değil, Google tarafından belirlenir ve yönetilir; ayrıntılı bilgi için Google'ın kendi gizlilik ve çerez uygulamalarına (policies.google.com/privacy) başvurabilirsiniz.",
             "Bu tek istisna dışında, Site'de hiçbir üçüncü taraf çerezi (analitik, reklam veya hedefleme amaçlı) bulunmamaktadır.",
           ],
         },
