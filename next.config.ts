@@ -38,6 +38,14 @@ const nextConfig: NextConfig = {
      * returns its own complete document instead.
      */
     globalNotFound: true,
+    /*
+     * The dev server's Model Context Protocol endpoint (`/_next/mcp`) is on by
+     * default and nothing here talks to it. GHSA-39w2-rjm5-chcv is a DNS-
+     * rebinding bypass of its origin check in `next` < 16.3.8; even patched, a
+     * client that sends no Origin header is let through. Dev-only — a static
+     * export serves no such endpoint — but switching it off costs nothing.
+     */
+    mcpServer: false,
   },
   images: {
     /*

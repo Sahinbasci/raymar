@@ -4,7 +4,7 @@
     {
       "name": "raymar-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev", "--port", "3000"],
+      "runtimeArgs": ["dev", "--port", "3000", "--hostname", "127.0.0.1"],
       "port": 3000,
       "autoPort": false
     },
