@@ -218,6 +218,29 @@ const server = createServer((request, response) => {
     return
   }
 
+  /*
+   * One URL per page, matching `.htaccess`: `/tr.html` and `/tr/` 301 to
+   * `/tr`. Decided from the request line, before the filesystem, exactly as
+   * the THE_REQUEST condition does; `/404.html` asked for directly is a page
+   * like any other.
+   */
+  const query = (request.url ?? '').slice(path.length)
+  const htmlMatch = /^\/+(.+?)\.html$/i.exec(path)
+  if (htmlMatch) {
+    response.writeHead(301, { ...SECURITY_HEADERS, Location: `/${htmlMatch[1]}${query}` })
+    response.end()
+    return
+  }
+  if (path.length > 1 && path.endsWith('/')) {
+    const bare = path.replace(/\/+$/, '')
+    const page = safeJoin(ROOT, `${bare}.html`)
+    if (page && isFile(page) && !isFile(safeJoin(ROOT, path) ?? '')) {
+      response.writeHead(301, { ...SECURITY_HEADERS, Location: `${bare}${query}` })
+      response.end()
+      return
+    }
+  }
+
   const target = safeJoin(ROOT, path)
   if (!target) {
     response.writeHead(400, SECURITY_HEADERS)
@@ -258,7 +281,12 @@ const server = createServer((request, response) => {
 
   // --- Real files win ------------------------------------------------------
   if (isFile(target)) {
-    send(response, 200, target, {}, request)
+    // `.htaccess`: every `.txt` except the three meant to be read is noindex.
+    const name = target.split('/').pop() ?? ''
+    const noindex =
+      name.endsWith('.txt') &&
+      !/^(llms|robots|62e9be2df8f1e009ba0be63c77a0cb03)\.txt$/.test(name)
+    send(response, 200, target, noindex ? { 'X-Robots-Tag': 'noindex' } : {}, request)
     return
   }
 

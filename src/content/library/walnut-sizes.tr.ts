@@ -120,7 +120,7 @@ export const walnutSizesTr: readonly ProductPage[] = [
     parent: 'walnut-kernels',
     slug: 'ceyrek-ceviz-ici',
     name: 'Çeyrek Ceviz İçi',
-    metaTitle: 'Toptan Çeyrek Ceviz İçi: Özellikler ve Kullanım',
+    metaTitle: 'Toptan Çeyrek Ceviz İçi: Özellikler, Kullanım',
     metaDescription:
       'Toptan çeyrek ceviz içi: TS 1276 ve UNECE standardındaki tanımı, kek, kurabiye ve fırın ürünlerinde kullanımı, sipariş kriterleri, depolama ve teklif.',
     eyebrow: 'Ceviz İçi',

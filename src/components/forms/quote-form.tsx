@@ -547,7 +547,10 @@ export function QuoteForm({ content, locale }: QuoteFormProps) {
                 aria-labelledby={`${fieldId('phone')}-label`}
                 onChange={(event) => setField('phone', event.target.value)}
                 className={cn(
-                  'min-w-0 flex-1 border-0 bg-transparent text-[15px] text-raymar-ink outline-none placeholder:text-raymar-ink/45',
+                  // 16px, not 15: below 16px iOS Safari zooms the page on focus
+                  // (see the base `input` rule in globals.css, which a size
+                  // utility here would otherwise override).
+                  'min-w-0 flex-1 border-0 bg-transparent text-base text-raymar-ink outline-none placeholder:text-raymar-ink/45',
                   dialCode ? 'pr-3.5 pl-2.5' : 'px-3.5',
                 )}
               />

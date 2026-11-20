@@ -30,7 +30,7 @@ export const guidesTr: readonly GuidePage[] = [
   {
     id: 'walnut-kernel-grades',
     slug: 'ceviz-ici-cesitleri',
-    metaTitle: 'Ceviz İçi Çeşitleri: Yarım, Çeyrek, Kırık, Pirinç',
+    metaTitle: 'Ceviz İçi Çeşitleri: Yarım, Çeyrek, Kırık',
     metaDescription:
       'Yarım, çeyrek, kırık ve pirinç ceviz içi arasındaki farklar; TS 1276, UNECE ve ABD standartlarındaki karşılıkları ve hangi üründe hangi boyun kullanıldığı.',
     eyebrow: 'Rehber',
@@ -143,7 +143,7 @@ export const guidesTr: readonly GuidePage[] = [
   {
     id: 'walnut-colour-grades',
     slug: 'ceviz-ici-renk-siniflari',
-    metaTitle: 'Ceviz İçi Renk Sınıfları: Extra Light’tan Amber’e',
+    metaTitle: 'Ceviz İçi Renk Sınıfları: Light’tan Amber’e',
     metaDescription:
       'Extra Light, Light, Light Amber ve Amber ne demek? USDA renk sınıfları, TS 1276’nın renk koşulları, rengin neden değiştiği ve lezzetle ilişkisi.',
     eyebrow: 'Rehber',
@@ -235,7 +235,7 @@ export const guidesTr: readonly GuidePage[] = [
   {
     id: 'storing-walnut-kernels',
     slug: 'ceviz-ici-nasil-saklanir',
-    metaTitle: 'Ceviz İçi Nasıl Saklanır? Acılaşmayı Geciktirme',
+    metaTitle: 'Ceviz İçi Nasıl Saklanır? Acılaşmayı Önleme',
     metaDescription:
       'Ceviz içi neden acılaşır, buzdolabında veya dondurucuda saklanır mı? Toptan alınan ceviz içini tazeliğini kaybetmeden saklamanın koşullarını anlatıyoruz.',
     eyebrow: 'Rehber',
@@ -883,7 +883,7 @@ export const guidesTr: readonly GuidePage[] = [
   {
     id: 'buying-nuts-wholesale',
     slug: 'toptan-kuruyemis-alirken-dikkat-edilecekler',
-    metaTitle: 'Toptan Kuruyemiş Alırken Nelere Dikkat Edilmeli?',
+    metaTitle: 'Toptan Kuruyemiş Alırken Nelere Dikkat Etmeli?',
     metaDescription:
       'Toptan kuruyemiş alımında kalite kriterleri, analiz raporları, numune, ambalaj, teslim şekli ve tedarikçi seçimi. Kurumsal alıcılar için kontrol listesi.',
     eyebrow: 'Rehber',

@@ -111,7 +111,12 @@ export function organizationGraph({ locale, dictionary }: OrganizationGraphOptio
     },
     address: {
       '@type': 'PostalAddress',
-      streetAddress: footer.addressLines.slice(1, -1).join(', '),
+      streetAddress: footer.addressLines
+        .slice(1, -1)
+        .join(', ')
+        // The postal code has its own field below; repeating it here made the
+        // street line read "…, 34235 Giyimkent".
+        .replace(/\b34235\s+/, ''),
       addressLocality: 'Esenler',
       addressRegion: 'İstanbul',
       postalCode: '34235',
@@ -302,17 +307,21 @@ export function libraryCrumbs(
   return crumbs
 }
 
-/** The publisher, stated in full rather than only by `@id`. */
-function organizationReference(locale: Locale, dictionary: Dictionary) {
+/**
+ * The publisher, stated in full rather than only by `@id`.
+ *
+ * Every field must match the `Organization` node on the same page: two
+ * declarations under one `@id` with a different `url` (it used to be the
+ * locale homepage here) or a different `logo` shape are conflicting data
+ * about one entity, which a validator merges unpredictably.
+ */
+function organizationReference(dictionary: Dictionary) {
   return {
     '@type': 'Organization',
     '@id': ORGANIZATION_ID,
     name: dictionary.meta.siteName,
-    url: `${siteUrl}/${locale}`,
-    logo: {
-      '@type': 'ImageObject',
-      url: `${siteUrl}/brand/raymar-logo-green-gold.svg`,
-    },
+    url: siteUrl,
+    logo: `${siteUrl}/brand/raymar-logo-green-gold.svg`,
   }
 }
 
@@ -416,8 +425,8 @@ export function libraryPageGraph({ locale, dictionary, entry }: LibraryPageGraph
           datePublished: publishedTimestamp(entry.page.published),
           dateModified: publishedTimestamp(entry.page.updated),
           inLanguage: localeTags[locale],
-          author: organizationReference(locale, dictionary),
-          publisher: organizationReference(locale, dictionary),
+          author: organizationReference(dictionary),
+          publisher: organizationReference(dictionary),
           mainEntityOfPage: { '@id': `${url}#webpage` },
           ...citation,
         }

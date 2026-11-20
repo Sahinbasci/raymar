@@ -26,6 +26,9 @@ Options -Indexes
   AddType video/mp4 .mp4
   AddType application/manifest+json .webmanifest
   AddType image/svg+xml .svg
+  # Measured live: `.txt` was served as bare `text/plain` with no charset, and
+  # `llms.txt` is full of Turkish letters a client may then decode as Latin-1.
+  AddCharset utf-8 .txt .xml .webmanifest .html .css .js
 </IfModule>
 
 # -----------------------------------------------------------------------------
@@ -144,6 +147,26 @@ Options -Indexes
   # `.html` sibling simply falls through, which is the correct outcome.
   DirectorySlash Off
 
+  # --- One URL per page -----------------------------------------------------
+  # Without these, `/tr/`, `/tr.html` and `/tr` all answered 200 with the same
+  # page. The canonical tag points at the extensionless form, but Search
+  # Console still files the other two as "Alternate page with proper
+  # canonical" and splits link signals across them. Permanent redirects make
+  # the extensionless URL the only one that serves.
+  #
+  # `.html` is matched on THE_REQUEST (what the client actually asked for), not
+  # on the URL being rewritten: the rewrite below turns `/tr` INTO `/tr.html`
+  # internally, and matching that would redirect every page to itself forever.
+  # The ErrorDocument's internal `/404.html` is safe for the same reason.
+  RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)\.html[?\s] [NC]
+  RewriteRule ^ /%1 [R=301,L,NE]
+
+  # Trailing slash, only where a page by that name exists — a real directory
+  # without an `.html` sibling (`/_next/`) keeps the server's own answer.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+)/$ /$1 [R=301,L]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^(.+?)/?$ /$1.html [L]
@@ -247,6 +270,11 @@ Options -Indexes
   <FilesMatch "\.(html|txt|xml|webmanifest)$">
     Header set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
+  # The sitemap's stylesheet has a fixed name, unlike the hashed `.css` above,
+  # so it must not be cached as immutable or an edit would never reach anyone.
+  <FilesMatch "^sitemap\.css$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
 </IfModule>
 
 # -----------------------------------------------------------------------------
@@ -272,6 +300,17 @@ ErrorDocument 404 /404.html
 <FilesMatch "^manifest\.json$">
   Require all denied
 </FilesMatch>
+
+# Served, then, but never indexed. robots.txt's `Disallow: /*.txt$` does not
+# reach them: the router requests them as `…txt?_rsc=…`, and the `$` anchor
+# then fails to match. A header travels with the file whatever the URL, so a
+# crawler that finds one cannot list a page of raw RSC payload. `llms.txt`,
+# `robots.txt` and the IndexNow key are the three `.txt` files meant to be read.
+<IfModule mod_headers.c>
+  <FilesMatch "^(?!(llms|robots|62e9be2df8f1e009ba0be63c77a0cb03)\.txt$).+\.txt$">
+    Header set X-Robots-Tag "noindex"
+  </FilesMatch>
+</IfModule>
 
 # -----------------------------------------------------------------------------
 # Never serve an enquiry backup

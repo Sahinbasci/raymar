@@ -69,7 +69,9 @@ export function QuoteRequestButton({
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(
-        'cursor-pointer border-0 border-b border-raymar-ink/36 bg-transparent p-0 pb-1.25 text-[12.5px] font-normal tracking-[0.04em] text-raymar-ink/78 transition-colors duration-300 hover:border-raymar-gold hover:text-raymar-green',
+        // The `after:` box widens the tap target to ~45px without moving the
+        // hairline: the visible link is 25px tall, too small for a thumb.
+        "relative cursor-pointer border-0 border-b border-raymar-ink/36 bg-transparent p-0 pb-1.25 text-[12.5px] font-normal tracking-[0.04em] text-raymar-ink/78 transition-colors duration-300 after:absolute after:-inset-x-2 after:-inset-y-2.5 after:content-[''] hover:border-raymar-gold hover:text-raymar-green",
         className,
       )}
     >

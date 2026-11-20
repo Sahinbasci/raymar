@@ -824,7 +824,7 @@ export const en: Dictionary = {
     title: 'Raymar Nuts | Wholesale Nuts and Walnut Kernel Supply',
     titleTemplate: '%s | Raymar Nuts',
     description:
-      'Istanbul-based Raymar Nuts supplies corporate buyers with wholesale walnut kernels, Antep pistachios, macadamia nuts, pecans, pumpkin seed kernels and sunflower seeds.',
+      'Istanbul-based Raymar Nuts supplies corporate buyers with wholesale walnut kernels, pistachios, macadamias, pecans, pumpkin and sunflower seeds.',
     skipToContent: 'Skip to content',
   },
 }

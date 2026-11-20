@@ -50,7 +50,8 @@ export function ArrowLink({
     <Link
       href={href}
       className={cn(
-        'group inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 hover:text-raymar-gold-dark',
+        // `after:` widens the 28px-tall link to a ~44px tap target in place.
+        "group relative inline-flex items-center gap-2.5 text-xs font-normal tracking-[0.2em] text-raymar-green uppercase transition-colors duration-300 after:absolute after:-inset-x-1 after:-inset-y-2 after:content-[''] hover:text-raymar-gold-dark",
         className,
       )}
     >

@@ -42,3 +42,11 @@ export const ogImage = {
   width: 3840,
   height: 2160,
 } as const
+
+/**
+ * When the copy of the homepage, the two library indexes and the product pages
+ * last changed (ISO date). The sitemap reports it as their `lastmod`; guides
+ * and legal documents carry their own dates. Bump it in the same commit as a
+ * change to that copy — never to "refresh" a page whose text did not change.
+ */
+export const contentUpdated = '2026-11-20'

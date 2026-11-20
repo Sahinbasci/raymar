@@ -76,7 +76,7 @@ export function GET() {
   const body = [
     `# ${en.meta.siteName}`,
     '',
-    `> ${en.meta.description} The registered company is ${en.footer.addressLines[0]}, ${en.footer.addressLines.slice(1).join(', ')}. Contact: ${en.quote.emailValue}.`,
+    `> ${en.meta.description} The registered company is ${en.footer.addressLines[0]}, ${en.footer.addressLines.slice(1).join(', ')}. Contact: ${en.quote.emailValue}, ${en.quote.phoneValue}.`,
     '',
     'Prices, minimum quantities and specifications are given on request through the quotation form; the pages below describe the products and the trade in general terms.',
     '',

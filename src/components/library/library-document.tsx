@@ -40,14 +40,43 @@ function relatedGroups(locale: Locale, entry: LibraryEntry): LinkGroup[] {
   const { library } = getDictionary(locale)
 
   if (entry.kind === 'guides') {
+    const { relatedProducts } = entry.page
+    /*
+     * Guides used to link only to products, so each was reachable from its
+     * index and a single product page and nothing else — no guide pointed at
+     * another. The neighbours are derived rather than listed by hand: the
+     * guides that discuss the most of the same products, which keeps both
+     * locales in step and cannot name a guide that does not exist.
+     */
+    const neighbours = guidePages(locale)
+      .filter((candidate) => candidate.id !== entry.page.id)
+      .map((candidate) => ({
+        candidate,
+        shared: candidate.relatedProducts.filter((id) => relatedProducts.includes(id))
+          .length,
+      }))
+      .filter(({ shared }) => shared > 0)
+      .sort((a, b) => b.shared - a.shared)
+      .slice(0, 3)
     return [
       {
         heading: library.relatedProductsHeading,
-        links: entry.page.relatedProducts.flatMap((id) => {
+        links: relatedProducts.flatMap((id) => {
           const product = productPages(locale).find((candidate) => candidate.id === id)
           return product ? [{ href: productPath(locale, id), label: product.name }] : []
         }),
       },
+      ...(neighbours.length > 0
+        ? [
+            {
+              heading: library.relatedGuidesHeading,
+              links: neighbours.map(({ candidate }) => ({
+                href: guidePath(locale, candidate.id),
+                label: candidate.heading,
+              })),
+            },
+          ]
+        : []),
     ]
   }
 

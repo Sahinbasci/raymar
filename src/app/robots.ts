@@ -63,8 +63,9 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: '*', ...rule },
       ...AI_AGENTS.map((userAgent) => ({ userAgent, ...rule })),
     ],
+    // No `host`: a Yandex-only directive Google ignores and Yandex itself has
+    // retired in favour of redirects, which `.htaccess` already performs.
     sitemap: `${siteUrl}/sitemap.xml`,
-    host: siteUrl,
   }
 }
 

@@ -283,7 +283,7 @@ export const walnutSizesEn: readonly ProductPage[] = [
     parent: 'walnut-kernels',
     slug: 'walnut-small-pieces',
     name: 'Walnut Small Pieces',
-    metaTitle: 'Walnut Small Pieces Wholesale: Uses and Storage',
+    metaTitle: 'Walnut Small Pieces Wholesale: Uses, Storage',
     metaDescription:
       'Wholesale walnut small pieces: the 3–8 mm size in the Turkish standard, uses in baklava and fillings, how they differ from walnut meal, storage and quotes.',
     eyebrow: 'Walnut Kernels',

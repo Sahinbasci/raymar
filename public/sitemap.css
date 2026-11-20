@@ -1,0 +1,114 @@
+/*
+ * Presentation for /sitemap.xml when a person opens it in a browser.
+ *
+ * Crawlers never load this file. Without it Safari runs every value in the
+ * sitemap into one unbroken line, which reads as a broken file even though the
+ * XML is valid. CSS on XML is the one styling route every browser still
+ * supports; XSLT, the usual choice, was removed from Chrome in November 2026.
+ *
+ * Elements are matched by namespace, so this cannot style anything but the
+ * sitemap's own vocabulary.
+ */
+@namespace sm url('http://www.sitemaps.org/schemas/sitemap/0.9');
+@namespace xhtml url('http://www.w3.org/1999/xhtml');
+@namespace image url('http://www.google.com/schemas/sitemap-image/1.1');
+
+sm|urlset {
+  display: block;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 104px 20px 48px;
+  background: #f8f5ee;
+  color: #16352c;
+  font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  counter-reset: page;
+}
+
+sm|urlset::before {
+  content: 'Raymar Nuts — XML Sitemap';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: block;
+  padding: 26px 20px 22px;
+  background: #004c38;
+  color: #fcfcfc;
+  border-bottom: 3px solid #f0b038;
+  font: 600 20px/1.2 Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+sm|url {
+  display: block;
+  margin: 0 0 12px;
+  padding: 14px 18px 14px 56px;
+  position: relative;
+  background: #fcfcfc;
+  border: 1px solid rgb(0 76 56 / 0.14);
+  border-left: 3px solid #f0b038;
+  counter-increment: page;
+}
+
+sm|url::before {
+  content: counter(page);
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  color: #8a5f0e;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+sm|loc {
+  display: block;
+  color: #004c38;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+sm|lastmod {
+  display: block;
+  margin-top: 2px;
+  color: rgb(22 53 44 / 0.7);
+  font-size: 13px;
+}
+
+sm|lastmod::before {
+  content: 'Son güncelleme / Last modified: ';
+}
+
+xhtml|link {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgb(22 53 44 / 0.78);
+  word-break: break-all;
+}
+
+xhtml|link::before {
+  content: attr(hreflang) ' → ' attr(href);
+}
+
+xhtml|link:first-of-type {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(0 76 56 / 0.1);
+}
+
+image|image {
+  display: block;
+  margin-top: 6px;
+}
+
+image|loc {
+  display: block;
+  font-size: 13px;
+  color: #8a5f0e;
+  word-break: break-all;
+}
+
+image|loc::before {
+  content: 'Görsel / Image: ';
+}

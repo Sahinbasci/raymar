@@ -84,6 +84,10 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       title: meta.title,
       description: meta.description,
       locale: ogLocales[locale],
+      // Same as every page below the homepage (see `lib/metadata`).
+      alternateLocale: completeLocales
+        .filter((code) => code !== locale)
+        .map((code) => ogLocales[code]),
       url: `/${locale}`,
       images: [
         {
