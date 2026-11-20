@@ -324,3 +324,19 @@ ErrorDocument 404 /404.html
 <FilesMatch "\.(jsonl|log)$">
   Require all denied
 </FilesMatch>
+
+# -----------------------------------------------------------------------------
+# PHP version (written by cPanel, kept verbatim)
+# -----------------------------------------------------------------------------
+# cPanel's MultiPHP Manager writes this block into the live .htaccess when the
+# PHP version is chosen there (it appeared on 2026-11-20). A deploy overwrites
+# the live file with this one, so the block has to live here too, or the next
+# upload silently drops it and `teklif-gonder.php` runs under whatever the
+# server default is. If the version is changed in MultiPHP Manager, copy the
+# block it writes back into this file.
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php72” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php72 .php .php7 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
