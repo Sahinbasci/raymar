@@ -31,6 +31,12 @@ Options -Indexes
   AddCharset utf-8 .txt .xml .webmanifest .html .css .js
 </IfModule>
 
+# LiteSpeed (the live server) ignores `AddCharset` — measured after the
+# 2026-11-20 deploy, `.txt` still went out as bare `text/plain`. It does honour
+# `AddDefaultCharset`, which labels every `text/plain` and `text/html` response
+# UTF-8; every file this site serves is UTF-8, so the label is always true.
+AddDefaultCharset UTF-8
+
 # -----------------------------------------------------------------------------
 # Routing
 # -----------------------------------------------------------------------------
